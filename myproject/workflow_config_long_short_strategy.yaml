@@ -1,0 +1,227 @@
+qlib_init:
+    provider_uri: "~/.qlib/qlib_data/cn_data"
+    region: cn
+market: &market csi300
+# 使用固定股票池（方法1：字典格式，确保股票池一致）
+# 注意：YAML中字典格式需要使用正确的语法
+benchmark: &benchmark SH000300
+
+# 短期因子配置（用于止盈）- 使用自定义因子（优化为 benchmark 风格）
+short_term_data_handler_config: &short_term_data_handler_config
+    start_time: 2015-01-01
+    end_time: 2025-11-25
+    fit_start_time: 2015-01-01
+    fit_end_time: 2021-12-31  # 与训练集结束时间一致
+    instruments:  # 使用固定股票池（方法1：字典格式）
+        market: csi300
+        filter_pipe: []
+    # 从factor_config.yaml加载短期因子
+    custom_factors_file: myproject/factor_config.yaml
+    # 注意：标签表达式必须与因子挖掘时一致！
+    # 因子挖掘时使用: "Ref($close, -1)/$close - 1" (未来1日收益率)
+    label_expr: "Ref($close, -1)/$close - 1"
+    infer_processors:
+        - class: RobustZScoreNorm
+          kwargs:
+              fields_group: feature
+              clip_outlier: true
+        - class: Fillna
+          kwargs:
+              fields_group: feature
+    learn_processors:
+        - class: DropnaLabel
+        - class: CSRankNorm  # 恢复CSRankNorm，标签需要标准化
+          kwargs:
+              fields_group: label
+        # 数据增强（暂时禁用，因为会在数据准备阶段一次性应用，导致训练提前结束）
+        # 需要在模型训练时动态应用数据增强，而不是在数据准备阶段
+        - class: GaussianNoiseAugment
+          module_path: myproject.data_augmentation
+          kwargs:
+              fields_group: feature
+              noise_std: 0.01  # 噪声标准差（相对于特征标准差的1%）
+              prob: 0.5  # 50%的概率应用增强
+        - class: FeatureScalingAugment
+          module_path: myproject.data_augmentation
+          kwargs:
+              fields_group: feature
+              scale_range: [0.98, 1.02]  # 缩放范围（轻微缩放，避免过度增强）
+              prob: 0.3  # 30%的概率应用增强
+
+# 长期因子配置（用于开仓和止损）- 使用自定义因子（优化为 benchmark 风格）
+long_term_data_handler_config: &long_term_data_handler_config
+    start_time: 2015-01-01
+    end_time: 2025-11-25
+    fit_start_time: 2015-01-01
+    fit_end_time: 2021-12-31  # 与训练集结束时间一致
+    instruments:  # 使用固定股票池（方法1：字典格式）
+        market: csi300
+        filter_pipe: []
+    # 从factor_config_longterm.yaml加载长期因子
+    custom_factors_file: myproject/factor_config_longterm.yaml
+    # 长期目标：未来20日平均价格（将在代码中自动生成）
+    label_expr: null
+    infer_processors:
+        - class: RobustZScoreNorm
+          kwargs:
+              fields_group: feature
+              clip_outlier: true
+        - class: Fillna
+          kwargs:
+              fields_group: feature
+    learn_processors:
+        - class: DropnaLabel
+        - class: CSRankNorm
+          kwargs:
+              fields_group: label
+        # 数据增强（暂时禁用，因为会在数据准备阶段一次性应用，导致训练提前结束）
+        # 需要在模型训练时动态应用数据增强，而不是在数据准备阶段
+        - class: GaussianNoiseAugment
+          module_path: myproject.data_augmentation
+          kwargs:
+              fields_group: feature
+              noise_std: 0.01  # 噪声标准差（相对于特征标准差的1%）
+              prob: 0.5  # 50%的概率应用增强
+        - class: FeatureScalingAugment
+          module_path: myproject.data_augmentation
+          kwargs:
+              fields_group: feature
+              scale_range: [0.98, 1.02]  # 缩放范围（轻微缩放，避免过度增强）
+              prob: 0.3  # 30%的概率应用增强
+
+# 股票池筛选配置
+stock_pool_filter_config: &stock_pool_filter_config
+    enable_stock_pool_filter: false  # 是否启用股票池筛选（基于验证集胜率）
+    min_win_rate: 0.5  # 最小胜率阈值（0.5表示50%，长期和短期都要满足）
+    filter_segment: test  # 用于筛选的数据集分段（test或train），已合并valid和test
+
+port_analysis_config: &port_analysis_config
+    strategy:
+        class: TopkDropLongShortStrategy
+        module_path: myproject.topkdrop_long_short_strategy
+        kwargs:
+            # TopkDrop 参数
+            topk: 20  # 持仓股票数量（减少到30，提高资金集中度）
+            n_drop: 5  # 每天替换的股票数量（减少到2，进一步降低交易频率）
+            method_sell: bottom  # 卖出方法：bottom（卖出预测值最低的）
+            method_buy: top  # 买入方法：top（买入预测值最高的）
+            hold_thresh: 10  # 最小持有天数（增加到10天，大幅减少交易频率）
+            # 加仓/止盈参数（进一步降低频率以减少交易成本）
+            add_position_ratio: 0.03  # 加仓比例（降低到3%，进一步减少交易）
+            profit_threshold: 0.05  # 止盈阈值（提高到5%，大幅减少止盈频率）
+            reduce_position_ratio: 0.2  # 止盈时减仓比例（降低到20%，减少交易）
+            max_single_stock_ratio: 0.05  # 单只股票最大仓位比例（相对于总资产，例如0.05表示最多5%）
+            # 其他参数
+            risk_degree: 0.95
+            only_tradable: false
+            forbid_all_trade_at_limit: true
+    backtest:
+        start_time: 2023-01-01  # 与测试集开始时间一致，确保有预测信号
+        end_time: 2024-12-31    # 与测试集结束时间一致
+        account: 100000000
+        benchmark: *benchmark
+        exchange_kwargs:
+            limit_threshold: 0.095
+            deal_price: close
+            open_cost: 0.0005
+            close_cost: 0.0015
+            min_cost: 5
+
+task:
+    # 短期模型配置（GATs TS - 时间序列模型，带数据增强）
+    short_term_model:
+        class: GATsWithAugmentation
+        module_path: myproject.gats_with_augmentation
+        kwargs:
+            d_feat: 49  # 特征维度（会被代码自动调整为实际因子数量）
+            hidden_size: 128  # 隐藏层大小（从128减少到64，减少模型容量）
+            num_layers: 2  # LSTM层数（从3减少到2，减少模型容量）
+            dropout: 0.7  # Dropout率（增加到0.7，更强的正则化）
+            n_epochs: 300  # 训练轮数
+            lr: 0.0001  # 学习率（降低到0.00005，更稳定的训练）
+            early_stop: 10  # 早停轮数（增加到30，给模型更多机会）
+            metric: loss
+            loss: mse
+            base_model: LSTM
+            optimizer: adam
+            GPU: -1
+            n_jobs: 0  # 设置为0禁用多进程，避免"Too many open files"错误
+            # 数据增强参数（启用中等频率增强，帮助防止过拟合）
+            use_augmentation: true  # 启用数据增强，帮助防止过拟合
+            noise_std: 0.01  # 噪声标准差（1%）
+            noise_prob: 0.3  # 应用噪声增强的概率（30%，中等频率）
+            scale_range: [0.98, 1.02]  # 缩放范围（±2%）
+            scale_prob: 0.2  # 应用缩放增强的概率（20%，中等频率）
+    short_term_dataset:
+        class: TSDatasetH  # GATs TS使用TSDatasetH
+        module_path: qlib.data.dataset
+        kwargs:
+            handler:
+                class: CustomFactorHandler
+                module_path: myproject.custom_factor_handler
+                kwargs: *short_term_data_handler_config
+            segments:
+                train: [2015-01-01, 2021-12-31]  # 训练集：7年数据
+                valid: [2022-01-01, 2023-12-31]  # 验证集：2年数据
+                test: [2024-01-01, 2024-11-25]   # 测试集：用于回测
+            step_len: 20  # 时间序列长度
+    
+    # 长期模型配置（GATs TS - 时间序列模型，带数据增强）
+    long_term_model:
+        class: GATsWithAugmentation
+        module_path: myproject.gats_with_augmentation
+        kwargs:
+            d_feat: 78  # 特征维度（长期因子有78个，会被代码自动调整为实际因子数量）
+            hidden_size: 128  # 隐藏层大小（从128减少到64，减少模型容量）
+            num_layers: 2  # LSTM层数
+            dropout: 0.7  # Dropout率（增加到0.7，更强的正则化）
+            n_epochs: 300  # 训练轮数
+            lr: 0.0001  # 学习率（降低到0.00005，更稳定的训练）
+            early_stop: 10  # 早停轮数（增加到30，给模型更多机会）
+            metric: loss
+            loss: mse
+            base_model: LSTM
+            optimizer: adam
+            GPU: -1
+            n_jobs: 0  # 设置为0禁用多进程，避免"Too many open files"错误
+            # 数据增强参数（启用中等频率增强，帮助防止过拟合）
+            use_augmentation: true  # 启用数据增强，帮助防止过拟合
+            noise_std: 0.01  # 噪声标准差（1%）
+            noise_prob: 0.3  # 应用噪声增强的概率（30%，中等频率）
+            scale_range: [0.98, 1.02]  # 缩放范围（±2%）
+            scale_prob: 0.2  # 应用缩放增强的概率（20%，中等频率）
+    long_term_dataset:
+        class: TSDatasetH  # GATs TS使用TSDatasetH
+        module_path: qlib.data.dataset
+        kwargs:
+            handler:
+                class: CustomFactorHandler
+                module_path: myproject.custom_factor_handler
+                kwargs: *long_term_data_handler_config
+            segments:
+                train: [2015-01-01, 2021-12-31]  # 训练集：7年数据
+                valid: [2022-01-01, 2023-12-31]  # 验证集：2年数据
+                test: [2024-01-01, 2024-11-25]   # 测试集：用于回测
+            step_len: 40  # 时间序列长度（长期模型使用更长的序列）
+    
+    record: 
+        - class: SignalRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            model: <LONG_TERM_MODEL>
+            dataset: <LONG_TERM_DATASET>
+        - class: SignalRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            model: <SHORT_TERM_MODEL>
+            dataset: <SHORT_TERM_DATASET>
+        - class: SigAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            ana_long_short: False
+            ann_scaler: 252
+        - class: PortAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            config: *port_analysis_config
+
