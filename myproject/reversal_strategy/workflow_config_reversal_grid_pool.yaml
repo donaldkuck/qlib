@@ -1,0 +1,1017 @@
+qlib_init:
+    provider_uri: "~/.qlib/qlib_data/cn_data"
+    region: cn
+
+market: &market csi300
+benchmark: &benchmark SH000300
+
+# 反转网格股票池策略配置
+port_analysis_config: &port_analysis_config
+    executor:
+        class: SimulatorExecutor
+        module_path: qlib.backtest.executor
+        kwargs:
+            time_per_step: day
+            generate_portfolio_metrics: true
+            verbose: false  # 禁用进度条，方便日志重定向
+    strategy:
+        class: ReversalGridPoolStrategy
+        module_path: myproject.reversal_grid_pool_strategy
+        kwargs:
+            max_holding_stocks: 20  # 最多同时持仓20只股票
+            # 股票池配置：每只股票有独立的参数
+            # 激进优化：放宽长期趋势限制、大幅降低开仓门槛、提高初始仓位
+            stock_pool:
+                # 浦发银行
+                SH600000:
+                    max_position_value: 5000000  # 该股票最高持仓500万（1亿/20只股票）
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.38  # 适当降低ATR倍数，在保持质量的同时增加机会
+                    short_trend_threshold: 0.14  # 适当降低ATR倍数，在保持质量的同时增加机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5  # 优化：降低网格间隔，更频繁加仓
+                    entry_atr_multiplier: 0.45  # 适当降低开仓门槛，增加开仓机会
+                    lookback_period: 10  # 优化：增加回看周期，更准确判断
+                    grid_size: 0.25  # 优化：降低单次加仓比例，更灵活
+                    initial_position_ratio: 0.95  # 进一步提高初始仓位，最大化资金利用率
+                    enable_short: false
+                
+                # 中国平安
+                SH601318:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 贵州茅台
+                SH600519:
+                    max_position_value: 5000000  # 统一调整为1000万，让10只股票基本用满资金
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
+                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    atr_period: 14
+                    atr_multiplier: 2.2  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.7  # 优化：降低开仓门槛，增加机会
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85  # 优化：提高初始仓位
+                    enable_short: false
+                
+                # 招商银行
+                SH600036:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 万科A
+                SZ000002:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国石油
+                SH601857:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国神华
+                SH601088:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国建筑
+                SH601668:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 工商银行
+                SH601398:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国银行
+                SH601988:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 科技行业 ==========
+                # 比亚迪
+                SZ002594:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 宁德时代
+                SZ300750:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 三一重工
+                SH600031:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 消费行业 ==========
+                # 五粮液
+                SZ000858:
+                    max_position_value: 5000000
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
+                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    atr_period: 14
+                    atr_multiplier: 2.2
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.7
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85
+                    enable_short: false
+                
+                # 泸州老窖
+                SZ000568:
+                    max_position_value: 5000000
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
+                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    atr_period: 14
+                    atr_multiplier: 2.2
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.7
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85
+                    enable_short: false
+                
+                # 海天味业
+                SH603288:
+                    max_position_value: 5000000
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.43  # 适当降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.14  # 适当降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.2
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.6
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85
+                    enable_short: false
+                
+                # 伊利股份
+                SH600887:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 医药行业 ==========
+                # 恒瑞医药
+                SH600276:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 药明康德
+                SH603259:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 迈瑞医疗
+                SZ300760:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 金融行业 ==========
+                # 建设银行
+                SH601939:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 农业银行
+                SH601288:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国太保
+                SH601601:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 地产行业 ==========
+                # 保利发展
+                SH600048:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 能源行业 ==========
+                # 中国石化
+                SH600028:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国海油
+                SH600938:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 通信行业 ==========
+                # 中国移动
+                SH600941:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国联通
+                SH600050:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 其他行业 ==========
+                # 中联重科
+                SZ000157:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 芯片半导体行业 ==========
+                # 中芯国际
+                SH688981:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 紫光国微
+                SZ002049:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 韦尔股份
+                SH603501:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 兆易创新
+                SH603986:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 北方华创
+                SZ002371:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 长电科技
+                SH600584:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 三安光电
+                SH600703:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 闻泰科技
+                SH600745:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 汇顶科技
+                SH603160:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 卓胜微
+                SZ300782:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
+                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    atr_period: 14
+                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 更多科技行业 ==========
+                # 立讯精密
+                SZ002475:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 歌尔股份
+                SZ002241:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 京东方A
+                SZ000725:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 海康威视
+                SZ002415:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 大华股份
+                SZ002236:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 更多消费行业 ==========
+                # 美的集团
+                SZ000333:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 格力电器
+                SZ000651:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 海尔智家
+                SH600690:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 片仔癀
+                SH600436:
+                    max_position_value: 5000000
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.48
+                    short_trend_threshold: 0.17
+                    atr_period: 14
+                    atr_multiplier: 2.2
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.7
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85
+                    enable_short: false
+                
+                # 云南白药
+                SZ000538:
+                    max_position_value: 5000000
+                    long_trend_period: 15
+                    short_trend_period: 5
+                    long_trend_threshold: 0.48
+                    short_trend_threshold: 0.17
+                    atr_period: 14
+                    atr_multiplier: 2.2
+                    grid_atr_interval: 0.6
+                    entry_atr_multiplier: 0.7
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.85
+                    enable_short: false
+                
+                # ========== 更多医药行业 ==========
+                # 复星医药
+                SH600196:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 华东医药
+                SZ000963:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 更多金融行业 ==========
+                # 中信证券
+                SH600030:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 华泰证券
+                SH601688:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 兴业银行
+                SH601166:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 新能源行业 ==========
+                # 隆基绿能
+                SH601012:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 通威股份
+                SH600438:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 阳光电源
+                SZ300274:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # ========== 制造业 ==========
+                # 中国中车
+                SH601766:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 中国重工
+                SH601989:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+                
+                # 徐工机械
+                SZ000425:
+                    max_position_value: 5000000
+                    long_trend_period: 12
+                    short_trend_period: 3
+                    long_trend_threshold: 0.4
+                    short_trend_threshold: 0.15
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.5
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.9
+                    enable_short: false
+    
+    backtest:
+        start_time: 2022-01-01  # 回测开始时间
+        end_time: 2025-12-31    # 回测结束时间
+        account: 100000000  # 初始资金（1亿）
+        benchmark: *benchmark
+        exchange_kwargs:
+            limit_threshold: 0.095
+            deal_price: close
+            open_cost: 0.0005
+            close_cost: 0.0015
+            min_cost: 5
+
+task:
+    record: 
+        - class: PortAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            config: *port_analysis_config

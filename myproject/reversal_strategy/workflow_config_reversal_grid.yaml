@@ -1,0 +1,62 @@
+qlib_init:
+    provider_uri: "~/.qlib/qlib_data/cn_data"
+    region: cn
+
+market: &market csi300
+benchmark: &benchmark SH000300
+
+# 单股反转网格策略配置
+port_analysis_config: &port_analysis_config
+    executor:
+        class: SimulatorExecutor
+        module_path: qlib.backtest.executor
+        kwargs:
+            time_per_step: day
+            generate_portfolio_metrics: true
+            verbose: false  # 禁用进度条，方便日志重定向
+    strategy:
+        class: ReversalGridStrategy
+        module_path: myproject.reversal_grid_strategy
+        kwargs:
+            # 股票代码（单只股票，可以根据需要修改）
+            stock_id: SH600000  # 浦发银行，示例股票
+            # 趋势计算参数
+            long_trend_period: 15  # 长期趋势周期（天）
+            short_trend_period: 3  # 短期趋势周期（天）
+            trend_threshold: 0.01  # 趋势判断阈值（绝对值小于此值视为持平，0.1%）
+            # ATR参数
+            atr_period: 14  # ATR计算周期
+            atr_multiplier: 1  # ATR倍数（用于判断反转/止损，默认3.0）
+            grid_atr_interval: 0.2  # 网格加仓间隔（ATR倍数，默认0.5）
+            entry_atr_multiplier: 1 # 开仓条件ATR倍数（用于判断开仓，默认1.0）
+            # 历史数据回看参数
+            lookback_period: 5  # 计算最低点/最高点的历史回看周期（天）
+            # 仓位管理参数
+            max_position_ratio: 0.99  # 最大仓位比例（80%，不满仓）
+            grid_size: 0.2  # 网格大小（每次加仓增加初始仓位的50%，例如初始仓位20%则每次加仓10%）
+            initial_position_ratio: 1  # 初始仓位比例（10%）
+            profit_threshold: 0.01  # 盈利平仓阈值（1个点）
+            enable_short: false  # 是否允许做空（true=允许，false=只做多）
+            # 交易参数
+            risk_degree: 0.99
+            only_tradable: false
+            forbid_all_trade_at_limit: true
+    backtest:
+        start_time: 2023-11-01  # 回测开始时间
+        end_time: 2025-12-31    # 回测结束时间
+        account: 100000000  # 初始资金（1亿）
+        benchmark: *benchmark
+        exchange_kwargs:
+            limit_threshold: 0.095
+            deal_price: close
+            open_cost: 0.0005
+            close_cost: 0.0015
+            min_cost: 5
+
+task:
+    # 本策略不需要模型，直接使用价格数据计算动量
+    record: 
+        - class: PortAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            config: *port_analysis_config

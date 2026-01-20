@@ -1,0 +1,85 @@
+qlib_init:
+    provider_uri: "~/.qlib/qlib_data/cn_data"
+    region: cn
+
+market: &market csi300
+benchmark: &benchmark SH000300
+
+# 反转网格股票池策略测试配置（快速测试用，只包含3只股票）
+port_analysis_config: &port_analysis_config
+    executor:
+        class: SimulatorExecutor
+        module_path: qlib.backtest.executor
+        kwargs:
+            time_per_step: day
+            generate_portfolio_metrics: true
+            verbose: false
+    strategy:
+        class: ReversalGridPoolStrategy
+        module_path: myproject.reversal_grid_pool_strategy
+        kwargs:
+            max_holding_stocks: 3  # 最多同时持仓3只股票
+            stock_pool:
+                # 浦发银行
+                SH600000:
+                    max_position_value: 3000000
+                    long_trend_period: 15
+                    short_trend_period: 3
+                    trend_threshold: 0.01
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.2
+                    entry_atr_multiplier: 1.0
+                    lookback_period: 5
+                    grid_size: 0.2
+                    initial_position_ratio: 0.3
+                    enable_short: false
+                
+                # 中国平安
+                SH601318:
+                    max_position_value: 3000000
+                    long_trend_period: 15
+                    short_trend_period: 3
+                    trend_threshold: 0.01
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.2
+                    entry_atr_multiplier: 1.0
+                    lookback_period: 5
+                    grid_size: 0.2
+                    initial_position_ratio: 0.3
+                    enable_short: false
+                
+                # 招商银行
+                SH600036:
+                    max_position_value: 3000000
+                    long_trend_period: 15
+                    short_trend_period: 3
+                    trend_threshold: 0.01
+                    atr_period: 14
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.2
+                    entry_atr_multiplier: 1.0
+                    lookback_period: 5
+                    grid_size: 0.2
+                    initial_position_ratio: 0.3
+                    enable_short: false
+    
+    backtest:
+        start_time: 2024-01-01  # 测试用：1年数据
+        end_time: 2024-12-31
+        account: 100000000  # 初始资金1亿
+        benchmark: *benchmark
+        exchange_kwargs:
+            limit_threshold: 0.095
+            deal_price: close
+            open_cost: 0.0005
+            close_cost: 0.0015
+            min_cost: 5
+
+task:
+    record: 
+        - class: PortAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            config: *port_analysis_config
