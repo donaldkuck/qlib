@@ -1,0 +1,1132 @@
+good_factors:
+  Price_Change_1_MA7_Slope7:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) * ($close / Mean($close, 7) - 1) * (Slope($close, 7) / $close)
+    ic: 0.049189944173670064
+    icir: 0.26504844728570426
+    ic_train: 0.0551809802705585
+    ic_valid: -0.010745071264748822
+    icir_train: 0.2933769280793835
+    icir_valid: -0.0737360751005922
+    ic_decay: 1.1947241823553068
+    stability_score: 0.2
+    is_stable: true
+  Price_Change_Relative_Volatility_20:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+    ic: 0.04460399068197295
+    icir: 0.2279051424054411
+    ic_train: 0.05114532274551494
+    ic_valid: -0.02083624901543685
+    icir_train: 0.2582426872147103
+    icir_valid: -0.13315609297132838
+    ic_decay: 1.407393049783111
+    stability_score: 0.2
+    is_stable: true
+  Price_Change_Squared_MA5:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) * ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1
+    ic: 0.03940154429814439
+    icir: 0.21758809473885524
+    ic_train: 0.04329992082842157
+    ic_valid: 0.0004017362936018441
+    icir_train: 0.23674847220182801
+    icir_valid: 0.002559932524947597
+    ic_decay: 0.9907220085876427
+    stability_score: 0.8
+    is_stable: true
+  Cumulative_Return_Normalized_7:
+    expression: Sum(($close - Ref($close, 1)) / Ref($close, 1), 7) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 7) + 0.0001)
+    ic: 0.03925156942347546
+    icir: 0.1976769681706438
+    ic_train: 0.04384106057094233
+    ic_valid: -0.006662228846038778
+    icir_train: 0.21797050496497455
+    icir_valid: -0.0405807720958523
+    ic_decay: 1.1519632225880612
+    stability_score: 0.0
+    is_stable: true
+  Price_Change_1_2_3_4:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) * ($close - Ref($close, 2)) / Ref($close, 2) * ($close - Ref($close, 3)) / Ref($close, 3) * ($close - Ref($close, 4)) / Ref($close, 4)
+    ic: 0.03849889024649102
+    icir: 0.22419959298921446
+    ic_train: 0.04230308655380249
+    ic_valid: 0.0004412720445397289
+    icir_train: 0.2432063795734646
+    icir_valid: 0.0030973827460843224
+    ic_decay: 0.9895687979178895
+    stability_score: 0.8
+    is_stable: true
+  Cumulative_Return_Normalized_3:
+    expression: Sum(($close - Ref($close, 1)) / Ref($close, 1), 3) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 3) + 0.0001)
+    ic: 0.037513246797086994
+    icir: 0.218258964697355
+    ic_train: 0.04268686819066491
+    ic_valid: -0.01424425776171106
+    icir_train: 0.24365670597546185
+    icir_valid: -0.1157574643864516
+    ic_decay: 1.3336917971608444
+    stability_score: 0.2
+    is_stable: true
+  Breakout_Low_5:
+    expression: (Min($close, 5) - $close) / (Min($close, 5) + 0.0001)
+    ic: -0.03363822031310471
+    icir: -0.17230267043915742
+    ic_train: -0.037899733062927154
+    ic_valid: 0.008994444274625138
+    icir_train: -0.19382123193165915
+    icir_valid: 0.04805053510385109
+    ic_decay: -1.2373221009153583
+    stability_score: 0.2
+    is_stable: true
+  Momentum_Reversal_Interaction_3_2:
+    expression: ($close - Ref($close, 3)) / Ref($close, 3) * (Ref($close, 2) / $close - 1) * (($close - Ref($close, 3)) / Ref($close, 3) + (Ref($close, 2) / $close - 1))
+    ic: -0.032730265695406865
+    icir: -0.18615933627486453
+    ic_train: -0.0376943785975747
+    ic_valid: 0.016931291774428495
+    icir_train: -0.2118264523008087
+    icir_valid: 0.11754810208748431
+    ic_decay: -1.4491728582446475
+    stability_score: 0.2
+    is_stable: true
+  MA_Ratio_5_15:
+    expression: ($close / Mean($close, 5) - 1) * ($close / Mean($close, 15) - 1)
+    ic: 0.03257671226140103
+    icir: 0.17220606986058795
+    ic_train: 0.03483728718146431
+    ic_valid: 0.009961660283319355
+    icir_train: 0.1824159054960474
+    icir_valid: 0.05902685909100111
+    ic_decay: 0.7140517793067538
+    stability_score: 1.0
+    is_stable: true
+  Price_Change_Quantile_20:
+    expression: Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5)
+    ic: 0.03250395043301925
+    icir: 0.16299733905147815
+    ic_train: 0.03604516747119938
+    ic_valid: -0.0029227928584042665
+    icir_train: 0.17873885028987702
+    icir_valid: -0.017022055534530747
+    ic_decay: 1.081086954603266
+    stability_score: 0.0
+    is_stable: true
+  Momentum_Reversal_Interaction_3_1:
+    expression: ($close - Ref($close, 3)) / Ref($close, 3) * (Ref($close, 1) / $close - 1) * (($close - Ref($close, 3)) / Ref($close, 3) + (Ref($close, 1) / $close - 1))
+    ic: -0.03240122824559745
+    icir: -0.1837192793523553
+    ic_train: -0.037027594830684595
+    ic_valid: 0.013881476150891673
+    icir_train: -0.2073772083563041
+    icir_valid: 0.0956445507351672
+    ic_decay: -1.3748954317548099
+    stability_score: 0.2
+    is_stable: true
+  Price_Change_1_MA_Ratio_7_Resi_Close_5:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * Resi($close, 5) / $close
+    ic: 0.031119374923115516
+    icir: 0.1593960899134317
+    ic_train: 0.03694053517800329
+    ic_valid: -0.027116183017757686
+    icir_train: 0.18878261604864077
+    icir_valid: -0.14976451295463936
+    ic_decay: 1.7340495444122412
+    stability_score: 0.2
+    is_stable: true
+  Price_Smoothness_10:
+    expression: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+    ic: 0.03022694438007201
+    icir: 0.14176817594703064
+    ic_train: 0.034092813515704215
+    ic_valid: -0.008447655902734103
+    icir_train: 0.15986132128917738
+    icir_valid: -0.04037487460189137
+    ic_decay: 1.2477840644874572
+    stability_score: 0.2
+    is_stable: true
+  Volatility_Norm_20:
+    expression: Std($close, 20) / (Mean($close, 20) + 0.0001)
+    ic: 0.028264289377227515
+    icir: 0.12625396896618685
+    ic_train: 0.029588821137090614
+    ic_valid: 0.01501352103061353
+    icir_train: 0.13331108818509774
+    icir_valid: 0.06196504077831755
+    ic_decay: 0.49259482285377165
+    stability_score: 1.0
+    is_stable: true
+  Price_Change_Quantile_10:
+    expression: Quantile(($close - Ref($close, 1)) / Ref($close, 1), 10, 0.5)
+    ic: 0.02732390673077312
+    icir: 0.1384532471601335
+    ic_train: 0.030905956607285356
+    ic_valid: -0.008511332980343133
+    icir_train: 0.15531393373922006
+    icir_valid: -0.04821159383099664
+    ic_decay: 1.2753945813260084
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Return_CSI100_1:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))
+    ic: 0.027074596302529706
+    icir: 0.14166054515600301
+    ic_train: 0.028932680686622417
+    ic_valid: -0.02606661708252173
+    icir_train: 0.15124546078419063
+    icir_valid: -0.14551237936998435
+    ic_decay: 1.9009402676805587
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Return_CSI500_1:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))
+    ic: 0.02445654547964116
+    icir: 0.12832143407256827
+    ic_train: 0.028932680735561427
+    ic_valid: -0.020323227389256612
+    icir_train: 0.15124546098944067
+    icir_valid: -0.11442832577257948
+    ic_decay: 1.7024315366766947
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Return_CSI300_1:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))
+    ic: 0.02445654545652743
+    icir: 0.128321433933156
+    ic_train: 0.02893268069106361
+    ic_valid: -0.02032322719844148
+    icir_train: 0.15124546072806727
+    icir_valid: -0.11442832470760309
+    ic_decay: 1.702431531161877
+    stability_score: 0.2
+    is_stable: true
+  Price_Change_2_MA_Ratio_7_Slope_Close_7:
+    expression: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * Slope($close, 7) / $close
+    ic: 0.023717103344953572
+    icir: 0.12411477732110382
+    ic_train: 0.026074833165008044
+    ic_valid: 0.00013010255255674387
+    icir_train: 0.1351670253926021
+    icir_valid: 0.0007634452811782882
+    ic_decay: 0.9950104166828826
+    stability_score: 0.8
+    is_stable: true
+  Stock_Market_Excess_Return_CSI100_3:
+    expression: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000903', ($close - Ref($close, 3)) / Ref($close, 3)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 3) + 0.0001)
+    ic: 0.02270113248169435
+    icir: 0.1122896757871955
+    ic_train: 0.025131450654794434
+    ic_valid: -0.04680596726896808
+    icir_train: 0.12416511726258132
+    icir_valid: -0.25566606137580317
+    ic_decay: 2.862445901428245
+    stability_score: 0.2
+    is_stable: true
+  Momentum_Reversal_Interaction_5_1:
+    expression: ($close - Ref($close, 5)) / Ref($close, 5) * (Ref($close, 1) / $close - 1) * (($close - Ref($close, 5)) / Ref($close, 5) + (Ref($close, 1) / $close - 1))
+    ic: -0.022539112566784553
+    icir: -0.13189835424405003
+    ic_train: -0.02643970462390903
+    ic_valid: 0.016482859823625334
+    icir_train: -0.15288709541836146
+    icir_valid: 0.11498272762978762
+    ic_decay: -1.6234131605509743
+    stability_score: 0.2
+    is_stable: true
+  Breakout_Low_20:
+    expression: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001)
+    ic: -0.022143334512501413
+    icir: -0.10383304251391778
+    ic_train: -0.024164571857361577
+    ic_valid: -0.0019226432147439777
+    icir_train: -0.11350649817917054
+    icir_valid: -0.008888527911016896
+    ic_decay: -0.9204354529394132
+    stability_score: 0.8
+    is_stable: true
+  Momentum_Reversal_Interaction_5_2:
+    expression: ($close - Ref($close, 5)) / Ref($close, 5) * (Ref($close, 2) / $close - 1) * (($close - Ref($close, 5)) / Ref($close, 5) + (Ref($close, 2) / $close - 1))
+    ic: -0.021998838887260994
+    icir: -0.12954282357938326
+    ic_train: -0.02508908017532611
+    ic_valid: 0.008916291035727913
+    icir_train: -0.14590880931560513
+    icir_valid: 0.06214146342378621
+    ic_decay: -1.3553853299291798
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Excess_Return_CSI300_3:
+    expression: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000300', ($close - Ref($close, 3)) / Ref($close, 3)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 3) + 0.0001)
+    ic: 0.021140375118349278
+    icir: 0.10529119136090147
+    ic_train: 0.02513145546124703
+    ic_valid: -0.018786852509570233
+    icir_train: 0.12416514150151989
+    icir_valid: -0.10478259677662988
+    ic_decay: 1.7475433541260577
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Excess_Return_CSI500_3:
+    expression: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000905', ($close - Ref($close, 3)) / Ref($close, 3)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 3) + 0.0001)
+    ic: 0.02114037052136595
+    icir: 0.1052911673822845
+    ic_train: 0.02513145025608926
+    ic_valid: -0.018786851022306327
+    icir_train: 0.12416511539504237
+    icir_valid: -0.10478257688699057
+    ic_decay: 1.747543449775818
+    stability_score: 0.2
+    is_stable: true
+  Conditional_Momentum_Reversal_10:
+    expression: If(($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) < 0.3, ($close - Ref($close, 3)) / Ref($close, 3), If(($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) > 0.7, (Ref($close, 3) / $close - 1), 0))
+    ic: -0.021029537553132693
+    icir: -0.12559302903933683
+    ic_train: -0.022976510305677357
+    ic_valid: -0.0015517977941365418
+    icir_train: -0.1359431458165196
+    icir_valid: -0.010364448740947597
+    ic_decay: -0.932461554279063
+    stability_score: 0.8
+    is_stable: true
+  Price_Change_1_MA_Ratio_3_Max_Gain_7:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+    ic: -0.02087689780277264
+    icir: -0.10388135247602703
+    ic_train: -0.023417406564411214
+    ic_valid: 0.004538644582179529
+    icir_train: -0.1167361606746445
+    icir_valid: 0.022326758745797967
+    ic_decay: -1.1938149969637188
+    stability_score: 0.0
+    is_stable: true
+  Stock_Market_Direction_Match_CSI500_5:
+    expression: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+    ic: 0.02058303431804813
+    icir: 0.09544196657384406
+    ic_train: 0.020374365584782735
+    ic_valid: 0.022670580369769038
+    icir_train: 0.09551239187459527
+    icir_valid: 0.09513003739739391
+    ic_decay: -0.11270116732868024
+    stability_score: 1.0
+    is_stable: true
+  Price_Change_2_MA_Ratio_3_Max_Gain_7:
+    expression: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+    ic: -0.020016572155617
+    icir: -0.10015476761033955
+    ic_train: -0.022650492590874215
+    ic_valid: 0.006333471375701109
+    icir_train: -0.11352376164919352
+    icir_valid: 0.03140092662125988
+    ic_decay: -1.279617379193459
+    stability_score: 0.0
+    is_stable: true
+  MA_Cross_After_3_5_3:
+    expression: If((Mean($close, 3) > Mean($close, 5)), If((Ref(Mean($close, 3), 3) <= Ref(Mean($close, 5), 3)), ($close - Ref($close, 3)) / Ref($close, 3), 0), 0)
+    ic: 0.016695748365879944
+    icir: 0.11792227836871104
+    ic_train: 0.018990963462934763
+    ic_valid: -0.006171394638110713
+    icir_train: 0.13337597263387496
+    icir_valid: -0.04696441733494714
+    ic_decay: 1.3249647997141172
+    stability_score: 0.0
+    is_stable: true
+  Price_Quantile_Consistency_10_20:
+    expression: 1 / (Abs(Quantile($close, 10, 0.5) / $close - Quantile($close, 20, 0.5) / $close) + 0.0001)
+    ic: 0.014552659905947103
+    icir: 0.15945226013267105
+    ic_train: 0.015853589564474434
+    ic_valid: 0.0015380097006798324
+    icir_train: 0.1690626593310456
+    icir_valid: 0.02592681422609342
+    ic_decay: 0.9029866583574053
+    stability_score: 0.8
+    is_stable: true
+  Price_Volume_Sync_5:
+    expression: Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 5)
+    ic: -0.013890463087650849
+    icir: -0.10428650427114618
+    ic_train: -0.014350957668717332
+    ic_valid: -0.009283622237557776
+    icir_train: -0.1075696001042332
+    icir_valid: -0.07075938075965985
+    ic_decay: -0.35310085557603543
+    stability_score: 1.0
+    is_stable: true
+  MA_Cross_After_3_5_2:
+    expression: If((Mean($close, 3) > Mean($close, 5)), If((Ref(Mean($close, 3), 2) <= Ref(Mean($close, 5), 2)), ($close - Ref($close, 2)) / Ref($close, 2), 0), 0)
+    ic: 0.013858528620837918
+    icir: 0.10764587545069325
+    ic_train: 0.015214680066677587
+    ic_valid: 0.0004030506952435218
+    icir_train: 0.11724342744952754
+    icir_valid: 0.003431505008876911
+    ic_decay: 0.9735090916485151
+    stability_score: 0.8
+    is_stable: true
+  Price_Quantile_Consistency_5_10:
+    expression: 1 / (Abs(Quantile($close, 5, 0.5) / $close - Quantile($close, 10, 0.5) / $close) + 0.0001)
+    ic: 0.009570447687719804
+    icir: 0.11133876919466626
+    ic_train: 0.010847280356124183
+    ic_valid: -0.003203133451749526
+    icir_train: 0.12328942765103623
+    icir_valid: -0.052635030401320976
+    ic_decay: 1.2952936908227963
+    stability_score: 0.0
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI100_20:
+    expression: Slope($close, 20) / $close - ChangeInstrument('SH000903', Slope($close, 20) / $close)
+    ic: 0.0358087667287729
+    icir: 0.16186376857132287
+    ic_train: 0.037760369561544306
+    ic_valid: -0.020007074288489076
+    icir_train: 0.1710943902078357
+    icir_valid: -0.0868875929837531
+    ic_decay: 1.5298431800536338
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI500_20:
+    expression: Slope($close, 20) / $close - ChangeInstrument('SH000905', Slope($close, 20) / $close)
+    ic: 0.03482127199831631
+    icir: 0.15813449739026642
+    ic_train: 0.037760369641478726
+    ic_valid: 0.005418200514662687
+    icir_train: 0.17109439057228198
+    icir_valid: 0.025393710565350076
+    ic_decay: 0.8565109249166104
+    stability_score: 0.8
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI300_20:
+    expression: Slope($close, 20) / $close - ChangeInstrument('SH000300', Slope($close, 20) / $close)
+    ic: 0.03482127197441259
+    icir: 0.15813449727839668
+    ic_train: 0.03776036962685652
+    ic_valid: 0.005418200397905618
+    icir_train: 0.17109439048589928
+    icir_valid: 0.025393710045653797
+    ic_decay: 0.8565109279530992
+    stability_score: 0.8
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI100_10:
+    expression: Slope($close, 10) / $close - ChangeInstrument('SH000903', Slope($close, 10) / $close)
+    ic: 0.03086400065115727
+    icir: 0.1446749533985564
+    ic_train: 0.032740863741045075
+    ic_valid: -0.022814283719633968
+    icir_train: 0.15345563982396085
+    icir_valid: -0.1103520672505112
+    ic_decay: 1.6968137401651135
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI300_10:
+    expression: Slope($close, 10) / $close - ChangeInstrument('SH000300', Slope($close, 10) / $close)
+    ic: 0.029069180291476492
+    icir: 0.13624478189092842
+    ic_train: 0.0327408638862626
+    ic_valid: -0.007662765465416682
+    icir_train: 0.15345564043208965
+    icir_valid: -0.03643479265431308
+    ic_decay: 1.234042861301281
+    stability_score: 0.0
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI500_10:
+    expression: Slope($close, 10) / $close - ChangeInstrument('SH000905', Slope($close, 10) / $close)
+    ic: 0.029069180208363573
+    icir: 0.13624478152682645
+    ic_train: 0.032740863811357004
+    ic_valid: -0.007662765630636593
+    icir_train: 0.15345564013198232
+    icir_valid: -0.036434793394914775
+    ic_decay: 1.2340428668830223
+    stability_score: 0.0
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI100_5:
+    expression: Slope($close, 5) / $close - ChangeInstrument('SH000903', Slope($close, 5) / $close)
+    ic: 0.026695176440181552
+    icir: 0.13090550891269315
+    ic_train: 0.029233280957973333
+    ic_valid: -0.04589461276866331
+    icir_train: 0.14355798341649337
+    icir_valid: -0.229419641748686
+    ic_decay: 2.569943956500908
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI300_5:
+    expression: Slope($close, 5) / $close - ChangeInstrument('SH000300', Slope($close, 5) / $close)
+    ic: 0.025217143950884983
+    icir: 0.1241975262800064
+    ic_train: 0.029233281044768848
+    ic_valid: -0.014960754301097268
+    icir_train: 0.14355798389778093
+    icir_valid: -0.07757833862470634
+    ic_decay: 1.5117713019686658
+    stability_score: 0.2
+    is_stable: true
+  Stock_Market_Slope_Diff_CSI500_5:
+    expression: Slope($close, 5) / $close - ChangeInstrument('SH000905', Slope($close, 5) / $close)
+    ic: 0.025217143939755025
+    icir: 0.1241975261843266
+    ic_train: 0.029233281036781057
+    ic_valid: -0.014960754343661736
+    icir_train: 0.14355798380687884
+    icir_valid: -0.07757833884846262
+    ic_decay: 1.5117713035645315
+    stability_score: 0.2
+    is_stable: true
+bad_factors:
+  Quantile_30_10: Quantile($close, 10, 0.3) / $close
+  Price_Change_2_MA_Ratio_5_Max_Gain_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  MA_Ratio_3_5_10: $close / Mean($close, 3) - 1 * $close / Mean($close, 5) - 1 * $close / Mean($close, 10) - 1
+  Price_Change_2_MA_Ratio_7_Max_Gain_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  Price_Change_3_MA_Ratio_3_Max_Gain_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  Quantile_20_20: Quantile($close, 20, 0.2) / $close
+  Quantile_80_10_MA10: (Quantile($close, 10, 0.8) / $close) * ($close / Mean($close, 10) - 1)
+  Momentum7_Reversal1: (($close - Ref($close, 7)) / Ref($close, 7)) * (Ref($close, 1) / $close - 1)
+  Quantile_75_10_MA10: (Quantile($close, 10, 0.75) / $close) * ($close / Mean($close, 10) - 1)
+  Price_Change_1_MA_Ratio_7_Slope_Close_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * Slope($close, 7) / $close
+  Quantile_70_10_MA10: (Quantile($close, 10, 0.7) / $close) * ($close / Mean($close, 10) - 1)
+  Stock_Market_Direction_Match_CSI500_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Cumulative_Price_Change_5: Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) / 5
+  Price_Asymmetry_20: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001)
+  Quantile_25_20: Quantile($close, 20, 0.25) / $close
+  MA_Ratio_5_7_10: $close / Mean($close, 5) - 1 * $close / Mean($close, 7) - 1 * $close / Mean($close, 10) - 1
+  Price_Change_1_MA_Ratio_5_Slope_Close_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * Slope($close, 7) / $close
+  Price_Change_3_MA_Ratio_5_Max_Gain_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  MA_Ratio_3_7_15: $close / Mean($close, 3) - 1 * $close / Mean($close, 7) - 1 * $close / Mean($close, 15) - 1
+  Price_Position_20_MA20: (($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001)) * ($close / Mean($close, 20) - 1)
+  Quantile_30_20: Quantile($close, 20, 0.3) / $close
+  Stock_Market_Direction_Match_CSI500_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Quantile_30_10_MA10: (Quantile($close, 10, 0.3) / $close) * ($close / Mean($close, 10) - 1)
+  Quantile_70_5: Quantile($close, 5, 0.7) / $close
+  Price_Change_1_MA_Ratio_3_Slope_Close_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * Slope($close, 7) / $close
+  Price_Change_3_MA_Ratio_7_Max_Gain_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  MA_Cross_Strength_3_5: (Mean($close, 3) - Mean($close, 5)) / (Mean($close, 5) + 0.0001) - (Ref(Mean($close, 3), 1) - Ref(Mean($close, 5), 1)) / (Ref(Mean($close, 5), 1) + 0.0001)
+  Quantile_25_10_MA10: (Quantile($close, 10, 0.25) / $close) * ($close / Mean($close, 10) - 1)
+  MA_Cross_3_5: (Mean($close, 3) - Mean($close, 5)) / (Mean($close, 5) + 0.0001)
+  Price_Change_1_Vol_20: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 20) / $close + 0.0001)
+  Price_Change_1_MA_Ratio_7_Slope_Close_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * Slope($close, 5) / $close
+  Quantile_20_10_MA10: (Quantile($close, 10, 0.2) / $close) * ($close / Mean($close, 10) - 1)
+  Stock_Market_Direction_Score_CSI500_5: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 5)
+  Stock_Market_Direction_Match_CSI300_5: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  Momentum_Decay_3: ($close - Ref($close, 1)) / Ref($close, 1) - ($close - Ref($close, 3)) / Ref($close, 3)
+  MA_Ratio_5_10_15: $close / Mean($close, 5) - 1 * $close / Mean($close, 10) - 1 * $close / Mean($close, 15) - 1
+  Price_MA_Relative_Change_5: ($close / Mean($close, 5) - Ref($close, 2) / Mean(Ref($close, 2), 5)) / (Ref($close, 2) / Mean(Ref($close, 2), 5) + 0.0001)
+  MA_Cross_5_10_Price_Change_1: ((Mean($close, 5) - Mean($close, 10)) / (Mean($close, 10) + 0.0001)) * (($close - Ref($close, 1)) / Ref($close, 1))
+  Price_Change_1_MA_Ratio_5_Slope_Close_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * Slope($close, 5) / $close
+  Price_Change_1_MA_Ratio_3_CumSum_Return_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Quantile_80_20_MA20: (Quantile($close, 20, 0.8) / $close) * ($close / Mean($close, 20) - 1)
+  Quantile_75_5: Quantile($close, 5, 0.75) / $close
+  Quantile_75_20_MA20: (Quantile($close, 20, 0.75) / $close) * ($close / Mean($close, 20) - 1)
+  Price_Change_1_MA_Ratio_3_Slope_Close_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * Slope($close, 5) / $close
+  Lag1_Price_Change_3: Ref(($close - Ref($close, 3)) / Ref($close, 3), 1)
+  Price_Change_1_MA_Ratio_5_CumSum_Return_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Quantile_70_20_MA20: (Quantile($close, 20, 0.7) / $close) * ($close / Mean($close, 20) - 1)
+  Price_Change_1_MA_Ratio_7_CumSum_Return_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Stock_Market_Beta_Approx_CSI500_10: (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))), 10) + 0.0001)
+  MA_Cross_Intensity_3_5: If((Mean($close, 3) - Mean($close, 5)) > 0 != (Ref(Mean($close, 3), 1) - Ref(Mean($close, 5), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Price_Change_Stability_10: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 10) / $close + 0.0001)
+  Price_Change_1_Vol_10: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 10) / $close + 0.0001)
+  RSV_20: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001)
+  MA_Cross_Aftermath_3_5: If((Mean($close, 3) > Mean($close, 5)), If((Ref(Ref(Mean($close, 3), 1), 1) <= Ref(Ref(Mean($close, 5), 1), 1)), ($close - Ref($close, 1)) / Ref($close, 1), 0), 0)
+  Price_MA_Quantile_Improved_5: ($close / Mean($close, 5) - Quantile($close / Mean($close, 5), 10, 0.5)) / (Quantile($close / Mean($close, 5), 10, 0.5) + 0.0001)
+  Price_Volume_Sync_10: Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 10)
+  Price_Change_1_Minus_MA_Ratio_3: ($close - Ref($close, 1)) / Ref($close, 1) - $close / Mean($close, 3) - 1
+  Stock_Market_Beta_Approx_CSI500_20: (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))), 20) + 0.0001)
+  Stock_Market_Direction_Score_CSI500_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 10)
+  Volatility_Clustering_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) * Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 10)
+  Quantile_70_10: Quantile($close, 10, 0.7) / $close
+  Price_Cycle_5_10: ($close - Ref($close, 5)) / Ref($close, 5) - ($close - Ref($close, 10)) / Ref($close, 10)
+  Quantile_80_5: Quantile($close, 5, 0.8) / $close
+  MA_Cross_3_10: (Mean($close, 3) - Mean($close, 10)) / (Mean($close, 10) + 0.0001)
+  Stock_Market_Direction_Score_CSI500_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 20)
+  Stock_Market_Beta_Approx_CSI500_60: (Std(($close - Ref($close, 1)) / Ref($close, 1), 60) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 60) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 60) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))), 60) + 0.0001)
+  Quantile_30_20_MA20: (Quantile($close, 20, 0.3) / $close) * ($close / Mean($close, 20) - 1)
+  Price_Change_3_MA_Ratio_7_CumSum_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  RSV_15: ($close - Min($low, 15)) / (Max($high, 15) - Min($low, 15) + 0.0001)
+  Quantile_25_20_MA20: (Quantile($close, 20, 0.25) / $close) * ($close / Mean($close, 20) - 1)
+  Price_Asymmetry_10: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 10) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 10)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 10) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 10) + 0.0001)
+  Momentum10_Reversal3: (($close - Ref($close, 10)) / Ref($close, 10)) * (Ref($close, 3) / $close - 1)
+  Stock_Market_Direction_Match_CSI300_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Momentum10_Reversal2: (($close - Ref($close, 10)) / Ref($close, 10)) * (Ref($close, 2) / $close - 1)
+  Quantile_20_20_MA20: (Quantile($close, 20, 0.2) / $close) * ($close / Mean($close, 20) - 1)
+  Stock_Market_Direction_Match_CSI300_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Relative_Strength_Change_5: ($close - Ref($close, 5)) / Ref($close, 5) - (Ref($close, 5) - Ref($close, 10)) / Ref($close, 10)
+  Price_Change_Rate_5: (($close - Ref($close, 5)) / Ref($close, 5)) - (Ref($close, 5) - Ref($close, 10)) / Ref($close, 10)
+  Top_Divergence_Momentum_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001) - ($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001))
+  Bottom_Divergence_Momentum_5: (Min($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * (($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001) - (Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001))
+  Price_Momentum_Div_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  Price_Momentum_Divergence_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  Price_Momentum_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  Price_Momentum_Div_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  MA_Cross_After_5_10_3: If((Mean($close, 5) > Mean($close, 10)), If((Ref(Mean($close, 5), 3) <= Ref(Mean($close, 10), 3)), ($close - Ref($close, 3)) / Ref($close, 3), 0), 0)
+  Quantile_75_10: Quantile($close, 10, 0.75) / $close
+  Stock_Market_Momentum_Diff_CSI100_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Return_CSI100_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Excess_Return_CSI100_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Price_Ratio_CSI100_5: ($close / ChangeInstrument('SH000903', $close) - Ref($close, 5) / Ref(ChangeInstrument('SH000903', $close), 5)) / (Ref($close, 5) / Ref(ChangeInstrument('SH000903', $close), 5) + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI500_3: ($close - Ref($close, 3)) / Ref($close, 3) / (ChangeInstrument('SH000905', ($close - Ref($close, 3)) / Ref($close, 3)) + 0.0001)
+  Top_Divergence_Slope_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001) - Slope($close, 5) / ($close + 0.0001))
+  Bottom_Divergence_Slope_20: (Min($close, 20) - $close) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Slope($close, 5) / ($close + 0.0001) - Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001))
+  Price_Position_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001)
+  Price_Change_2_MA_Ratio_3_CumSum_Return_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Volatility_Clustering_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) * Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 5), 5)
+  Stock_Market_Price_Position_CSI300_20: ($close / ChangeInstrument('SH000300', $close) - Min($close / ChangeInstrument('SH000300', $close), 20)) / (Max($close / ChangeInstrument('SH000300', $close), 20) - Min($close / ChangeInstrument('SH000300', $close), 20) + 0.0001)
+  Stock_Market_Excess_Return_CSI300_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Momentum_Diff_CSI300_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Return_CSI300_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Momentum_Diff_CSI500_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Return_CSI500_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Excess_Return_CSI500_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Price_Ratio_CSI300_5: ($close / ChangeInstrument('SH000300', $close) - Ref($close, 5) / Ref(ChangeInstrument('SH000300', $close), 5)) / (Ref($close, 5) / Ref(ChangeInstrument('SH000300', $close), 5) + 0.0001)
+  Stock_Market_Price_Ratio_CSI500_5: ($close / ChangeInstrument('SH000905', $close) - Ref($close, 5) / Ref(ChangeInstrument('SH000905', $close), 5)) / (Ref($close, 5) / Ref(ChangeInstrument('SH000905', $close), 5) + 0.0001)
+  Price_MA_Quantile_Improved_10: ($close / Mean($close, 10) - Quantile($close / Mean($close, 10), 20, 0.5)) / (Quantile($close / Mean($close, 10), 20, 0.5) + 0.0001)
+  Stock_Market_Price_Position_CSI500_20: ($close / ChangeInstrument('SH000905', $close) - Min($close / ChangeInstrument('SH000905', $close), 20)) / (Max($close / ChangeInstrument('SH000905', $close), 20) - Min($close / ChangeInstrument('SH000905', $close), 20) + 0.0001)
+  Price_Change_3_MA_Ratio_5_CumSum_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Stock_Market_Beta_Approx_CSI300_10: (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))), 10) + 0.0001)
+  Price_Change_1_Vol_7: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 7) / $close + 0.0001)
+  MA_Cross_After_3_5_1: If((Mean($close, 3) > Mean($close, 5)), If((Ref(Mean($close, 3), 1) <= Ref(Mean($close, 5), 1)), ($close - Ref($close, 1)) / Ref($close, 1), 0), 0)
+  MA_Distance_Relative_Change_5: (($close - Mean($close, 5)) / Mean($close, 5) - (Ref($close, 2) - Mean(Ref($close, 2), 5)) / Mean(Ref($close, 2), 5)) / (Abs((Ref($close, 2) - Mean(Ref($close, 2), 5)) / Mean(Ref($close, 2), 5)) + 0.0001)
+  Quantile_80_10: Quantile($close, 10, 0.8) / $close
+  Price_RSV_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001), 5) - ($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001))
+  Price_RSV_Divergence_Bottom_10: (Min($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * (($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001) - Ref(($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001), 5))
+  Price_Change_2_MA_Ratio_5_CumSum_Return_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Multi_Timeframe_Consistency_3_20: If(($close - Ref($close, 3)) / Ref($close, 3) > 0, 1, If(($close - Ref($close, 3)) / Ref($close, 3) < 0, -1, 0)) * If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, If(($close - Ref($close, 20)) / Ref($close, 20) < 0, -1, 0)) * (Abs(($close - Ref($close, 3)) / Ref($close, 3)) + Abs(($close - Ref($close, 20)) / Ref($close, 20)))
+  RSV_10: ($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001)
+  Trend_Strength_5: Slope($close, 5) / $close - Ref(Slope($close, 5), 5) / Ref($close, 5)
+  Price_Change_2_Minus_MA_Ratio_5: ($close - Ref($close, 2)) / Ref($close, 2) - $close / Mean($close, 5) - 1
+  MA_Distance_Relative_Change_10: (($close - Mean($close, 10)) / Mean($close, 10) - (Ref($close, 5) - Mean(Ref($close, 5), 10)) / Mean(Ref($close, 5), 10)) / (Abs((Ref($close, 5) - Mean(Ref($close, 5), 10)) / Mean(Ref($close, 5), 10)) + 0.0001)
+  Stock_Market_Direction_Match_CSI100_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Bottom_Divergence_Confirmation_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * $close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 * ($close - Ref($close, 1)) / Ref($close, 1)
+  Stock_Market_Direction_Score_CSI100_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 20)
+  Stock_Market_Direction_Match_CSI100_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Price_Change_2_MA_Ratio_7_CumSum_Return_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  MA_Cross_Intensity_5_10: If((Mean($close, 5) - Mean($close, 10)) > 0 != (Ref(Mean($close, 5), 1) - Ref(Mean($close, 10), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Price_MA_Deviation_20: ($close - Mean($close, 20)) / (Std($close, 20) + 0.0001)
+  Price_MA_Distance_20: ($close - Mean($close, 20)) / (Std($close, 20) + 0.0001)
+  Price_Slope_Div_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Slope($close, 5) / $close - Ref(Slope($close, 5), 5) / Ref($close, 5))
+  Price_Slope_Div_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(Slope($close, 5), 5) / Ref($close, 5) - Slope($close, 5) / $close)
+  Price_Slope_Divergence_Bottom_10: (Min($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Slope($close, 5) / ($close + 0.0001) - Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001))
+  Bottom_Divergence_Slope_10: (Min($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Slope($close, 5) / ($close + 0.0001) - Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001))
+  Top_Divergence_Slope_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001) - Slope($close, 5) / ($close + 0.0001))
+  Price_Slope_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001) - Slope($close, 5) / ($close + 0.0001))
+  Stock_Market_Momentum_Ratio_CSI300_3: ($close - Ref($close, 3)) / Ref($close, 3) / (ChangeInstrument('SH000300', ($close - Ref($close, 3)) / Ref($close, 3)) + 0.0001)
+  Price_Skewness_10: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 10, 0.5) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Price_Stability_5: Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Std(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Top_Divergence_MA_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Stock_Market_Sensitivity_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Return_Sync_CSI500_10: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Return_Sync_CSI500_5: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Price_Volume_Corr_Change_5: Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 5) - Ref(Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 5), 5)
+  Stock_Market_Return_Sync_CSI500_20: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  MA_Cross_5_20_Price_Change_1: ((Mean($close, 5) - Mean($close, 20)) / (Mean($close, 20) + 0.0001)) * (($close - Ref($close, 1)) / Ref($close, 1))
+  MA_Cross_After_5_10_2: If((Mean($close, 5) > Mean($close, 10)), If((Ref(Mean($close, 5), 2) <= Ref(Mean($close, 10), 2)), ($close - Ref($close, 2)) / Ref($close, 2), 0), 0)
+  Stock_Market_Beta_Approx_CSI300_20: (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))), 20) + 0.0001)
+  MA_Distance_Relative_Change_20: (($close - Mean($close, 20)) / Mean($close, 20) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / Mean(Ref($close, 10), 20)) / (Abs((Ref($close, 10) - Mean(Ref($close, 10), 20)) / Mean(Ref($close, 10), 20)) + 0.0001)
+  Stock_Market_Volatility_Ratio_CSI300_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Volatility_Diff_CSI500_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) - Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  Stock_Market_Volatility_Diff_CSI300_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) - Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  Bottom_Divergence_Magnitude_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * $close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1
+  Stock_Market_Price_Position_CSI300_10: ($close / ChangeInstrument('SH000300', $close) - Min($close / ChangeInstrument('SH000300', $close), 10)) / (Max($close / ChangeInstrument('SH000300', $close), 10) - Min($close / ChangeInstrument('SH000300', $close), 10) + 0.0001)
+  Price_Position_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001)
+  Stock_Market_Direction_Match_CSI100_5: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  Price_MA_Quantile_Improved_20: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 40, 0.5)) / (Quantile($close / Mean($close, 20), 40, 0.5) + 0.0001)
+  Price_Change_1_MA_Ratio_3_CumSum_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Price_Change_3_MA_Ratio_7_If_Up_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Quantile_70_20: Quantile($close, 20, 0.7) / $close
+  RSV_Change_10: ($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001) - Ref(($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001), 5)
+  Price_Acceleration_3_MA3: ((($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) * ($close / Mean($close, 3) - 1)
+  Bottom_Divergence_MA_20: (Min($close, 20) - $close) / (Max($close, 20) - Min($close, 20) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Price_Change_Rate_3: (($close - Ref($close, 3)) / Ref($close, 3)) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6)
+  MA_Cross_Aftermath_5_10: If((Mean($close, 5) > Mean($close, 10)), If((Ref(Ref(Mean($close, 5), 1), 1) <= Ref(Ref(Mean($close, 10), 1), 1)), ($close - Ref($close, 1)) / Ref($close, 1), 0), 0)
+  Multi_Timeframe_Consistency_5_20: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, If(($close - Ref($close, 5)) / Ref($close, 5) < 0, -1, 0)) * If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, If(($close - Ref($close, 20)) / Ref($close, 20) < 0, -1, 0)) * (Abs(($close - Ref($close, 5)) / Ref($close, 5)) + Abs(($close - Ref($close, 20)) / Ref($close, 20)))
+  Bottom_Divergence_Momentum_10: (Min($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * (($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001) - (Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001))
+  Top_Divergence_Momentum_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001) - ($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001))
+  Price_Momentum_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  Price_Momentum_Div_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  Price_Momentum_Divergence_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  Price_Momentum_Div_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  Price_Change_3_MA_Ratio_3_CumSum_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Price_Change_1_MA_Ratio_5_CumSum_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Stock_Market_Price_Position_CSI500_10: ($close / ChangeInstrument('SH000905', $close) - Min($close / ChangeInstrument('SH000905', $close), 10)) / (Max($close / ChangeInstrument('SH000905', $close), 10) - Min($close / ChangeInstrument('SH000905', $close), 10) + 0.0001)
+  Lag2_Price_Change_5: Ref(($close - Ref($close, 5)) / Ref($close, 5), 2)
+  Price_Acceleration_3: (($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)
+  Price_Acceleration_7: (($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)
+  Price_Acceleration_5: (($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)
+  Price_Change_1_MA_Ratio_7_CumSum_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Stock_Market_Sensitivity_CSI300_60: ($close - Ref($close, 60)) / Ref($close, 60) / (ChangeInstrument('SH000300', ($close - Ref($close, 60)) / Ref($close, 60)) + 0.0001)
+  Momentum10_Reversal1: (($close - Ref($close, 10)) / Ref($close, 10)) * (Ref($close, 1) / $close - 1)
+  Multi_Timeframe_Consistency_5_10: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, If(($close - Ref($close, 5)) / Ref($close, 5) < 0, -1, 0)) * If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * (Abs(($close - Ref($close, 5)) / Ref($close, 5)) + Abs(($close - Ref($close, 10)) / Ref($close, 10)))
+  Price_Cycle_3_7: ($close - Ref($close, 3)) / Ref($close, 3) - ($close - Ref($close, 7)) / Ref($close, 7)
+  Momentum_Decay_7: ($close - Ref($close, 3)) / Ref($close, 3) - ($close - Ref($close, 7)) / Ref($close, 7)
+  Stock_Market_Beta_Approx_CSI100_60: (Std(($close - Ref($close, 1)) / Ref($close, 1), 60) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 60) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 60) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))), 60) + 0.0001)
+  MA_Cross_5_10: (Mean($close, 5) - Mean($close, 10)) / (Mean($close, 10) + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI500_5: ($close - Ref($close, 5)) / Ref($close, 5) / (ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) + 0.0001)
+  Price_MA_Divergence_Top_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref($close, 10) / Mean(Ref($close, 10), 20) - 1 - $close / Mean($close, 20) - 1)
+  Simple_Top_Divergence_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref($close, 10) / Mean(Ref($close, 10), 20) - 1 - $close / Mean($close, 20) - 1)
+  Price_Skewness_20: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Stock_Market_Price_Position_CSI100_20: ($close / ChangeInstrument('SH000903', $close) - Min($close / ChangeInstrument('SH000903', $close), 20)) / (Max($close / ChangeInstrument('SH000903', $close), 20) - Min($close / ChangeInstrument('SH000903', $close), 20) + 0.0001)
+  Price_MA_Distance_10: ($close - Mean($close, 10)) / (Std($close, 10) + 0.0001)
+  Price_MA_Deviation_10: ($close - Mean($close, 10)) / (Std($close, 10) + 0.0001)
+  Stock_Market_Excess_Return_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Momentum_Diff_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Return_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Price_Ratio_CSI100_10: ($close / ChangeInstrument('SH000903', $close) - Ref($close, 10) / Ref(ChangeInstrument('SH000903', $close), 10)) / (Ref($close, 10) / Ref(ChangeInstrument('SH000903', $close), 10) + 0.0001)
+  Lag1_Price_Change_5: Ref(($close - Ref($close, 5)) / Ref($close, 5), 1)
+  Trend_Strength_10: Slope($close, 10) / $close - Ref(Slope($close, 10), 10) / Ref($close, 10)
+  Stock_Market_Momentum_Diff_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Return_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Return_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Momentum_Diff_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Excess_Return_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Excess_Return_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Price_Ratio_CSI500_10: ($close / ChangeInstrument('SH000905', $close) - Ref($close, 10) / Ref(ChangeInstrument('SH000905', $close), 10)) / (Ref($close, 10) / Ref(ChangeInstrument('SH000905', $close), 10) + 0.0001)
+  Stock_Market_Price_Ratio_CSI300_10: ($close / ChangeInstrument('SH000300', $close) - Ref($close, 10) / Ref(ChangeInstrument('SH000300', $close), 10)) / (Ref($close, 10) / Ref(ChangeInstrument('SH000300', $close), 10) + 0.0001)
+  Lag3_Price_Change_5: Ref(($close - Ref($close, 5)) / Ref($close, 5), 3)
+  Top_Divergence_Momentum_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * ((Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001) - ($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001))
+  Bottom_Divergence_Momentum_20: (Min($close, 20) - $close) / (Max($close, 20) - Min($close, 20) + 0.0001) * (($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001) - (Ref($close, 3) - Ref($close, 6)) / (Ref($close, 6) + 0.0001))
+  Price_Acceleration_5_MA5: ((($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) * ($close / Mean($close, 5) - 1)
+  Quantile_75_20: Quantile($close, 20, 0.75) / $close
+  Stock_Market_Sensitivity_CSI500_20: ($close - Ref($close, 20)) / Ref($close, 20) / (ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20)) + 0.0001)
+  MA_Cross_After_5_10_1: If((Mean($close, 5) > Mean($close, 10)), If((Ref(Mean($close, 5), 1) <= Ref(Mean($close, 10), 1)), ($close - Ref($close, 1)) / Ref($close, 1), 0), 0)
+  Price_Change_3_MA_Ratio_5_If_Up_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Price_Slope_Div_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(Slope($close, 5), 5) / Ref($close, 5) - Slope($close, 5) / $close)
+  Price_Slope_Div_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Slope($close, 5) / $close - Ref(Slope($close, 5), 5) / Ref($close, 5))
+  Top_Divergence_Slope_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001) - Slope($close, 5) / ($close + 0.0001))
+  Bottom_Divergence_Slope_5: (Min($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Slope($close, 5) / ($close + 0.0001) - Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001))
+  Price_Slope_Divergence_Bottom_5: (Min($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Slope($close, 5) / ($close + 0.0001) - Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001))
+  Price_Slope_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(Slope($close, 5), 5) / (Ref($close, 5) + 0.0001) - Slope($close, 5) / ($close + 0.0001))
+  Price_MA_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 10) - 1 - $close / Mean($close, 10) - 1)
+  Simple_Top_Divergence_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 10) - 1 - $close / Mean($close, 10) - 1)
+  Stock_Market_Direction_Score_CSI300_5: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 5)
+  Comprehensive_Top_Divergence_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1 + (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  RSV_7: ($close - Min($low, 7)) / (Max($high, 7) - Min($low, 7) + 0.0001)
+  Price_Change_1_Minus_MA_Ratio_5: ($close - Ref($close, 1)) / Ref($close, 1) - $close / Mean($close, 5) - 1
+  Price_Stability_10: Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 10) - Std(($close - Ref($close, 1)) / Ref($close, 1), 10)
+  Multi_Timeframe_Consistency_3_10: If(($close - Ref($close, 3)) / Ref($close, 3) > 0, 1, If(($close - Ref($close, 3)) / Ref($close, 3) < 0, -1, 0)) * If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * (Abs(($close - Ref($close, 3)) / Ref($close, 3)) + Abs(($close - Ref($close, 10)) / Ref($close, 10)))
+  MA_Cross_Frequency_10: Sum(If($close > Mean($close, 10) != Ref($close, 1) > Mean(Ref($close, 1), 10), 1, 0), 20) / (20 + 0.0001)
+  Stock_Market_Direction_Score_CSI100_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 10)
+  Price_Quantile_Position_10_25: $close / Quantile($close, 10, 0.25) - Ref($close, 5) / Ref(Quantile($close, 10, 0.25), 5)
+  Top_Divergence_Strength_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Top_Divergence_MA_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Top_Divergence_Power_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * Abs(Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Quantile_80_20: Quantile($close, 20, 0.8) / $close
+  Stock_Market_Beta_Approx_CSI100_10: (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))), 10) + 0.0001)
+  Price_Jerk_5: (($close - Ref($close, 1)) / Ref($close, 1)) - ((Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) - ((Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) - ((Ref($close, 2) - Ref($close, 3)) / Ref($close, 3))
+  Price_Jerk_3: (($close - Ref($close, 1)) / Ref($close, 1)) - ((Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) - ((Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) - ((Ref($close, 2) - Ref($close, 3)) / Ref($close, 3))
+  Price_Cycle_7_14: ($close - Ref($close, 7)) / Ref($close, 7) - ($close - Ref($close, 14)) / Ref($close, 14)
+  Price_Volume_Corr_Change_10: Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 10) - Ref(Corr(($close - Ref($close, 1)) / Ref($close, 1), ($volume - Ref($volume, 1)) / Ref($volume, 1), 10), 10)
+  Stock_Market_Return_Sync_CSI100_20: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Price_CumSum_Div_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Price_CumSum_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Price_CumSum_Div_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5))
+  Price_CumSum_Divergence_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5))
+  Price_Kurtosis_20: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_Change_3_MA_Ratio_3_CumSum_Return_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Price_Change_Stability_5: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 5) / $close + 0.0001)
+  Price_Change_1_Vol_5: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 5) / $close + 0.0001)
+  Top_Divergence_Confirmation_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1 * 0 - ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Persistence_5: (Sum(($close > Ref($close, 1)), 5) - Sum(($close < Ref($close, 1)), 5)) / 5
+  Trend_Consistency_5: (Sum(($close > Ref($close, 1)), 5) - Sum(($close < Ref($close, 1)), 5)) / 5
+  Bottom_Divergence_Power_10: (Max($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * Abs($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Simple_Bottom_Divergence_20: 1 - ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * ($close / Mean($close, 20) - 1 - Ref($close, 10) / Mean(Ref($close, 10), 20) - 1)
+  Price_MA_Divergence_Bottom_20: 1 - ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * ($close / Mean($close, 20) - 1 - Ref($close, 10) / Mean(Ref($close, 10), 20) - 1)
+  Stock_Market_Beta_Approx_CSI100_20: (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))), 20) + 0.0001)
+  Momentum_Decay_5: ($close - Ref($close, 2)) / Ref($close, 2) - ($close - Ref($close, 5)) / Ref($close, 5)
+  Stock_Market_Direction_Score_CSI100_5: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 5)
+  RSV_5: ($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001)
+  Stock_Market_Volatility_Diff_CSI300_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) - Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Stock_Market_Volatility_Ratio_CSI300_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Price_Relative_Strength_20: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_Quantile_Position_20_25: $close / Quantile($close, 20, 0.25) - Ref($close, 10) / Ref(Quantile($close, 20, 0.25), 10)
+  Bottom_Divergence_Confirmation_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * $close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Consistency_5: Mean(($close > Ref($close, 1)), 5) - Mean(($close < Ref($close, 1)), 5)
+  Bottom_Divergence_MA_10: (Min($close, 10) - $close) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  MA_Cross_5_20: (Mean($close, 5) - Mean($close, 20)) / (Mean($close, 20) + 0.0001)
+  Price_RSV_Divergence_Bottom_20: (Min($close, 20) - $close) / (Max($close, 20) - Min($close, 20) + 0.0001) * (($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) - Ref(($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001), 10))
+  Price_RSV_Divergence_Top_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref(($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001), 10) - ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001))
+  Relative_Strength_Change_10: ($close - Ref($close, 10)) / Ref($close, 10) - (Ref($close, 10) - Ref($close, 20)) / Ref($close, 20)
+  Stock_Market_Volatility_Diff_CSI300_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) - Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Stock_Market_Volatility_Ratio_CSI300_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Return_Sync_CSI100_10: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  MA_Distance_Norm_Change_10: ($close - Mean($close, 10)) / (Std($close, 10) + 0.0001) - (Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)
+  Stock_Market_Return_Sync_CSI300_10: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Beta_Approx_CSI300_60: (Std(($close - Ref($close, 1)) / Ref($close, 1), 60) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 60) + 0.0001)) * Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 60) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))), 60) + 0.0001)
+  Price_Acceleration_7_MA7: ((($close - Ref($close, 1)) / Ref($close, 1)) - (Ref($close, 1) - Ref($close, 2)) / Ref($close, 2)) * ($close / Mean($close, 7) - 1)
+  Price_Kurtosis_10: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 10, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 10, 0.25)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Price_MA_Divergence_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close / Mean($close, 10) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 10) - 1)
+  Simple_Bottom_Divergence_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close / Mean($close, 10) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 10) - 1)
+  MA_Deviation_Change_Rate_20: (($close - Mean($close, 20)) / (Std($close, 20) + 0.0001) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) / (Abs((Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) + 0.0001)
+  MA_Distance_Norm_Change_Improved_20: (($close - Mean($close, 20)) / (Std($close, 20) + 0.0001) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) / (Abs((Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) + 0.0001)
+  Price_MA_Position_Change_Rate_20: (($close - Mean($close, 20)) / (Std($close, 20) + 0.0001) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) / (Abs((Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) + 0.0001)
+  Price_Change_2_MA_Ratio_7_If_Up_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Stock_Market_Price_Ratio_CSI100_20: ($close / ChangeInstrument('SH000903', $close) - Ref($close, 20) / Ref(ChangeInstrument('SH000903', $close), 20)) / (Ref($close, 20) / Ref(ChangeInstrument('SH000903', $close), 20) + 0.0001)
+  Stock_Market_Return_CSI100_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Excess_Return_CSI100_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Price_Position_CSI100_10: ($close / ChangeInstrument('SH000903', $close) - Min($close / ChangeInstrument('SH000903', $close), 10)) / (Max($close / ChangeInstrument('SH000903', $close), 10) - Min($close / ChangeInstrument('SH000903', $close), 10) + 0.0001)
+  Price_Change_3_MA_Ratio_3_If_Up_Return_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Price_MA_Distance_3: ($close - Mean($close, 3)) / (Std($close, 3) + 0.0001)
+  Comprehensive_Bottom_Divergence_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 + ($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  Relative_Strength_Change_20: ($close - Ref($close, 20)) / Ref($close, 20) - (Ref($close, 20) - Ref($close, 40)) / Ref($close, 40)
+  Breakout_Confirm_5_2: (Ref($close, 2) - Max(Ref($close, 2), 5)) / (Max(Ref($close, 2), 5) + 0.0001) * ($close - Ref($close, 2)) / (Ref($close, 2) + 0.0001)
+  Top_Divergence_Magnitude_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1
+  Stock_Market_Return_Sync_CSI300_20: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Price_Relative_Strength_10: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Stock_Market_Sensitivity_CSI300_20: ($close - Ref($close, 20)) / Ref($close, 20) / (ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20)) + 0.0001)
+  Price_MA_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 2) / Mean(Ref($close, 2), 5) - 1 - $close / Mean($close, 5) - 1)
+  Simple_Top_Divergence_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 2) / Mean(Ref($close, 2), 5) - 1 - $close / Mean($close, 5) - 1)
+  Stock_Market_Return_Sync_CSI300_5: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Price_Relative_Strength_5: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 5)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 5) + 0.0001)
+  Price_Change_3_MA_Ratio_5_CumSum_Return_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Stock_Market_Price_Position_CSI300_5: ($close / ChangeInstrument('SH000300', $close) - Min($close / ChangeInstrument('SH000300', $close), 5)) / (Max($close / ChangeInstrument('SH000300', $close), 5) - Min($close / ChangeInstrument('SH000300', $close), 5) + 0.0001)
+  Price_Change_2_MA_Ratio_5_If_Up_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Price_MA_Distance_7: ($close - Mean($close, 7)) / (Std($close, 7) + 0.0001)
+  MA_Cross_10_20_Price_Change_1: ((Mean($close, 10) - Mean($close, 20)) / (Mean($close, 20) + 0.0001)) * (($close - Ref($close, 1)) / Ref($close, 1))
+  Lag3_Price_Change_3: Ref(($close - Ref($close, 3)) / Ref($close, 3), 3)
+  Price_Position_Change_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - (Ref($close, 5) - Min(Ref($close, 5), 10)) / (Max(Ref($close, 5), 10) - Min(Ref($close, 5), 10) + 0.0001)
+  MA_Distance_Change_20: ($close - Mean($close, 20)) / Mean($close, 20) - (Ref($close, 20) - Mean(Ref($close, 20), 20)) / Mean(Ref($close, 20), 20)
+  Price_Change_1_Div_MA_Ratio_3: ($close - Ref($close, 1)) / Ref($close, 1) / ($close / Mean($close, 3) - 1 + 0.0001)
+  MA_Distance_Norm_Change_20: ($close - Mean($close, 20)) / (Std($close, 20) + 0.0001) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)
+  Comprehensive_Bottom_Divergence_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 + ($close - Ref($close, 3)) / Ref($close, 3) - (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6))
+  MA_Cross_Frequency_5: Sum(If($close > Mean($close, 5) != Ref($close, 1) > Mean(Ref($close, 1), 5), 1, 0), 10) / (10 + 0.0001)
+  Lag2_Price_Change_3: Ref(($close - Ref($close, 3)) / Ref($close, 3), 2)
+  Price_Position_Change_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - (Ref($close, 10) - Min(Ref($close, 10), 20)) / (Max(Ref($close, 10), 20) - Min(Ref($close, 10), 20) + 0.0001)
+  RSV_Change_5: ($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001) - Ref(($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001), 2)
+  Trend_Consistency_3: (Sum(($close > Ref($close, 1)), 3) - Sum(($close < Ref($close, 1)), 3)) / 3
+  Price_Persistence_3: (Sum(($close > Ref($close, 1)), 3) - Sum(($close < Ref($close, 1)), 3)) / 3
+  Top_Divergence_Magnitude_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1
+  Price_Stability_Change_5: (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Std(($close - Ref($close, 1)) / Ref($close, 1), 5)) / (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) + 0.0001)
+  Price_CumSum_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Price_CumSum_Div_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5) - Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Price_CumSum_Div_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5))
+  Price_CumSum_Divergence_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1), 5), 5))
+  MA_Cross_Strength_10_20: (Mean($close, 10) - Mean($close, 20)) / (Mean($close, 20) + 0.0001) - (Ref(Mean($close, 10), 1) - Ref(Mean($close, 20), 1)) / (Ref(Mean($close, 20), 1) + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI100_5: ($close - Ref($close, 5)) / Ref($close, 5) / (ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Sensitivity_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Price_Ratio_CSI300_20: ($close / ChangeInstrument('SH000300', $close) - Ref($close, 20) / Ref(ChangeInstrument('SH000300', $close), 20)) / (Ref($close, 20) / Ref(ChangeInstrument('SH000300', $close), 20) + 0.0001)
+  Stock_Market_Excess_Return_CSI300_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Return_CSI300_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Return_CSI500_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Excess_Return_CSI500_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Price_Ratio_CSI500_20: ($close / ChangeInstrument('SH000905', $close) - Ref($close, 20) / Ref(ChangeInstrument('SH000905', $close), 20)) / (Ref($close, 20) / Ref(ChangeInstrument('SH000905', $close), 20) + 0.0001)
+  Price_Quantile_Position_20_50: $close / Quantile($close, 20, 0.5) - Ref($close, 10) / Ref(Quantile($close, 20, 0.5), 10)
+  Price_Consistency_3: Mean(($close > Ref($close, 1)), 3) - Mean(($close < Ref($close, 1)), 3)
+  Price_Change_2_MA_Ratio_3_CumSum_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Bottom_Divergence_Magnitude_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * $close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1
+  Price_Change_2_Div_MA_Ratio_3: ($close - Ref($close, 2)) / Ref($close, 2) / ($close / Mean($close, 3) - 1 + 0.0001)
+  Price_Change_1_Vol_3: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 3) / $close + 0.0001)
+  Price_Quantile_Position_20_75: $close / Quantile($close, 20, 0.75) - Ref($close, 10) / Ref(Quantile($close, 20, 0.75), 10)
+  Price_RSV_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref(($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001), 2) - ($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001))
+  Price_RSV_Divergence_Bottom_5: (Min($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * (($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001) - Ref(($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001), 2))
+  Stock_Market_Price_Position_CSI500_3: ($close / ChangeInstrument('SH000905', $close) - Min($close / ChangeInstrument('SH000905', $close), 3)) / (Max($close / ChangeInstrument('SH000905', $close), 3) - Min($close / ChangeInstrument('SH000905', $close), 3) + 0.0001)
+  MA_Distance_Norm_Change_Improved_5: (($close - Mean($close, 5)) / (Std($close, 5) + 0.0001) - (Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) / (Abs((Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) + 0.0001)
+  MA_Deviation_Change_Rate_5: (($close - Mean($close, 5)) / (Std($close, 5) + 0.0001) - (Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) / (Abs((Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) + 0.0001)
+  Price_MA_Position_Change_Rate_5: (($close - Mean($close, 5)) / (Std($close, 5) + 0.0001) - (Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) / (Abs((Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)) + 0.0001)
+  MA_Distance_Norm_Change_Improved_10: (($close - Mean($close, 10)) / (Std($close, 10) + 0.0001) - (Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) / (Abs((Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) + 0.0001)
+  Price_MA_Position_Change_Rate_10: (($close - Mean($close, 10)) / (Std($close, 10) + 0.0001) - (Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) / (Abs((Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) + 0.0001)
+  MA_Deviation_Change_Rate_10: (($close - Mean($close, 10)) / (Std($close, 10) + 0.0001) - (Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) / (Abs((Ref($close, 5) - Mean(Ref($close, 5), 10)) / (Std(Ref($close, 5), 10) + 0.0001)) + 0.0001)
+  Price_MA_Relative_Change_10: ($close / Mean($close, 10) - Ref($close, 5) / Mean(Ref($close, 5), 10)) / (Ref($close, 5) / Mean(Ref($close, 5), 10) + 0.0001)
+  Price_MA_Relative_Change_20: ($close / Mean($close, 20) - Ref($close, 10) / Mean(Ref($close, 10), 20)) / (Ref($close, 10) / Mean(Ref($close, 10), 20) + 0.0001)
+  Short_Long_Ratio_5_10: ($close / Mean($close, 5) - 1) / ($close / Mean($close, 10) - 1 + 0.0001)
+  RSV_3: ($close - Min($low, 3)) / (Max($high, 3) - Min($low, 3) + 0.0001)
+  Stock_Market_Direction_Score_CSI300_10: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 10)
+  Stock_Market_Sensitivity_CSI100_60: ($close - Ref($close, 60)) / Ref($close, 60) / (ChangeInstrument('SH000903', ($close - Ref($close, 60)) / Ref($close, 60)) + 0.0001)
+  Price_Position_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001)
+  Price_Change_3_MA_Ratio_7_CumSum_Return_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 7)
+  Price_Asymmetry_5: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 5) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 5)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 5) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 5) + 0.0001)
+  Trend_Strength_Change_10: (Slope($close, 10) / $close - Ref(Slope($close, 10), 10) / Ref($close, 10)) / (Abs(Ref(Slope($close, 10), 10) / Ref($close, 10)) + 0.0001)
+  Price_Change_2_MA_Ratio_3_If_Up_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Price_Change_2_Div_MA_Ratio_5: ($close - Ref($close, 2)) / Ref($close, 2) / ($close / Mean($close, 5) - 1 + 0.0001)
+  Bottom_Divergence_MA_5: (Min($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Stock_Market_Momentum_Ratio_CSI300_5: ($close - Ref($close, 5)) / Ref($close, 5) / (ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) + 0.0001)
+  Stock_Market_Price_Position_CSI500_5: ($close / ChangeInstrument('SH000905', $close) - Min($close / ChangeInstrument('SH000905', $close), 5)) / (Max($close / ChangeInstrument('SH000905', $close), 5) - Min($close / ChangeInstrument('SH000905', $close), 5) + 0.0001)
+  Price_MA_Quantile_20: Quantile($close / Mean($close, 20), 40, 0.5) / $close / Mean($close, 20)
+  Price_Change_1_MA_Ratio_7_If_Up_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Price_MA_Quantile_10: Quantile($close / Mean($close, 10), 20, 0.5) / $close / Mean($close, 10)
+  Price_Quantile_Change_10: Quantile($close, 10, 0.5) / $close - Ref(Quantile($close, 10, 0.5), 5) / Ref($close, 5)
+  Breakout_Confirm_5_1: (Ref($close, 1) - Max(Ref($close, 1), 5)) / (Max(Ref($close, 1), 5) + 0.0001) * ($close - Ref($close, 1)) / (Ref($close, 1) + 0.0001)
+  Stock_Market_Price_Position_CSI100_5: ($close / ChangeInstrument('SH000903', $close) - Min($close / ChangeInstrument('SH000903', $close), 5)) / (Max($close / ChangeInstrument('SH000903', $close), 5) - Min($close / ChangeInstrument('SH000903', $close), 5) + 0.0001)
+  Price_MA_Quantile_5: Quantile($close / Mean($close, 5), 10, 0.5) / $close / Mean($close, 5)
+  Trend_Strength_Change_5: (Slope($close, 5) / $close - Ref(Slope($close, 5), 5) / Ref($close, 5)) / (Abs(Ref(Slope($close, 5), 5) / Ref($close, 5)) + 0.0001)
+  Price_Autocorr_3: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 3), 10)
+  Trend_Consistency_7: (Sum(($close > Ref($close, 1)), 7) - Sum(($close < Ref($close, 1)), 7)) / 7
+  Price_Persistence_7: (Sum(($close > Ref($close, 1)), 7) - Sum(($close < Ref($close, 1)), 7)) / 7
+  Price_Quantile_Position_10_50: $close / Quantile($close, 10, 0.5) - Ref($close, 5) / Ref(Quantile($close, 10, 0.5), 5)
+  Price_Change_1_MA_Ratio_5_If_Up_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Stock_Market_Direction_Score_CSI300_20: Mean(($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)) / (Abs(($close - Ref($close, 1)) / Ref($close, 1)) * Abs(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))) + 0.0001), 20)
+  MA_Cross_Strength_5_10: (Mean($close, 5) - Mean($close, 10)) / (Mean($close, 10) + 0.0001) - (Ref(Mean($close, 5), 1) - Ref(Mean($close, 10), 1)) / (Ref(Mean($close, 10), 1) + 0.0001)
+  Price_MA_Angle_10: Slope($close, 10) / $close / (Slope(Mean($close, 10), 10) / Mean($close, 10) + 0.0001)
+  Price_Volume_Divergence_Bottom_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($volume / Mean($volume, 5) - Ref($volume, 5) / Mean(Ref($volume, 5), 5))
+  Price_Volume_Divergence_Top_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($volume, 5) / Mean(Ref($volume, 5), 5) - $volume / Mean($volume, 5))
+  Top_Divergence_Confirmation_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1 * 0 - ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_MA_Deviation_5: ($close - Mean($close, 5)) / (Std($close, 5) + 0.0001)
+  Price_MA_Distance_5: ($close - Mean($close, 5)) / (Std($close, 5) + 0.0001)
+  Price_Stability_Change_10: (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 10) - Std(($close - Ref($close, 1)) / Ref($close, 1), 10)) / (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 10) + 0.0001)
+  Breakout_Confirm_10_3: (Ref($close, 3) - Max(Ref($close, 3), 10)) / (Max(Ref($close, 3), 10) + 0.0001) * ($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001)
+  Momentum_Decay_Rate_3_5: ($close - Ref($close, 3)) / Ref($close, 3) / (($close - Ref($close, 5)) / Ref($close, 5) + 0.0001) - 1
+  Price_Change_1_Div_MA_Ratio_5: ($close - Ref($close, 1)) / Ref($close, 1) / ($close / Mean($close, 5) - 1 + 0.0001)
+  Stock_Market_Momentum_Ratio_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Sensitivity_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) / (ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) + 0.0001)
+  Stock_Market_Price_Position_CSI100_3: ($close / ChangeInstrument('SH000903', $close) - Min($close / ChangeInstrument('SH000903', $close), 3)) / (Max($close / ChangeInstrument('SH000903', $close), 3) - Min($close / ChangeInstrument('SH000903', $close), 3) + 0.0001)
+  MA_Distance_Change_5: ($close - Mean($close, 5)) / Mean($close, 5) - (Ref($close, 5) - Mean(Ref($close, 5), 5)) / Mean(Ref($close, 5), 5)
+  Price_Change_2_MA_Ratio_5_CumSum_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  Price_Autocorr_5: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10)
+  Breakout_Confirm_5_3: (Ref($close, 3) - Max(Ref($close, 3), 5)) / (Max(Ref($close, 3), 5) + 0.0001) * ($close - Ref($close, 3)) / (Ref($close, 3) + 0.0001)
+  Stock_Market_Sensitivity_CSI100_20: ($close - Ref($close, 20)) / Ref($close, 20) / (ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20)) + 0.0001)
+  Short_Long_Ratio_3_20: ($close / Mean($close, 3) - 1) / ($close / Mean($close, 20) - 1 + 0.0001)
+  Bottom_Divergence_Power_5: (Max($close, 5) - $close) / (Max($close, 5) - Min($close, 5) + 0.0001) * Abs($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Short_Long_Ratio_3_10: ($close / Mean($close, 3) - 1) / ($close / Mean($close, 10) - 1 + 0.0001)
+  Price_Change_1_MA_Ratio_3_If_Up_Return_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * If($close > Ref($close, 5), ($close - Ref($close, 5)) / Ref($close, 5), 0)
+  Momentum_Decay_Rate_5_10: ($close - Ref($close, 5)) / Ref($close, 5) / (($close - Ref($close, 10)) / Ref($close, 10) + 0.0001) - 1
+  Simple_Bottom_Divergence_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 2) / Mean(Ref($close, 2), 5) - 1)
+  Price_MA_Divergence_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 2) / Mean(Ref($close, 2), 5) - 1)
+  Breakout_High_20: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001)
+  RSV_Change_20: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) - Ref(($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001), 10)
+  Stock_Market_Return_Sync_CSI100_5: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Price_Volume_Divergence_Bottom_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($volume / Mean($volume, 5) - Ref($volume, 5) / Mean(Ref($volume, 5), 5))
+  Price_Volume_Divergence_Top_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($volume, 5) / Mean(Ref($volume, 5), 5) - $volume / Mean($volume, 5))
+  Comprehensive_Top_Divergence_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1 + (Ref($close, 3) - Ref($close, 6)) / Ref($close, 6) - ($close - Ref($close, 3)) / Ref($close, 3))
+  Price_Quantile_Position_10_75: $close / Quantile($close, 10, 0.75) - Ref($close, 5) / Ref(Quantile($close, 10, 0.75), 5)
+  Price_MA_Angle_20: Slope($close, 20) / $close / (Slope(Mean($close, 20), 20) / Mean($close, 20) + 0.0001)
+  Price_Position_Change_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - (Ref($close, 2) - Min(Ref($close, 2), 5)) / (Max(Ref($close, 2), 5) - Min(Ref($close, 2), 5) + 0.0001)
+  Breakout_Confirm_10_2: (Ref($close, 2) - Max(Ref($close, 2), 10)) / (Max(Ref($close, 2), 10) + 0.0001) * ($close - Ref($close, 2)) / (Ref($close, 2) + 0.0001)
+  Stock_Market_Sensitivity_CSI500_60: ($close - Ref($close, 60)) / Ref($close, 60) / (ChangeInstrument('SH000905', ($close - Ref($close, 60)) / Ref($close, 60)) + 0.0001)
+  MA_Distance_Change_10: ($close - Mean($close, 10)) / Mean($close, 10) - (Ref($close, 10) - Mean(Ref($close, 10), 10)) / Mean(Ref($close, 10), 10)
+  Stock_Market_Momentum_Ratio_CSI100_3: ($close - Ref($close, 3)) / Ref($close, 3) / (ChangeInstrument('SH000903', ($close - Ref($close, 3)) / Ref($close, 3)) + 0.0001)
+  MA_Cross_Intensity_10_20: If((Mean($close, 10) - Mean($close, 20)) > 0 != (Ref(Mean($close, 10), 1) - Ref(Mean($close, 20), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Short_Long_Ratio_5_20: ($close / Mean($close, 5) - 1) / ($close / Mean($close, 20) - 1 + 0.0001)
+  Price_Quantile_Change_20: Quantile($close, 20, 0.5) / $close - Ref(Quantile($close, 20, 0.5), 10) / Ref($close, 10)
+  Breakout_Confirm_10_1: (Ref($close, 1) - Max(Ref($close, 1), 10)) / (Max(Ref($close, 1), 10) + 0.0001) * ($close - Ref($close, 1)) / (Ref($close, 1) + 0.0001)
+  Price_Autocorr_7: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 7), 10)
+  MA_Cross_10_20: (Mean($close, 10) - Mean($close, 20)) / (Mean($close, 20) + 0.0001)
+  Top_Divergence_Power_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * Abs(Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Top_Divergence_Strength_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Top_Divergence_MA_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 5) / Mean(Ref($close, 5), 5) - 1 - $close / Mean($close, 5) - 1)
+  Price_MA_Angle_5: Slope($close, 5) / $close / (Slope(Mean($close, 5), 5) / Mean($close, 5) + 0.0001)
+  Breakout_High_5: ($close - Max($close, 5)) / (Max($close, 5) + 0.0001)
+  Price_Change_2_MA_Ratio_7_CumSum_Return_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * Sum(($close - Ref($close, 1)) / Ref($close, 1), 5)
+  MA_Distance_Norm_Change_5: ($close - Mean($close, 5)) / (Std($close, 5) + 0.0001) - (Ref($close, 2) - Mean(Ref($close, 2), 5)) / (Std(Ref($close, 2), 5) + 0.0001)
+  Breakout_High_10: ($close - Max($close, 10)) / (Max($close, 10) + 0.0001)
+  Stock_Market_Price_Position_CSI300_3: ($close / ChangeInstrument('SH000300', $close) - Min($close / ChangeInstrument('SH000300', $close), 3)) / (Max($close / ChangeInstrument('SH000300', $close), 3) - Min($close / ChangeInstrument('SH000300', $close), 3) + 0.0001)
+  Breakout_Intensity_10: If($close > Max($close, 10), ($close - Max($close, 10)) / Max($close, 10) * Sum($close > Max($close, 10), 10), 0)
+  Breakout_Intensity_5: If($close > Max($close, 5), ($close - Max($close, 5)) / Max($close, 5) * Sum($close > Max($close, 5), 5), 0)
+  Breakout_Persistence_10: Sum($close > Max($close, 10), 10) * ($close - Max($close, 10)) / (Max($close, 10) + 0.0001)
+  Breakout_Persistence_5: Sum($close > Max($close, 5), 5) * ($close - Max($close, 5)) / (Max($close, 5) + 0.0001)
+  Stock_Market_Excess_Return_CSI100_1: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 1) + 0.0001)
+  Breakout_Intensity_Improved_10: If($close > Max($close, 10), ($close - Max($close, 10)) / Max($close, 10) * (Sum($close > Max($close, 10), 10) + 1), 0)
+  Stock_Market_Excess_Return_CSI500_1: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 1) + 0.0001)
+  Breakout_Strength_Volume_5: If($close > Max($close, 5), ($close - Max($close, 5)) / Max($close, 5) * $volume / Mean($volume, 5) - 1, 0)
+  Breakout_Strength_Volume_10: If($close > Max($close, 10), ($close - Max($close, 10)) / Max($close, 10) * $volume / Mean($volume, 10) - 1, 0)
+  Breakout_Intensity_Improved_5: If($close > Max($close, 5), ($close - Max($close, 5)) / Max($close, 5) * (Sum($close > Max($close, 5), 5) + 1), 0)
+  Stock_Market_Excess_Return_CSI300_1: ($close - Ref($close, 1)) / Ref($close, 1) - ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 1) + 0.0001)
+  Volatility_Quantile_20: Quantile(Std($close, 5) / $close, 20, 0.5) / Std($close, 5) / $close
+  Volatility_Quantile_10: Quantile(Std($close, 5) / $close, 10, 0.5) / Std($close, 5) / $close
+  Volatility_Quantile_5: Quantile(Std($close, 5) / $close, 5, 0.5) / Std($close, 5) / $close
+  Price_Change_1_MA5_Slope5: ($close - Ref($close, 1)) / Ref($close, 1) * ($close / Mean($close, 5) - 1) * (Slope($close, 5) / $close)
+  Price_Change_1_MA10_Slope10: ($close - Ref($close, 1)) / Ref($close, 1) * ($close / Mean($close, 10) - 1) * (Slope($close, 10) / $close)
+  Price_Change_Relative_Volatility_10: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Price_Change_1_MA20_Slope20: ($close - Ref($close, 1)) / Ref($close, 1) * ($close / Mean($close, 20) - 1) * (Slope($close, 20) / $close)
+  Price_Change_1_MA15_Slope15: ($close - Ref($close, 1)) / Ref($close, 1) * ($close / Mean($close, 15) - 1) * (Slope($close, 15) / $close)
+  Price_Change_Relative_Volatility_5: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 5) + 0.0001)
+  Price_Change_Squared_MA10: ($close - Ref($close, 1)) / Ref($close, 1) * ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 10) - 1
+  Price_Change_Squared_MA3: ($close - Ref($close, 1)) / Ref($close, 1) * ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1
+  MA_Ratio_5_7: ($close / Mean($close, 5) - 1) * ($close / Mean($close, 7) - 1)
+  Momentum3_Reversal2: (($close - Ref($close, 3)) / Ref($close, 3)) * (Ref($close, 2) / $close - 1)
+  Price_Change_Magnitude_7: Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 7)
+  Price_Change_Magnitude_5: Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  MA_Ratio_5_10: ($close / Mean($close, 5) - 1) * ($close / Mean($close, 10) - 1)
+  Momentum3_Reversal1: (($close - Ref($close, 3)) / Ref($close, 3)) * (Ref($close, 1) / $close - 1)
+  Price_Change_2_4: ($close - Ref($close, 2)) / Ref($close, 2) * ($close - Ref($close, 4)) / Ref($close, 4)
+  Price_Change_Magnitude_3: Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 3)
+  Cumulative_Return_Normalized_5: Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 5) + 0.0001)
+  Momentum3_Reversal3: (($close - Ref($close, 3)) / Ref($close, 3)) * (Ref($close, 3) / $close - 1)
+  Volatility_Norm_5: Std($close, 5) / (Mean($close, 5) + 0.0001)
+  MA_Ratio_7_10: ($close / Mean($close, 7) - 1) * ($close / Mean($close, 10) - 1)
+  Volatility_Norm_3: Std($close, 3) / (Mean($close, 3) + 0.0001)
+  Volatility_Norm_7: Std($close, 7) / (Mean($close, 7) + 0.0001)
+  MA_Cross_3_5_Price_Change_1: ((Mean($close, 3) - Mean($close, 5)) / (Mean($close, 5) + 0.0001)) * (($close - Ref($close, 1)) / Ref($close, 1))
+  Price_Smoothness_Signal_5: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 5) + 0.0001) * $close / Mean($close, 5) - 1
+  Price_Smoothness_5: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 5) + 0.0001)
+  Volatility_Norm_10: Std($close, 10) / (Mean($close, 10) + 0.0001)
+  MA_Ratio_7_15: ($close / Mean($close, 7) - 1) * ($close / Mean($close, 15) - 1)
+  Price_Change_1_MA_Ratio_5_Resi_Close_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * Resi($close, 5) / $close
+  RSV_3_MA3: (($close - Min($low, 3)) / (Max($high, 3) - Min($low, 3) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  Price_Change_1_MA_Ratio_3_Resi_Close_5: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 3) - 1 * Resi($close, 5) / $close
+  Price_Smoothness_Signal_10: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 10) - 1
+  MA_Ratio_10_15: ($close / Mean($close, 10) - 1) * ($close / Mean($close, 15) - 1)
+  MA_Ratio_5_20: ($close / Mean($close, 5) - 1) * ($close / Mean($close, 20) - 1)
+  RSV_3_MA5: (($close - Min($low, 3)) / (Max($high, 3) - Min($low, 3) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  MA_Ratio_7_20: ($close / Mean($close, 7) - 1) * ($close / Mean($close, 20) - 1)
+  RSV_5_MA3: (($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  RSV_5_MA5: (($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  Breakout_Low_10: (Min($close, 10) - $close) / (Min($close, 10) + 0.0001)
+  Price_Position_5_MA5: (($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  Momentum5_Reversal2: (($close - Ref($close, 5)) / Ref($close, 5)) * (Ref($close, 2) / $close - 1)
+  MA_Ratio_10_20: ($close / Mean($close, 10) - 1) * ($close / Mean($close, 20) - 1)
+  Quantile_20_5: Quantile($close, 5, 0.2) / $close
+  RSV_7_MA3: (($close - Min($low, 7)) / (Max($high, 7) - Min($low, 7) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  RSV_7_MA5: (($close - Min($low, 7)) / (Max($high, 7) - Min($low, 7) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  RSV_10_MA3: (($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  RSV_10_MA5: (($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  MA_Ratio_15_20: ($close / Mean($close, 15) - 1) * ($close / Mean($close, 20) - 1)
+  Momentum5_Reversal3: (($close - Ref($close, 5)) / Ref($close, 5)) * (Ref($close, 3) / $close - 1)
+  Quantile_25_5: Quantile($close, 5, 0.25) / $close
+  Price_Change_2_MA_Ratio_7_Resi_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * Resi($close, 5) / $close
+  Breakout_Confirmation_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Breakdown_Confirmation_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (0 - ($close - Ref($close, 1)) / Ref($close, 1))
+  Breakout_Retracement_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * (Ref($close, 1) - $close) / (Ref($close, 1) + 0.0001)
+  Breakdown_Rebound_5: 1 - ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) * ($close - Ref($close, 1)) / (Ref($close, 1) + 0.0001)
+  Quantile_30_5: Quantile($close, 5, 0.3) / $close
+  Price_Change_2_MA_Ratio_5_Resi_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * Resi($close, 5) / $close
+  Price_Change_3_MA_Ratio_7_Slope_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * Slope($close, 5) / $close
+  Price_Change_3_MA_Ratio_7_Slope_Close_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * Slope($close, 7) / $close
+  Price_Change_1_5: ($close - Ref($close, 1)) / Ref($close, 1) * ($close - Ref($close, 5)) / Ref($close, 5)
+  RSV_15_MA3: (($close - Min($low, 15)) / (Max($high, 15) - Min($low, 15) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  RSV_15_MA5: (($close - Min($low, 15)) / (Max($high, 15) - Min($low, 15) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  Price_Change_3_MA_Ratio_5_Slope_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * Slope($close, 5) / $close
+  RSV_20_MA5: (($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001)) * ($close / Mean($close, 5) - 1)
+  Price_Change_2_MA_Ratio_3_Resi_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * Resi($close, 5) / $close
+  RSV_20_MA3: (($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001)) * ($close / Mean($close, 3) - 1)
+  Price_Change_3_MA_Ratio_5_Slope_Close_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * Slope($close, 7) / $close
+  Bottom_Divergence_Strength_5: (Min($close, 5) - $close) / (Min($close, 5) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Momentum5_Reversal1: (($close - Ref($close, 5)) / Ref($close, 5)) * (Ref($close, 1) / $close - 1)
+  Conditional_Momentum_Reversal_5: If(($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) < 0.3, ($close - Ref($close, 3)) / Ref($close, 3), If(($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) > 0.7, (Ref($close, 3) / $close - 1), 0))
+  Price_Change_3_MA_Ratio_3_Slope_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * Slope($close, 5) / $close
+  Price_Change_2_MA_Ratio_7_Slope_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 7) - 1 * Slope($close, 5) / $close
+  RSV_3_MA7: (($close - Min($low, 3)) / (Max($high, 3) - Min($low, 3) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  Price_Change_3_MA_Ratio_3_Slope_Close_7: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * Slope($close, 7) / $close
+  Quantile_80_5_MA5: (Quantile($close, 5, 0.8) / $close) * ($close / Mean($close, 5) - 1)
+  RSV_5_MA7: (($close - Min($low, 5)) / (Max($high, 5) - Min($low, 5) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  Price_Change_2_MA_Ratio_5_Slope_Close_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * Slope($close, 7) / $close
+  RSV_7_MA7: (($close - Min($low, 7)) / (Max($high, 7) - Min($low, 7) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  Breakout_Confirmation_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Breakdown_Confirmation_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (0 - ($close - Ref($close, 1)) / Ref($close, 1))
+  Breakout_Retracement_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * (Ref($close, 1) - $close) / (Ref($close, 1) + 0.0001)
+  Breakdown_Rebound_10: 1 - ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) * ($close - Ref($close, 1)) / (Ref($close, 1) + 0.0001)
+  Quantile_75_5_MA5: (Quantile($close, 5, 0.75) / $close) * ($close / Mean($close, 5) - 1)
+  Stock_Market_Momentum_Diff_CSI100_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000903', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_Price_Ratio_CSI100_3: ($close / ChangeInstrument('SH000903', $close) - Ref($close, 3) / Ref(ChangeInstrument('SH000903', $close), 3)) / (Ref($close, 3) / Ref(ChangeInstrument('SH000903', $close), 3) + 0.0001)
+  Quantile_70_5_MA5: (Quantile($close, 5, 0.7) / $close) * ($close / Mean($close, 5) - 1)
+  Price_Change_2_MA_Ratio_5_Slope_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 5) - 1 * Slope($close, 5) / $close
+  RSV_10_MA7: (($close - Min($low, 10)) / (Max($high, 10) - Min($low, 10) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  MA_Cross_3_10_Price_Change_1: ((Mean($close, 3) - Mean($close, 10)) / (Mean($close, 10) + 0.0001)) * (($close - Ref($close, 1)) / Ref($close, 1))
+  Price_Change_3_MA_Ratio_7_Resi_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 7) - 1 * Resi($close, 5) / $close
+  Price_Change_2_MA_Ratio_3_Slope_Close_7: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * Slope($close, 7) / $close
+  Bottom_Divergence_Strength_10: (Min($close, 10) - $close) / (Min($close, 10) + 0.0001) * ($close / Mean($close, 5) - 1 - Ref($close, 5) / Mean(Ref($close, 5), 5) - 1)
+  Price_Change_3_MA_Ratio_5_Resi_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 5) - 1 * Resi($close, 5) / $close
+  Quantile_20_10: Quantile($close, 10, 0.2) / $close
+  Price_Change_2_MA_Ratio_3_Slope_Close_5: ($close - Ref($close, 2)) / Ref($close, 2) * $close / Mean($close, 3) - 1 * Slope($close, 5) / $close
+  Stock_Market_Momentum_Diff_CSI500_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000905', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_Momentum_Diff_CSI300_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000300', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_Price_Ratio_CSI300_3: ($close / ChangeInstrument('SH000300', $close) - Ref($close, 3) / Ref(ChangeInstrument('SH000300', $close), 3)) / (Ref($close, 3) / Ref(ChangeInstrument('SH000300', $close), 3) + 0.0001)
+  Stock_Market_Price_Ratio_CSI500_3: ($close / ChangeInstrument('SH000905', $close) - Ref($close, 3) / Ref(ChangeInstrument('SH000905', $close), 3)) / (Ref($close, 3) / Ref(ChangeInstrument('SH000905', $close), 3) + 0.0001)
+  Quantile_30_5_MA5: (Quantile($close, 5, 0.3) / $close) * ($close / Mean($close, 5) - 1)
+  Breakout_Retracement_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * (Ref($close, 1) - $close) / (Ref($close, 1) + 0.0001)
+  Breakdown_Rebound_20: 1 - ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) * ($close - Ref($close, 1)) / (Ref($close, 1) + 0.0001)
+  Quantile_25_5_MA5: (Quantile($close, 5, 0.25) / $close) * ($close / Mean($close, 5) - 1)
+  Price_Change_2_Minus_MA_Ratio_3: ($close - Ref($close, 2)) / Ref($close, 2) - $close / Mean($close, 3) - 1
+  RSV_15_MA7: (($close - Min($low, 15)) / (Max($high, 15) - Min($low, 15) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  Quantile_20_5_MA5: (Quantile($close, 5, 0.2) / $close) * ($close / Mean($close, 5) - 1)
+  RSV_20_MA7: (($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001)) * ($close / Mean($close, 7) - 1)
+  Price_Change_1_MA_Ratio_5_Max_Gain_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 5) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  Price_Change_1_MA_Ratio_7_Max_Gain_7: ($close - Ref($close, 1)) / Ref($close, 1) * $close / Mean($close, 7) - 1 * (($close - Min($close, 7)) / Min($close, 7))
+  Price_Position_10_MA10: (($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001)) * ($close / Mean($close, 10) - 1)
+  Price_Change_3_MA_Ratio_3_Resi_Close_5: ($close - Ref($close, 3)) / Ref($close, 3) * $close / Mean($close, 3) - 1 * Resi($close, 5) / $close
+  Quantile_25_10: Quantile($close, 10, 0.25) / $close
+  Cumulative_Price_Change_10: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10
+  Momentum7_Reversal2: (($close - Ref($close, 7)) / Ref($close, 7)) * (Ref($close, 2) / $close - 1)
+  Momentum7_Reversal3: (($close - Ref($close, 7)) / Ref($close, 7)) * (Ref($close, 3) / $close - 1)
+  Stock_Market_MA_Ratio_Product_CSI300_10: $close / Mean($close, 10) - 1 * ChangeInstrument('SH000300', $close / Mean($close, 10) - 1)
+  Stock_Market_MA_Ratio_Product_CSI500_10: $close / Mean($close, 10) - 1 * ChangeInstrument('SH000905', $close / Mean($close, 10) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI300_10: $close / Mean($close, 10) - 1 - ChangeInstrument('SH000300', $close / Mean($close, 10) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI500_10: $close / Mean($close, 10) - 1 - ChangeInstrument('SH000905', $close / Mean($close, 10) - 1)
+  Stock_Market_Price_Change_Product_CSI500: ($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1))
+  Stock_Market_Divergence_Up_CSI100_5: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) < 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_CumReturn_Diff_CSI100_5: Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - ChangeInstrument('SH000903', Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Stock_Market_CumReturn_Diff_CSI300_5: Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - ChangeInstrument('SH000300', Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Stock_Market_CumReturn_Diff_CSI500_5: Sum(($close - Ref($close, 1)) / Ref($close, 1), 5) - ChangeInstrument('SH000905', Sum(($close - Ref($close, 1)) / Ref($close, 1), 5))
+  Stock_Market_MA_Ratio_Diff_CSI100_20: $close / Mean($close, 20) - 1 - ChangeInstrument('SH000903', $close / Mean($close, 20) - 1)
+  Stock_Market_CumReturn_Diff_CSI500_20: Sum(($close - Ref($close, 1)) / Ref($close, 1), 20) - ChangeInstrument('SH000905', Sum(($close - Ref($close, 1)) / Ref($close, 1), 20))
+  Stock_Market_CumReturn_Diff_CSI300_20: Sum(($close - Ref($close, 1)) / Ref($close, 1), 20) - ChangeInstrument('SH000300', Sum(($close - Ref($close, 1)) / Ref($close, 1), 20))
+  Stock_Market_CumReturn_Diff_CSI100_20: Sum(($close - Ref($close, 1)) / Ref($close, 1), 20) - ChangeInstrument('SH000903', Sum(($close - Ref($close, 1)) / Ref($close, 1), 20))
+  Stock_Market_MA_Ratio_Diff_CSI500_20: $close / Mean($close, 20) - 1 - ChangeInstrument('SH000905', $close / Mean($close, 20) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI300_20: $close / Mean($close, 20) - 1 - ChangeInstrument('SH000300', $close / Mean($close, 20) - 1)
+  Stock_Market_Price_Change_Product_CSI300: ($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1))
+  Stock_Market_Divergence_Up_CSI300_5: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) < 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Divergence_Up_CSI100_10: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) < 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Relative_Strength_Change_CSI500_10: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) - ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Relative_Strength_Change_CSI300_10: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) - ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Relative_Strength_Change_CSI100_10: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) - ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Divergence_Up_CSI500_5: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) < 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Sharpe_Diff_CSI100_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI500_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - (ChangeInstrument('SH000905', $close) - Min(ChangeInstrument('SH000905', $close), 20)) / (Max(ChangeInstrument('SH000905', $close), 20) - Min(ChangeInstrument('SH000905', $close), 20) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI300_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - (ChangeInstrument('SH000300', $close) - Min(ChangeInstrument('SH000300', $close), 20)) / (Max(ChangeInstrument('SH000300', $close), 20) - Min(ChangeInstrument('SH000300', $close), 20) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI300_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI500_5: ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI100_20: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - (ChangeInstrument('SH000903', $close) - Min(ChangeInstrument('SH000903', $close), 20)) / (Max(ChangeInstrument('SH000903', $close), 20) - Min(ChangeInstrument('SH000903', $close), 20) + 0.0001)
+  Stock_Market_Divergence_Down_CSI300_5: If(($close - Ref($close, 5)) / Ref($close, 5) < 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5)) > 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Divergence_Down_CSI100_5: If(($close - Ref($close, 5)) / Ref($close, 5) < 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5)) > 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Divergence_Up_CSI300_10: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) < 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Volatility_Ratio_CSI500_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI100_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - (ChangeInstrument('SH000903', $close) - Min(ChangeInstrument('SH000903', $close), 10)) / (Max(ChangeInstrument('SH000903', $close), 10) - Min(ChangeInstrument('SH000903', $close), 10) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI500_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - (ChangeInstrument('SH000905', $close) - Min(ChangeInstrument('SH000905', $close), 10)) / (Max(ChangeInstrument('SH000905', $close), 10) - Min(ChangeInstrument('SH000905', $close), 10) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI300_10: ($close - Min($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - (ChangeInstrument('SH000300', $close) - Min(ChangeInstrument('SH000300', $close), 10)) / (Max(ChangeInstrument('SH000300', $close), 10) - Min(ChangeInstrument('SH000300', $close), 10) + 0.0001)
+  Stock_Market_Divergence_Down_CSI300_10: If(($close - Ref($close, 10)) / Ref($close, 10) < 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) > 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Volatility_Ratio_CSI100_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5) + 0.0001)
+  Stock_Market_Volatility_Diff_CSI100_5: Std(($close - Ref($close, 1)) / Ref($close, 1), 5) - Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 5)
+  Stock_Market_Sharpe_Diff_CSI100_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI500_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI300_10: ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000300', ($close - Ref($close, 10)) / Ref($close, 10)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Price_Change_Product_CSI100: ($close - Ref($close, 1)) / Ref($close, 1) * ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1))
+  Stock_Market_Divergence_Down_CSI500_5: If(($close - Ref($close, 5)) / Ref($close, 5) < 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5)) > 0, 1, 0) * ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Divergence_Down_CSI100_20: If(($close - Ref($close, 20)) / Ref($close, 20) < 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20)) > 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Relative_Strength_Change_CSI100_5: ($close - Ref($close, 2)) / Ref($close, 2) - ChangeInstrument('SH000903', ($close - Ref($close, 2)) / Ref($close, 2)) - ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000903', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Relative_Strength_Change_CSI500_5: ($close - Ref($close, 2)) / Ref($close, 2) - ChangeInstrument('SH000905', ($close - Ref($close, 2)) / Ref($close, 2)) - ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000905', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Relative_Strength_Change_CSI300_5: ($close - Ref($close, 2)) / Ref($close, 2) - ChangeInstrument('SH000300', ($close - Ref($close, 2)) / Ref($close, 2)) - ($close - Ref($close, 5)) / Ref($close, 5) - ChangeInstrument('SH000300', ($close - Ref($close, 5)) / Ref($close, 5))
+  Stock_Market_Volatility_Ratio_CSI500_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Volatility_Diff_CSI500_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) - Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Stock_Market_Volatility_Diff_CSI500_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) - Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Stock_Market_Volatility_Ratio_CSI500_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI100_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Divergence_Down_CSI300_20: If(($close - Ref($close, 20)) / Ref($close, 20) < 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20)) > 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Volatility_Diff_CSI100_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) - Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10)
+  Stock_Market_Volatility_Ratio_CSI100_10: Std(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI300_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000300', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Sharpe_Diff_CSI500_20: ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20)) / (Std(ChangeInstrument('SH000905', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Divergence_Down_CSI500_20: If(($close - Ref($close, 20)) / Ref($close, 20) < 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20)) > 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Divergence_Down_CSI100_10: If(($close - Ref($close, 10)) / Ref($close, 10) < 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10)) > 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000903', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Divergence_Down_CSI500_10: If(($close - Ref($close, 10)) / Ref($close, 10) < 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) > 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Price_Position_Diff_CSI100_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - (ChangeInstrument('SH000903', $close) - Min(ChangeInstrument('SH000903', $close), 5)) / (Max(ChangeInstrument('SH000903', $close), 5) - Min(ChangeInstrument('SH000903', $close), 5) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI500_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - (ChangeInstrument('SH000905', $close) - Min(ChangeInstrument('SH000905', $close), 5)) / (Max(ChangeInstrument('SH000905', $close), 5) - Min(ChangeInstrument('SH000905', $close), 5) + 0.0001)
+  Stock_Market_Price_Position_Diff_CSI300_5: ($close - Min($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - (ChangeInstrument('SH000300', $close) - Min(ChangeInstrument('SH000300', $close), 5)) / (Max(ChangeInstrument('SH000300', $close), 5) - Min(ChangeInstrument('SH000300', $close), 5) + 0.0001)
+  Stock_Market_Divergence_Up_CSI300_20: If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, 0) * If(ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20)) < 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000300', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Volatility_Ratio_CSI100_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Stock_Market_Volatility_Diff_CSI100_20: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) - Std(ChangeInstrument('SH000903', ($close - Ref($close, 1)) / Ref($close, 1)), 20)
+  Stock_Market_Divergence_Up_CSI500_10: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10)) < 0, 1, 0) * ($close - Ref($close, 10)) / Ref($close, 10) - ChangeInstrument('SH000905', ($close - Ref($close, 10)) / Ref($close, 10))
+  Stock_Market_Divergence_Up_CSI500_20: If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, 0) * If(ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20)) < 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000905', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Divergence_Up_CSI100_20: If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, 0) * If(ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20)) < 0, 1, 0) * ($close - Ref($close, 20)) / Ref($close, 20) - ChangeInstrument('SH000903', ($close - Ref($close, 20)) / Ref($close, 20))
+  Stock_Market_Breakout_CSI500_20: If($close > Max($close, 20), ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (ChangeInstrument('SH000905', $close) - Max(ChangeInstrument('SH000905', $close), 20)) / (Max(ChangeInstrument('SH000905', $close), 20) + 0.0001), 0)
+  Stock_Market_Breakout_CSI100_5: If($close > Max($close, 5), ($close - Max($close, 5)) / (Max($close, 5) + 0.0001) - (ChangeInstrument('SH000903', $close) - Max(ChangeInstrument('SH000903', $close), 5)) / (Max(ChangeInstrument('SH000903', $close), 5) + 0.0001), 0)
+  Stock_Market_Breakout_CSI300_20: If($close > Max($close, 20), ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (ChangeInstrument('SH000300', $close) - Max(ChangeInstrument('SH000300', $close), 20)) / (Max(ChangeInstrument('SH000300', $close), 20) + 0.0001), 0)
+  Stock_Market_Breakout_CSI300_10: If($close > Max($close, 10), ($close - Max($close, 10)) / (Max($close, 10) + 0.0001) - (ChangeInstrument('SH000300', $close) - Max(ChangeInstrument('SH000300', $close), 10)) / (Max(ChangeInstrument('SH000300', $close), 10) + 0.0001), 0)
+  Stock_Market_Breakout_CSI300_5: If($close > Max($close, 5), ($close - Max($close, 5)) / (Max($close, 5) + 0.0001) - (ChangeInstrument('SH000300', $close) - Max(ChangeInstrument('SH000300', $close), 5)) / (Max(ChangeInstrument('SH000300', $close), 5) + 0.0001), 0)
+  Stock_Market_Breakout_CSI100_20: If($close > Max($close, 20), ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (ChangeInstrument('SH000903', $close) - Max(ChangeInstrument('SH000903', $close), 20)) / (Max(ChangeInstrument('SH000903', $close), 20) + 0.0001), 0)
+  Stock_Market_Breakout_CSI500_5: If($close > Max($close, 5), ($close - Max($close, 5)) / (Max($close, 5) + 0.0001) - (ChangeInstrument('SH000905', $close) - Max(ChangeInstrument('SH000905', $close), 5)) / (Max(ChangeInstrument('SH000905', $close), 5) + 0.0001), 0)
+  Stock_Market_Breakout_CSI500_10: If($close > Max($close, 10), ($close - Max($close, 10)) / (Max($close, 10) + 0.0001) - (ChangeInstrument('SH000905', $close) - Max(ChangeInstrument('SH000905', $close), 10)) / (Max(ChangeInstrument('SH000905', $close), 10) + 0.0001), 0)
+  Stock_Market_Breakout_CSI100_10: If($close > Max($close, 10), ($close - Max($close, 10)) / (Max($close, 10) + 0.0001) - (ChangeInstrument('SH000903', $close) - Max(ChangeInstrument('SH000903', $close), 10)) / (Max(ChangeInstrument('SH000903', $close), 10) + 0.0001), 0)
+  Stock_Market_Return_CSI100_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000903', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_Return_CSI500_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000905', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_Return_CSI300_3: ($close - Ref($close, 3)) / Ref($close, 3) - ChangeInstrument('SH000300', ($close - Ref($close, 3)) / Ref($close, 3))
+  Stock_Market_MA_Ratio_Diff_CSI100_5: $close / Mean($close, 5) - 1 - ChangeInstrument('SH000903', $close / Mean($close, 5) - 1)
+  Stock_Market_MA_Ratio_Product_CSI100_5: $close / Mean($close, 5) - 1 * ChangeInstrument('SH000903', $close / Mean($close, 5) - 1)
+  Stock_Market_MA_Ratio_Product_CSI300_5: $close / Mean($close, 5) - 1 * ChangeInstrument('SH000300', $close / Mean($close, 5) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI500_5: $close / Mean($close, 5) - 1 - ChangeInstrument('SH000905', $close / Mean($close, 5) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI300_5: $close / Mean($close, 5) - 1 - ChangeInstrument('SH000300', $close / Mean($close, 5) - 1)
+  Stock_Market_MA_Ratio_Product_CSI500_5: $close / Mean($close, 5) - 1 * ChangeInstrument('SH000905', $close / Mean($close, 5) - 1)
+  Stock_Market_CumReturn_Diff_CSI100_10: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) - ChangeInstrument('SH000903', Sum(($close - Ref($close, 1)) / Ref($close, 1), 10))
+  Stock_Market_MA_Ratio_Product_CSI100_10: $close / Mean($close, 10) - 1 * ChangeInstrument('SH000903', $close / Mean($close, 10) - 1)
+  Stock_Market_MA_Ratio_Diff_CSI100_10: $close / Mean($close, 10) - 1 - ChangeInstrument('SH000903', $close / Mean($close, 10) - 1)
+  Stock_Market_CumReturn_Diff_CSI300_10: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) - ChangeInstrument('SH000300', Sum(($close - Ref($close, 1)) / Ref($close, 1), 10))
+  Stock_Market_CumReturn_Diff_CSI500_10: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) - ChangeInstrument('SH000905', Sum(($close - Ref($close, 1)) / Ref($close, 1), 10))
+min_ic_threshold: 0.02
+min_icir_threshold: 0.1

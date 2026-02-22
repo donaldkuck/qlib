@@ -1,0 +1,208 @@
+qlib_init:
+    provider_uri: "~/.qlib/qlib_data/cn_data"
+    region: cn
+market: &market csi100
+# 使用CSI100作为股票池（100只股票）
+# 注意：YAML中字典格式需要使用正确的语法
+benchmark: &benchmark SH000300  # 沪深300指数
+
+# 短期因子配置（用于止盈）- 使用自定义因子
+short_term_data_handler_config: &short_term_data_handler_config
+    start_time: 2015-01-01
+    end_time: 2025-12-31
+    fit_start_time: 2015-01-01
+    fit_end_time: 2024-12-31 # 与训练集结束时间一致
+    instruments:  # 使用固定股票池（方法1：字典格式）
+        market: csi100  # CSI100（100只股票）
+        filter_pipe: []
+        # 使用2025-12-31的成分股，确保股票数量是100个
+        use_fixed_date: true
+        fixed_date: 2025-12-31
+    # 从factor_config.yaml加载因子
+    custom_factors_file: ./factor_config.yaml
+    # 启用股票ID的one-hot编码（让模型学习股票特定的特征）
+    add_stock_id_onehot: false
+    # 短期目标：未来1日收益率（用于止盈）
+    label_expr: "Ref($close, -1) / $close - 1"
+    infer_processors:
+        - class: RobustZScoreNorm
+          kwargs:
+              fields_group: feature
+              clip_outlier: true
+        - class: Fillna
+          kwargs:
+              fields_group: feature
+    learn_processors:
+        - class: DropnaLabel
+        # 注意：移除CSRankNorm，保留原始收益率值，这样"正预测"判断才有意义
+        # CSRankNorm会把标签转换为0-1的排名，导致策略逻辑失效
+        - class: CSRankNorm
+          kwargs:
+              fields_group: label
+
+# 长期因子配置（用于开仓和止损）- 使用自定义因子
+long_term_data_handler_config: &long_term_data_handler_config
+    start_time: 2015-01-01
+    end_time: 2025-12-31
+    fit_start_time: 2015-01-01
+    fit_end_time: 2024-12-31 # 与训练集结束时间一致
+    instruments:  # 使用固定股票池（方法1：字典格式）
+        market: csi100  # CSI100（100只股票），与短期数据保持一致
+        filter_pipe: []
+        # 使用2025-12-31的成分股，确保股票数量是100个
+        use_fixed_date: true
+        fixed_date: 2025-12-31
+    # 从factor_config_longterm.yaml加载因子
+    custom_factors_file: ./factor_config_longterm.yaml
+    # 启用股票ID的one-hot编码（让模型学习股票特定的特征）
+    add_stock_id_onehot: false
+    # 长期目标：未来5日收益率（真正的长期目标）
+    label_expr: "Ref($close, -5) / $close - 1"
+    infer_processors:
+        - class: RobustZScoreNorm
+          kwargs:
+              fields_group: feature
+              clip_outlier: true
+        - class: Fillna
+          kwargs:
+              fields_group: feature
+    learn_processors:
+        - class: DropnaLabel
+        # 注意：移除CSRankNorm，保留原始收益率值，这样"正预测"判断才有意义
+        # - class: CSRankNorm
+        #   kwargs:
+        #       fields_group: label
+
+# 股票池筛选配置（短期胜率偏低时可启用，只交易胜率达标股票）
+stock_pool_filter_config: &stock_pool_filter_config
+    enable_stock_pool_filter: false  # 关闭：不按胜率筛选，使用全部股票池
+    min_win_rate: 0.52  # 最小胜率阈值（52%，过滤掉短期表现差的股票）
+    filter_segment: test  # 用于筛选的数据段（test 或 train）
+
+port_analysis_config: &port_analysis_config
+    strategy:
+        class: TopkDropLongShortStrategy
+        module_path: long_short_strategy
+        kwargs:
+            # TopkDrop 参数
+            topk: 20  # 持仓股票数量（减少到30，提高资金集中度）
+            n_drop: 5  # 每天替换的股票数量（减少到2，进一步降低交易频率）
+            method_sell: bottom  # 卖出方法：bottom（卖出预测值最低的）
+            method_buy: top  # 买入方法：top（买入预测值最高的）
+            hold_thresh: 10  # 最小持有天数（增加到10天，大幅减少交易频率）
+            # 加仓/止盈参数（进一步降低频率以减少交易成本）
+            add_position_ratio: 0.03  # 加仓比例（降低到3%，进一步减少交易）
+            profit_threshold: 0.05  # 止盈阈值（提高到5%，大幅减少止盈频率）
+            reduce_position_ratio: 0.2  # 止盈时减仓比例（降低到20%，减少交易）
+            max_single_stock_ratio: 0.05  # 单只股票最大仓位比例（相对于总资产，例如0.05表示最多5%）
+            # 其他参数
+            risk_degree: 0.95
+            only_tradable: false
+            forbid_all_trade_at_limit: true
+    backtest:
+        start_time: 2025-01-01  # 与测试集开始时间一致，确保有预测信号
+        end_time: 2025-12-31    # 与测试集结束时间一致
+        account: 100000000
+        benchmark: *benchmark
+        exchange_kwargs:
+            limit_threshold: 0.095
+            deal_price: close
+            open_cost: 0.0005
+            close_cost: 0.0015
+            min_cost: 5
+
+task:
+    # n-fold 交叉验证配置
+    use_nfold: false  # 是否使用 n-fold 交叉验证（默认 false，使用单次训练）
+    n_folds: 5  # fold 数量（当 use_nfold=true 时生效，默认 5）
+    ensemble_method: mean  # 集成方法：mean（平均）或 median（中位数）
+    
+    # 短期模型配置（GATs TS - 图注意力时间序列模型）
+    short_term_model:
+        class: GATs
+        module_path: qlib.contrib.model.pytorch_gats_ts
+        kwargs:
+            d_feat: 143  # 特征维度（会自动调整）
+            hidden_size: 64  # 隐藏层维度
+            num_layers: 2  # 层数
+            dropout: 0.7  # Dropout 率
+            n_epochs: 300  # 训练轮数
+            lr: 0.0001  # 学习率
+            metric: loss  # 评估指标
+            early_stop: 5  # 早停轮数
+            loss: mse  # 损失函数
+            base_model: LSTM  # 基座模型（LSTM/GRU）
+            model_path: null  # 预训练基座模型路径（可选）
+            optimizer: adam  # 优化器
+            n_jobs: 0  # 设置为0禁用多进程，避免"Too many open files"错误
+            GPU: 0  # GPU 设备
+            seed: 0  # 随机种子
+    short_term_dataset:
+        class: TSDatasetH  # GATs TS 使用 TSDatasetH（需要时间序列）
+        module_path: qlib.data.dataset
+        kwargs:
+            handler:
+                class: CustomFactorHandler
+                module_path: custom_factor_handler
+                kwargs: *short_term_data_handler_config
+            segments:
+                train: [2015-01-01, 2024-12-31]
+                valid: [2025-01-01, 2025-06-30]
+                test: [2025-07-01, 2025-12-31]
+            step_len: 20  # 时间序列长度
+    
+    # 长期模型配置（GATs TS - 图注意力时间序列模型）
+    long_term_model:
+        class: GATs
+        module_path: qlib.contrib.model.pytorch_gats_ts
+        kwargs:
+            d_feat: 150  # 特征维度（会自动调整）
+            hidden_size: 128  # 隐藏层维度
+            num_layers: 2  # 层数
+            dropout: 0.5  # Dropout 率
+            n_epochs: 300  # 训练轮数
+            lr: 0.0001  # 学习率
+            metric: loss  # 评估指标
+            early_stop: 5  # 早停轮数
+            loss: mse  # 损失函数
+            base_model: LSTM  # 基座模型（LSTM/GRU）
+            model_path: null  # 预训练基座模型路径（可选）
+            optimizer: adam  # 优化器
+            n_jobs: 0  # 设置为0禁用多进程，避免"Too many open files"错误
+            GPU: 0  # GPU 设备
+            seed: 0  # 随机种子
+    long_term_dataset:
+        class: TSDatasetH  # GATs TS 使用 TSDatasetH（需要时间序列）
+        module_path: qlib.data.dataset
+        kwargs:
+            handler:
+                class: CustomFactorHandler
+                module_path: custom_factor_handler
+                kwargs: *long_term_data_handler_config
+            segments:
+                train: [2015-01-01, 2024-12-31]  # 训练集
+                valid: [2025-01-01, 2025-06-30]  # 验证集
+                test: [2025-07-01, 2025-12-31]   # 测试集
+            step_len: 40  # 时间序列长度（长期使用更长序列）
+    
+    record: 
+        - class: SignalRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            model: <LONG_TERM_MODEL>
+            dataset: <LONG_TERM_DATASET>
+        - class: SignalRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            model: <SHORT_TERM_MODEL>
+            dataset: <SHORT_TERM_DATASET>
+        - class: SigAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            ana_long_short: False
+            ann_scaler: 252
+        - class: PortAnaRecord
+          module_path: qlib.workflow.record_temp
+          kwargs: 
+            config: *port_analysis_config
+

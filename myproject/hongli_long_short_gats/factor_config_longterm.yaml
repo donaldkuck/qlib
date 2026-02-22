@@ -1,0 +1,1222 @@
+good_factors:
+  RSV_60_LongTerm:
+    expression: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001)
+    ic: 0.019148481762995183
+    icir: 0.10888605713131007
+    ic_train: 0.020424980853561894
+    ic_valid: 0.005356618255583328
+    icir_train: 0.11674178701758986
+    icir_valid: 0.02893226106588372
+    ic_decay: 0.7377418224287249
+    stability_score: 0.3
+    is_stable: true
+  Multi_Timeframe_10_30_LongTerm:
+    expression: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30)))
+    ic: 0.017360928422973123
+    icir: 0.11159557105219546
+    ic_train: 0.015556666911315013
+    ic_valid: 0.036854971688932495
+    icir_train: 0.10102248206924386
+    icir_valid: 0.2157069143786077
+    ic_decay: -1.3690789228203077
+    stability_score: 0.5
+    is_stable: true
+  Cumulative_Return_10_LongTerm_MA40_Extend:
+    expression: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1
+    ic: 0.022380740186362512
+    icir: 0.11218953407028918
+    ic_train: 0.023309824579783752
+    ic_valid: 0.012342499473442342
+    icir_train: 0.11765621369073037
+    icir_valid: 0.057683451066146925
+    ic_decay: 0.47050225834188386
+    stability_score: 0.8
+    is_stable: true
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend:
+    expression: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1
+    ic: 0.016966307403549114
+    icir: 0.11716637492274078
+    ic_train: 0.019703330710968192
+    ic_valid: -0.012605708864609886
+    icir_train: 0.1345673703505785
+    icir_valid: -0.10291963448967882
+    ic_decay: 1.639775530823969
+    stability_score: 0.0
+    is_stable: true
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1
+    ic: 0.016734893866475697
+    icir: 0.11236920749217777
+    ic_train: 0.01981771297179666
+    ic_valid: -0.016573253889236597
+    icir_train: 0.13323489857651183
+    icir_valid: -0.11261384565756578
+    ic_decay: 1.836284888817525
+    stability_score: 0.2
+    is_stable: true
+  Price_MA_Angle_Change_20_5_LongTerm_MA100_Extend:
+    expression: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * $close / Mean($close, 100) - 1
+    ic: 0.013902378402486704
+    icir: 0.11613860541067682
+    ic_train: 0.01572237635402485
+    ic_valid: -0.005761688353909902
+    icir_train: 0.12920334877777925
+    icir_valid: -0.061494312085289826
+    ic_decay: 1.366464217887453
+    stability_score: 0.0
+    is_stable: true
+  MA30_Slope20_LongTerm_Slope40_Extend_Slope25_Extend:
+    expression: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * Slope($close, 25) / $close
+    ic: 0.06424911864176651
+    icir: 0.29665048329664
+    ic_train: 0.06195235026080784
+    ic_valid: 0.08906442501559106
+    icir_train: 0.2818660155222331
+    icir_valid: 0.5039268987041051
+    ic_decay: -0.437627864651566
+    stability_score: 1.0
+    is_stable: true
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_MA40_Extend:
+    expression: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+    ic: 0.05435785547581562
+    icir: 0.24670964235274137
+    ic_train: 0.056150411415961735
+    ic_valid: 0.03499028440694807
+    icir_train: 0.24949176686616528
+    icir_valid: 0.21908629288489717
+    ic_decay: 0.3768472300631894
+    stability_score: 1.0
+    is_stable: true
+  Quantile_Range_60_LongTerm_MA40_Extend_Slope25_Extend:
+    expression: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+    ic: 0.03282148253976612
+    icir: 0.1521898539286604
+    ic_train: 0.027859050429920557
+    ic_valid: 0.08643780457991976
+    icir_train: 0.13053553704921697
+    icir_valid: 0.3720017473180676
+    ic_decay: -2.1026830866814383
+    stability_score: 0.5
+    is_stable: true
+  Price_Smoothness_10_LongTerm_Slope25_Extend_Slope40_Extend:
+    expression: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * Slope($close, 40) / $close
+    ic: 0.0676830351101339
+    icir: 0.32728361398510575
+    ic_train: 0.0667836752353771
+    ic_valid: 0.0774001189125064
+    icir_train: 0.31587679688280357
+    icir_valid: 0.5231403642453885
+    ic_decay: -0.15896764650510709
+    stability_score: 1.0
+    is_stable: true
+  Price_Smoothness_10_LongTerm_Slope25_Extend_MA50_Extend:
+    expression: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+    ic: 0.053331885070124624
+    icir: 0.23635171123671034
+    ic_train: 0.05501910416519453
+    ic_valid: 0.03510242009183602
+    icir_train: 0.23941067317030773
+    icir_valid: 0.20197989296583624
+    ic_decay: 0.3619957899270549
+    stability_score: 1.0
+    is_stable: true
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+    ic: 0.042167779425989274
+    icir: 0.21809251934186324
+    ic_train: 0.0460264504878676
+    ic_valid: 0.00047698230853939096
+    icir_train: 0.234355832746283
+    icir_valid: 0.003161793096782793
+    ic_decay: 0.9896367783419423
+    stability_score: 0.3
+    is_stable: true
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_Slope40_Extend:
+    expression: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+    ic: 0.02465193673904496
+    icir: 0.12755971204027683
+    ic_train: 0.02097848604724436
+    ic_valid: 0.06434153065801061
+    icir_train: 0.10948694319243481
+    icir_valid: 0.31144712024307714
+    ic_decay: -2.067024498961031
+    stability_score: 0.5
+    is_stable: true
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_Slope15_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 15) / $close
+    ic: 0.05597853676704495
+    icir: 0.26874769692044953
+    ic_train: 0.05890067233135137
+    ic_valid: 0.024406485403361013
+    icir_train: 0.2772934179161861
+    icir_valid: 0.15857611014668788
+    ic_decay: 0.5856331610943252
+    stability_score: 0.5
+    is_stable: true
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_MA50_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+    ic: 0.04016879013017423
+    icir: 0.20025611395050333
+    ic_train: 0.04369933119403543
+    ic_valid: 0.0020232553468561123
+    icir_train: 0.21462150941293895
+    icir_valid: 0.01265574129455775
+    ic_decay: 0.9537005420546969
+    stability_score: 0.3
+    is_stable: true
+  Price_Smoothness_10_LongTerm_MA50_Extend_MA40_Extend:
+    expression: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * $close / Mean($close, 40) - 1
+    ic: 0.032339746109303125
+    icir: 0.12989026558682426
+    ic_train: 0.04073527854889655
+    ic_valid: -0.0583693177158152
+    icir_train: 0.16281643590063205
+    icir_valid: -0.2702086860642062
+    ic_decay: 2.4328935457198764
+    stability_score: 0.2
+    is_stable: true
+  Quantile_Range_30_LongTerm_MA40_Extend_Slope40_Extend:
+    expression: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+    ic: 0.030733693522997544
+    icir: 0.15668926743557346
+    ic_train: 0.025561359386280548
+    ic_valid: 0.08661789035125982
+    icir_train: 0.13306516103378946
+    icir_valid: 0.37888191642601515
+    ic_decay: -2.388626130648979
+    stability_score: 0.5
+    is_stable: true
+  Quantile_Range_30_LongTerm_Slope25_Extend_Slope40_Extend:
+    expression: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * Slope($close, 40) / $close
+    ic: 0.06485038052924877
+    icir: 0.3071763682569159
+    ic_train: 0.06228129851668527
+    ic_valid: 0.0926078844072125
+    icir_train: 0.2922970534771859
+    icir_valid: 0.49560721612997055
+    ic_decay: -0.48692924863155645
+    stability_score: 1.0
+    is_stable: true
+  Quantile_Range_30_LongTerm_Slope25_Extend_MA40_Extend:
+    expression: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+    ic: 0.030850659156417642
+    icir: 0.14450281853617344
+    ic_train: 0.02989472394914433
+    ic_valid: 0.04117900799589057
+    icir_train: 0.14087194125973362
+    icir_valid: 0.1812937725848411
+    ic_decay: -0.3774674108361929
+    stability_score: 1.0
+    is_stable: true
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+    ic: 0.022278952382832062
+    icir: 0.1547290575836343
+    ic_train: 0.022823631083063713
+    ic_valid: 0.016394001626106994
+    icir_train: 0.15832887392513964
+    icir_valid: 0.11515838402891318
+    ic_decay: 0.28170931406825217
+    stability_score: 1.0
+    is_stable: true
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_MA40_Extend:
+    expression: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+    ic: -0.019722467276587587
+    icir: -0.1073094330237859
+    ic_train: -0.02058866776482199
+    ic_valid: -0.010363652223708315
+    icir_train: -0.11115094943845727
+    icir_valid: -0.061862782998105104
+    ic_decay: -0.4966331798594682
+    stability_score: 0.8
+    is_stable: true
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_MA40_Extend:
+    expression: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+    ic: 0.06860077302561657
+    icir: 0.31585512722547876
+    ic_train: 0.06717476464891109
+    ic_valid: 0.08400800130904344
+    icir_train: 0.3040900649304408
+    icir_valid: 0.4893371530547316
+    ic_decay: -0.2505886957417903
+    stability_score: 1.0
+    is_stable: true
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_MA40_Extend:
+    expression: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 40) - 1
+    ic: 0.06132940741200244
+    icir: 0.2903522641425967
+    ic_train: 0.06296205094633917
+    ic_valid: 0.04368960104767976
+    icir_train: 0.29286621551161807
+    icir_valid: 0.26548710222493255
+    ic_decay: 0.3060962851271282
+    stability_score: 1.0
+    is_stable: true
+  Breakout_Low_20_LongTerm_MA40_Extend_Slope40_Extend:
+    expression: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+    ic: -0.023656182269626184
+    icir: -0.11754244124412783
+    ic_train: -0.021839940509519526
+    ic_valid: -0.04327966546437855
+    icir_train: -0.10989887673995469
+    icir_valid: -0.19120436241286887
+    ic_decay: 0.9816750620503726
+    stability_score: 0.5
+    is_stable: true
+  Cumulative_Return_10_LongTerm_Slope40_Extend_MA40_Extend:
+    expression: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+    ic: 0.05515786663901946
+    icir: 0.261027664191101
+    ic_train: 0.055556072202520373
+    ic_valid: 0.05085547675070522
+    icir_train: 0.26073292326287884
+    icir_valid: 0.26546286810010644
+    ic_decay: 0.08460993129031731
+    stability_score: 1.0
+    is_stable: true
+  Cumulative_Return_10_LongTerm_Slope40_Extend_Slope25_Extend:
+    expression: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * Slope($close, 25) / $close
+    ic: 0.05120166132919791
+    icir: 0.23201964707383052
+    ic_train: 0.052450521705092325
+    ic_valid: 0.0377084187789787
+    icir_train: 0.2360413613966543
+    icir_valid: 0.18541374650299058
+    ic_decay: 0.2810668501831573
+    stability_score: 1.0
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04514956624909625
+    icir: 0.22187999853980733
+    ic_train: 0.04820731078729226
+    ic_valid: 0.012112335260853969
+    icir_train: 0.2332528412376141
+    icir_valid: 0.07481547910451254
+    ic_decay: 0.7487448467246414
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04358316529611695
+    icir: 0.2226301959696199
+    ic_train: 0.04691426423569859
+    ic_valid: 0.007592491864459204
+    icir_train: 0.23625122559641962
+    icir_valid: 0.047981192135575605
+    ic_decay: 0.8381624013900268
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * Slope($close, 40) / $close
+    ic: 0.05288155101120315
+    icir: 0.25236996357778996
+    ic_train: 0.05736227918585218
+    ic_valid: 0.004469772377550832
+    icir_train: 0.26954461723682366
+    icir_valid: 0.027437263163604106
+    ic_decay: 0.9220781942246594
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_Slope25_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * Slope($close, 25) / $close
+    ic: 0.04952333949924254
+    icir: 0.2357078748805206
+    ic_train: 0.05380039278417273
+    ic_valid: 0.003312154896285623
+    icir_train: 0.2519991282770773
+    icir_valid: 0.020376729969639833
+    ic_decay: 0.9384362320629747
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04314513805426419
+    icir: 0.22872123761973448
+    ic_train: 0.04730325674529319
+    ic_valid: -0.0017810243363646366
+    icir_train: 0.24769205178361145
+    icir_valid: -0.011522366104693241
+    ic_decay: 1.0376511990697523
+    stability_score: 0.0
+    is_stable: true
+  Price_Asymmetry_20_LongTerm_MA40_Extend_MA80_Extend:
+    expression: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+    ic: 0.0381872904946884
+    icir: 0.2236965368253452
+    ic_train: 0.03961122272287852
+    ic_valid: 0.022802493842554263
+    icir_train: 0.23010768848337712
+    icir_valid: 0.1481595401923634
+    ic_decay: 0.42434259093486476
+    stability_score: 1.0
+    is_stable: true
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_MA50_Extend:
+    expression: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 50) - 1
+    ic: 0.04829340557201268
+    icir: 0.2215028472650473
+    ic_train: 0.0516771275575435
+    ic_valid: 0.011734169363899568
+    icir_train: 0.23545902890276663
+    icir_valid: 0.05910902685739652
+    ic_decay: 0.7729330185615805
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+    ic: 0.016006889844384864
+    icir: 0.1132018004215789
+    ic_train: 0.017362672233161812
+    ic_valid: 0.0013584143460881669
+    icir_train: 0.12379971940990955
+    icir_valid: 0.008885568904644326
+    ic_decay: 0.9217623688424144
+    stability_score: 0.3
+    is_stable: true
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_Slope25_Extend:
+    expression: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * Slope($close, 25) / $close
+    ic: 0.07537344824156429
+    icir: 0.3259893393780805
+    ic_train: 0.07452506965952538
+    ic_valid: 0.08453970749906028
+    icir_train: 0.3167184163605918
+    icir_valid: 0.4660081356408844
+    ic_decay: -0.13437944956358577
+    stability_score: 1.0
+    is_stable: true
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_MA50_Extend:
+    expression: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+    ic: 0.048380699507321046
+    icir: 0.2063630832456142
+    ic_train: 0.04984280284774214
+    ic_valid: 0.03258348519370469
+    icir_train: 0.21084669486859975
+    icir_valid: 0.15363309464939678
+    ic_decay: 0.3462750220279655
+    stability_score: 1.0
+    is_stable: true
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_MA40_Extend:
+    expression: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04786241363323397
+    icir: 0.20833493070009448
+    ic_train: 0.04990059628885063
+    ic_valid: 0.025840982362993488
+    icir_train: 0.21555626117629795
+    icir_valid: 0.12364040703035077
+    ic_decay: 0.4821508301541643
+    stability_score: 1.0
+    is_stable: true
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 40) / $close
+    ic: 0.049280538636791625
+    icir: 0.23723260472505497
+    ic_train: 0.05435058738026493
+    ic_valid: -0.005498521342690987
+    icir_train: 0.25829928009670516
+    icir_valid: -0.03293856025072662
+    ic_decay: 1.1011676525999705
+    stability_score: 0.0
+    is_stable: true
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_MA50_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+    ic: 0.03808026712852102
+    icir: 0.19836554815694954
+    ic_train: 0.043213374951077216
+    ic_valid: -0.017380111167630555
+    icir_train: 0.22247128483324718
+    icir_valid: -0.11190603762498083
+    ic_decay: 1.4021928670766157
+    stability_score: 0.2
+    is_stable: true
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_MA40_Extend:
+    expression: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+    ic: 0.022715979227757872
+    icir: 0.14132857491253548
+    ic_train: 0.024288527325953792
+    ic_valid: 0.005725470664583302
+    icir_train: 0.14924328797888836
+    icir_valid: 0.042015238264086624
+    ic_decay: 0.7642726301291523
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04502153780370567
+    icir: 0.22481277989127105
+    ic_train: 0.049463674121418374
+    ic_valid: -0.0029732772556702674
+    icir_train: 0.24406370554916854
+    icir_valid: -0.018013244554663414
+    ic_decay: 1.060110319511886
+    stability_score: 0.0
+    is_stable: true
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_MA50_Extend:
+    expression: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+    ic: 0.023161846552876963
+    icir: 0.1406210289446669
+    ic_train: 0.022922601234873014
+    ic_valid: 0.025746759299844064
+    icir_train: 0.1372521529974682
+    icir_valid: 0.18694577099106532
+    ic_decay: -0.1232040829936243
+    stability_score: 1.0
+    is_stable: true
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_MA50_Extend:
+    expression: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+    ic: 0.04380918261460041
+    icir: 0.22890335540968304
+    ic_train: 0.04975934856315192
+    ic_valid: -0.02047905481174954
+    icir_train: 0.2570648962533768
+    icir_valid: -0.13458788902160534
+    ic_decay: 1.41156195575508
+    stability_score: 0.2
+    is_stable: true
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * $close / Mean($close, 40) - 1
+    ic: 0.042751654986195896
+    icir: 0.21132141958618114
+    ic_train: 0.046883649131953094
+    ic_valid: -0.0018922462064074243
+    icir_train: 0.22951145111903695
+    icir_valid: -0.010882137690788574
+    ic_decay: 1.0403604719650072
+    stability_score: 0.0
+    is_stable: true
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_Slope15_Extend:
+    expression: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * Slope($close, 15) / $close
+    ic: 0.059382375081857196
+    icir: 0.2834413150499052
+    ic_train: 0.06309990480829647
+    ic_valid: 0.019216531681973188
+    icir_train: 0.2947767618067165
+    icir_valid: 0.13139800250752975
+    ic_decay: 0.6954586264376333
+    stability_score: 0.5
+    is_stable: true
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * Slope($close, 40) / $close
+    ic: 0.051228045470344284
+    icir: 0.24344447141682357
+    ic_train: 0.055363460223953706
+    ic_valid: 0.006547186510235279
+    icir_train: 0.25830576158471974
+    icir_valid: 0.041997474498060995
+    ic_decay: 0.8817417393394325
+    stability_score: 0.3
+    is_stable: true
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_Slope40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * Slope($close, 40) / $close
+    ic: 0.050135639378622775
+    icir: 0.2331106052556742
+    ic_train: 0.057159855955874604
+    ic_valid: -0.025757118396040425
+    icir_train: 0.26286635760717025
+    icir_valid: -0.1512687219001514
+    ic_decay: 1.4506155231728368
+    stability_score: 0.2
+    is_stable: true
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+    ic: 0.04083069230586269
+    icir: 0.20570307922200426
+    ic_train: 0.045194535287390945
+    ic_valid: -0.006318206752338167
+    icir_train: 0.22518044855548583
+    icir_valid: -0.03805592906861281
+    ic_decay: 1.1398002371782527
+    stability_score: 0.0
+    is_stable: true
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_MA40_Extend:
+    expression: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * $close / Mean($close, 40) - 1
+    ic: 0.03395956708080097
+    icir: 0.17038125010174685
+    ic_train: 0.03879500868854376
+    ic_valid: -0.018284693134411105
+    icir_train: 0.19223593425416957
+    icir_valid: -0.11327691563277527
+    ic_decay: 1.4713156086960901
+    stability_score: 0.2
+    is_stable: true
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_Slope40_Extend:
+    expression: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * Slope($close, 40) / $close
+    ic: 0.03344708944289945
+    icir: 0.19788123615438374
+    ic_train: 0.03589377815708065
+    ic_valid: 0.0070119771576796315
+    icir_train: 0.20958638111628988
+    icir_valid: 0.049978964549817206
+    ic_decay: 0.8046464452141714
+    stability_score: 0.3
+    is_stable: true
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_MA50_Extend:
+    expression: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+    ic: 0.03008967829299679
+    icir: 0.19061516428423245
+    ic_train: 0.032582695740362655
+    ic_valid: 0.0031540097839016096
+    icir_train: 0.2022426074377404
+    icir_valid: 0.027680375091864794
+    ic_decay: 0.9031998515704611
+    stability_score: 0.3
+    is_stable: true
+bad_factors:
+  Breakout_Low_30_LongTerm: (Min($close, 30) - $close) / (Min($close, 30) + 0.0001)
+  Momentum_30_LongTerm: ($close - Ref($close, 30)) / Ref($close, 30)
+  Price_Asymmetry_30_LongTerm: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 30) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 30)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 30) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 30) + 0.0001)
+  Price_MA_Q25_Norm_20_LongTerm: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.25)) / (Quantile($close / Mean($close, 20), 20, 0.25) + 0.0001)
+  Price_MA_Multi_Timeframe_20_30_LongTerm: $close / Mean($close, 20) / ($close / Mean($close, 30) + 0.0001) - 1
+  MA_Cross_20_30_LongTerm: (Mean($close, 20) - Mean($close, 30)) / (Mean($close, 30) + 0.0001)
+  MA_Ratio_20_30_LongTerm: $close / Mean($close, 20) - 1 * $close / Mean($close, 30) - 1
+  Price_Change_Diff_30_LongTerm: ($close - Ref($close, 30)) / Ref($close, 30) - (Ref($close, 30) - Ref($close, 60)) / Ref($close, 60)
+  MA_Distance_Cumulative_Change_30_LongTerm: Sum(($close - Mean($close, 30)) / Mean($close, 30), 15) - Ref(Sum((Ref($close, 15) - Mean(Ref($close, 15), 30)) / Mean(Ref($close, 15), 30), 15), 15)
+  MA_Cross_Frequency_30_LongTerm: Sum(If($close > Mean($close, 30) != Ref($close, 1) > Mean(Ref($close, 1), 30), 1, 0), 30) / (30 + 0.0001)
+  Momentum_Decay_10_30_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) - ($close - Ref($close, 30)) / Ref($close, 30)
+  Momentum_Decay_5_30_LongTerm: ($close - Ref($close, 5)) / Ref($close, 5) - ($close - Ref($close, 30)) / Ref($close, 30)
+  Price_Quantile_25_20_LongTerm: $close / (Quantile($close, 20, 0.25) + 0.0001) - 1
+  MA_Cross_Frequency_20_LongTerm: Sum(If($close > Mean($close, 20) != Ref($close, 1) > Mean(Ref($close, 1), 20), 1, 0), 20) / (20 + 0.0001)
+  MA_Distance_Norm_Cum_20_30_LongTerm: Sum(($close - Mean($close, 20)) / (Std($close, 20) + 0.0001), 10) - Sum(($close - Mean($close, 30)) / (Std($close, 30) + 0.0001), 15)
+  MA_Cross_20_60_LongTerm: (Mean($close, 20) - Mean($close, 60)) / (Mean($close, 60) + 0.0001)
+  Trend_Strength_30_LongTerm: Slope($close, 30) / $close - Ref(Slope($close, 30), 30) / Ref($close, 30)
+  Price_Position_60_LongTerm: ($close - Min($close, 60)) / (Max($close, 60) - Min($close, 60) + 0.0001)
+  Price_Stability_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 20) / $close + 0.0001)
+  Price_Position_20_LongTerm: ($close - Min($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001)
+  Price_MA_Relative_Change_60_LongTerm: ($close / Mean($close, 60) - Ref($close, 30) / Mean(Ref($close, 30), 60)) / (Ref($close, 30) / Mean(Ref($close, 30), 60) + 0.0001)
+  Price_MA_Quantile_60_LongTerm: ($close / Mean($close, 60) - Quantile($close / Mean($close, 60), 120, 0.5)) / (Quantile($close / Mean($close, 60), 120, 0.5) + 0.0001)
+  Breakout_Low_60_LongTerm: (Min($close, 60) - $close) / (Min($close, 60) + 0.0001)
+  MA_Distance_Change_60_LongTerm: ($close - Mean($close, 60)) / Mean($close, 60) - (Ref($close, 30) - Mean(Ref($close, 30), 60)) / Mean(Ref($close, 30), 60)
+  Price_MA_Relative_Position_60_LongTerm: ($close / Mean($close, 60) - Min($close / Mean($close, 60), 60)) / (Max($close / Mean($close, 60), 60) - Min($close / Mean($close, 60), 60) + 0.0001)
+  Price_Change_Skewness_20_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001), 3), 20) * Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)
+  Price_MA_Quantile_Cumulative_30_LongTerm: Sum($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.5), 15) / (15 + 0.0001)
+  MA_Distance_Cumulative_30_LongTerm: Sum(($close - Mean($close, 30)) / Mean($close, 30), 15) / (15 + 0.0001)
+  MA_Distance_CumChange_30_5_LongTerm: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 5) * Sign(($close - Mean($close, 30)) / Mean($close, 30))
+  MA_Cross_10_30_LongTerm: (Mean($close, 10) - Mean($close, 30)) / (Mean($close, 30) + 0.0001)
+  Price_MA_Position_Consistency_5_30_LongTerm: Sign(($close - Mean($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - 0.5) * Sign(($close - Mean($close, 30)) / (Max($close, 30) - Min($close, 30) + 0.0001) - 0.5) * (($close - Mean($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) + ($close - Mean($close, 30)) / (Max($close, 30) - Min($close, 30) + 0.0001)) / 2
+  Trend_Consistency_10_LongTerm: (Sum(($close > Ref($close, 1)), 10) - Sum(($close < Ref($close, 1)), 10)) / 10
+  Price_Sign_Consistency_10_LongTerm: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, 1, 0), 10) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, 1, 0), 10)) / 10
+  Price_Persistence_10_LongTerm: (Sum(($close > Ref($close, 1)), 10) - Sum(($close < Ref($close, 1)), 10)) / 10
+  Price_Position_30_LongTerm: ($close - Min($close, 30)) / (Max($close, 30) - Min($close, 30) + 0.0001)
+  Price_MA_Position_Consistency_5_20_LongTerm: Sign(($close - Mean($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) - 0.5) * Sign(($close - Mean($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - 0.5) * (($close - Mean($close, 5)) / (Max($close, 5) - Min($close, 5) + 0.0001) + ($close - Mean($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001)) / 2
+  Price_Change_Skewness_30_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001), 3), 30) * Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)
+  Price_MA_Multi_Timeframe_30_60_LongTerm: $close / Mean($close, 30) / ($close / Mean($close, 60) + 0.0001) - 1
+  Price_Cycle_5_20_LongTerm: Corr(($close - Ref($close, 5)) / Ref($close, 5), ($close - Ref($close, 20)) / Ref($close, 20), 20)
+  Momentum_20_LongTerm: ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Change_Consistency_5_20_10_LongTerm: Mean(Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)), 10) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) * Abs(($close - Ref($close, 20)) / Ref($close, 20))
+  Price_MA_Angle_Change_10_5_LongTerm: (($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 5)) / (Abs(Ref(($close - Mean($close, 10)) / Mean($close, 10), 5)) + 0.0001) * ($close - Mean($close, 10)) / Mean($close, 10)
+  Momentum_Reversal_20_3_LongTerm: ($close - Ref($close, 20)) / Ref($close, 20) * (Ref($close, 3) / $close - 1) * (($close - Ref($close, 20)) / Ref($close, 20) + (Ref($close, 3) / $close - 1))
+  Price_Change_Kurtosis_20_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001), 4), 20) * Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20))
+  Price_Change_Kurtosis_10_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001), 4), 10) * Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10))
+  Price_MA_Q50_Norm_20_LongTerm: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.5)) / (Quantile($close / Mean($close, 20), 20, 0.5) + 0.0001)
+  Price_MA_Angle_Change_30_5_LongTerm: (($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 5)) / (Abs(Ref(($close - Mean($close, 30)) / Mean($close, 30), 5)) + 0.0001) * ($close - Mean($close, 30)) / Mean($close, 30)
+  Price_MA_Position_Consistency_10_20_LongTerm: Sign(($close - Mean($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - 0.5) * Sign(($close - Mean($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001) - 0.5) * (($close - Mean($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) + ($close - Mean($close, 20)) / (Max($close, 20) - Min($close, 20) + 0.0001)) / 2
+  MA_Cross_30_60_LongTerm: (Mean($close, 30) - Mean($close, 60)) / (Mean($close, 60) + 0.0001)
+  Price_Stability_10_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Std($close, 10) / $close + 0.0001)
+  Price_MA_Q25_Norm_30_LongTerm: ($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.25)) / (Quantile($close / Mean($close, 30), 30, 0.25) + 0.0001)
+  Price_MA_Position_Consistency_10_30_LongTerm: Sign(($close - Mean($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) - 0.5) * Sign(($close - Mean($close, 30)) / (Max($close, 30) - Min($close, 30) + 0.0001) - 0.5) * (($close - Mean($close, 10)) / (Max($close, 10) - Min($close, 10) + 0.0001) + ($close - Mean($close, 30)) / (Max($close, 30) - Min($close, 30) + 0.0001)) / 2
+  MA_Distance_Norm_Cumulative_30_LongTerm: Sum(($close - Mean($close, 30)) / (Std($close, 30) + 0.0001), 15) / (15 + 0.0001)
+  Price_MA_Quantile_Change_20_LongTerm: Quantile($close / Mean($close, 20), 20, 0.5) - Ref(Quantile(Ref($close, 10) / Mean(Ref($close, 10), 20), 20, 0.5), 10)
+  Price_Change_Skewness_10_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001), 3), 10) * Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)
+  MA_Ratio_30_60_LongTerm: $close / Mean($close, 30) - 1 * $close / Mean($close, 60) - 1
+  Price_MA_Angle_Change_20_10_LongTerm: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 10)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 10)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20)
+  Price_Quantile_50_20_LongTerm: $close / (Quantile($close, 20, 0.5) + 0.0001) - 1
+  Momentum_Decay_10_20_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) - ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Quantile_25_30_LongTerm: $close / (Quantile($close, 30, 0.25) + 0.0001) - 1
+  Price_Autocorr_5_LongTerm: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10)
+  Price_Kurtosis_20_LongTerm: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_MA_Angle_Change_10_10_LongTerm: (($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 10)) / (Abs(Ref(($close - Mean($close, 10)) / Mean($close, 10), 10)) + 0.0001) * ($close - Mean($close, 10)) / Mean($close, 10)
+  Price_Change_Quantile_CumChange_30_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15), 15)
+  Price_MA_Deviation_20_LongTerm: ($close - Mean($close, 20)) / (Std($close, 20) + 0.0001)
+  Price_MA_Distance_20_LongTerm: ($close - Mean($close, 20)) / (Std($close, 20) + 0.0001)
+  Volatility_Quantile_Position_10_20_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 20, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 20, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 20, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Change_Consistency_5_20_5_LongTerm: Mean(Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)), 5) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) * Abs(($close - Ref($close, 20)) / Ref($close, 20))
+  Price_Change_5_20_LongTerm: ($close - Ref($close, 5)) / Ref($close, 5) * ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_MA_Quantile_Change_30_LongTerm: Quantile($close / Mean($close, 30), 30, 0.5) - Ref(Quantile(Ref($close, 15) / Mean(Ref($close, 15), 30), 30, 0.5), 15)
+  Momentum_Decay_5_20_LongTerm: ($close - Ref($close, 5)) / Ref($close, 5) - ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Quantile_75_60_LongTerm: $close / (Quantile($close, 60, 0.75) + 0.0001) - 1
+  Price_Change_Relative_AbsMean_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 30) + 0.0001)
+  Momentum_Reversal_20_5_LongTerm: ($close - Ref($close, 20)) / Ref($close, 20) * (Ref($close, 5) / $close - 1) * (($close - Ref($close, 20)) / Ref($close, 20) + (Ref($close, 5) / $close - 1))
+  Price_Change_Relative_AbsMean_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  Volatility_Quantile_Position_20_20_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Sign_Consistency_20_LongTerm: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, 1, 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, 1, 0), 20)) / 20
+  Trend_Consistency_20_LongTerm: (Sum(($close > Ref($close, 1)), 20) - Sum(($close < Ref($close, 1)), 20)) / 20
+  Price_Persistence_20_LongTerm: (Sum(($close > Ref($close, 1)), 20) - Sum(($close < Ref($close, 1)), 20)) / 20
+  Price_MA_Angle_Change_30_10_LongTerm: (($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 10)) / (Abs(Ref(($close - Mean($close, 30)) / Mean($close, 30), 10)) + 0.0001) * ($close - Mean($close, 30)) / Mean($close, 30)
+  Momentum_Reversal_10_5_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) * (Ref($close, 5) / $close - 1) * (($close - Ref($close, 10)) / Ref($close, 10) + (Ref($close, 5) / $close - 1))
+  Price_Cycle_5_10_LongTerm: Corr(($close - Ref($close, 5)) / Ref($close, 5), ($close - Ref($close, 10)) / Ref($close, 10), 10)
+  Cumulative_Return_20_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 20) / 20
+  Price_MA_Relative_Change_20_LongTerm: ($close / Mean($close, 20) - Ref($close, 10) / Mean(Ref($close, 10), 20)) / (Ref($close, 10) / Mean(Ref($close, 10), 20) + 0.0001)
+  MA_Distance_Change_20_LongTerm: ($close - Mean($close, 20)) / Mean($close, 20) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / Mean(Ref($close, 10), 20)
+  Price_Change_Consistency_3_20_10_LongTerm: Mean(Sign(($close - Ref($close, 3)) / Ref($close, 3)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)), 10) * Abs(($close - Ref($close, 3)) / Ref($close, 3)) * Abs(($close - Ref($close, 20)) / Ref($close, 20))
+  Price_Kurtosis_30_LongTerm: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Volatility_Quantile_Position_30_20_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 20, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 20, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 20, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_MA_Distance_60_LongTerm: ($close - Mean($close, 60)) / (Std($close, 60) + 0.0001)
+  Price_MA_Deviation_60_LongTerm: ($close - Mean($close, 60)) / (Std($close, 60) + 0.0001)
+  Volatility_20_LongTerm: Std(($close - Ref($close, 1)) / Ref($close, 1), 20)
+  Price_Acceleration_Norm_10_10_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 10), 10) + 0.0001)
+  MA_Distance_Momentum_20_5_LongTerm: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * Sign(($close - Mean($close, 20)) / Mean($close, 20))
+  Price_MA_Q50_Norm_60_LongTerm: ($close / Mean($close, 60) - Quantile($close / Mean($close, 60), 60, 0.5)) / (Quantile($close / Mean($close, 60), 60, 0.5) + 0.0001)
+  Price_Change_Quantile_Cumulative_20_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10) / (10 + 0.0001)
+  Price_MA_Quantile_20_LongTerm: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 40, 0.5)) / (Quantile($close / Mean($close, 20), 40, 0.5) + 0.0001)
+  MA_Triple_20_30_60_LongTerm: $close / Mean($close, 20) - 1 * $close / Mean($close, 30) - 1 * $close / Mean($close, 60) - 1
+  Price_Change_Kurtosis_30_LongTerm: Mean(Power((($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001), 4), 30) * Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30))
+  Price_Acceleration_Norm_10_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 10), 20) + 0.0001)
+  Price_Magnitude_Consistency_20_LongTerm: Abs(($close - Ref($close, 1)) / Ref($close, 1)) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 20) + 0.0001)
+  MA_Triple_10_30_60_LongTerm: $close / Mean($close, 10) - 1 * $close / Mean($close, 30) - 1 * $close / Mean($close, 60) - 1
+  Price_MA_Distance_Sign_30_LongTerm: (Sum(If(($close - Mean($close, 30)) / Mean($close, 30) > 0, 1, 0), 15) - Sum(If(($close - Mean($close, 30)) / Mean($close, 30) < 0, 1, 0), 15)) / (15 + 0.0001)
+  Price_Change_Consistency_3_20_5_LongTerm: Mean(Sign(($close - Ref($close, 3)) / Ref($close, 3)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)), 5) * Abs(($close - Ref($close, 3)) / Ref($close, 3)) * Abs(($close - Ref($close, 20)) / Ref($close, 20))
+  Price_Change_5_30_LongTerm: ($close - Ref($close, 5)) / Ref($close, 5) * ($close - Ref($close, 30)) / Ref($close, 30)
+  MA_Cross_10_20_LongTerm: (Mean($close, 10) - Mean($close, 20)) / (Mean($close, 20) + 0.0001)
+  Price_Change_Diff_20_LongTerm: ($close - Ref($close, 20)) / Ref($close, 20) - (Ref($close, 20) - Ref($close, 40)) / Ref($close, 40)
+  Price_MA_Multi_Timeframe_10_20_LongTerm: $close / Mean($close, 10) / ($close / Mean($close, 20) + 0.0001) - 1
+  Price_MA_Deviation_30_LongTerm: ($close - Mean($close, 30)) / (Std($close, 30) + 0.0001)
+  Price_MA_Distance_30_LongTerm: ($close - Mean($close, 30)) / (Std($close, 30) + 0.0001)
+  Volatility_30_LongTerm: Std(($close - Ref($close, 1)) / Ref($close, 1), 30)
+  Price_Quantile_50_60_LongTerm: $close / (Quantile($close, 60, 0.5) + 0.0001) - 1
+  Price_MA_Q75_Norm_60_LongTerm: ($close / Mean($close, 60) - Quantile($close / Mean($close, 60), 60, 0.75)) / (Quantile($close / Mean($close, 60), 60, 0.75) + 0.0001)
+  Momentum_Consistency_5_30_LongTerm: Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 30)) / Ref($close, 30)) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) / (Abs(($close - Ref($close, 30)) / Ref($close, 30)) + 0.0001) * ($close - Ref($close, 30)) / Ref($close, 30)
+  Price_Change_Quantile_CumChange_Rate_20_LongTerm: (Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10), 10)) / (Abs(Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10), 10)) + 0.0001)
+  Price_Change_Lag_5_10_LongTerm: Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) * Ref(($close - Ref($close, 1)) / Ref($close, 1), 10)
+  MA_Ratio_10_20_LongTerm: $close / Mean($close, 10) - 1 * $close / Mean($close, 20) - 1
+  Multi_Timeframe_5_20_LongTerm: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, If(($close - Ref($close, 5)) / Ref($close, 5) < 0, -1, 0)) * If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, If(($close - Ref($close, 20)) / Ref($close, 20) < 0, -1, 0)) * (Abs(($close - Ref($close, 5)) / Ref($close, 5)) + Abs(($close - Ref($close, 20)) / Ref($close, 20)))
+  Price_Stability_Change_30_LongTerm: (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 30) - Std(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 30) + 0.0001)
+  Price_Change_Relative_Q75_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) + 0.0001)
+  MA_Distance_Momentum_30_5_LongTerm: (($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 5)) / (Abs(Ref(($close - Mean($close, 30)) / Mean($close, 30), 5)) + 0.0001) * Sign(($close - Mean($close, 30)) / Mean($close, 30))
+  Price_Change_Relative_Q75_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) + 0.0001)
+  Volatility_60_LongTerm: Std(($close - Ref($close, 1)) / Ref($close, 1), 60)
+  Price_Magnitude_Consistency_10_LongTerm: Abs(($close - Ref($close, 1)) / Ref($close, 1)) / (Mean(Abs(($close - Ref($close, 1)) / Ref($close, 1)), 10) + 0.0001)
+  Price_Skewness_20_LongTerm: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  MA_Distance_Norm_Cum_10_20_LongTerm: Sum(($close - Mean($close, 10)) / (Std($close, 10) + 0.0001), 5) - Sum(($close - Mean($close, 20)) / (Std($close, 20) + 0.0001), 10)
+  Multi_Timeframe_5_30_LongTerm: If(($close - Ref($close, 5)) / Ref($close, 5) > 0, 1, If(($close - Ref($close, 5)) / Ref($close, 5) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 5)) / Ref($close, 5)) + Abs(($close - Ref($close, 30)) / Ref($close, 30)))
+  MA_Distance_Momentum_20_10_LongTerm: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 10)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 10)) + 0.0001) * Sign(($close - Mean($close, 20)) / Mean($close, 20))
+  Volatility_Quantile_Position_10_40_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 40, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 40, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 10), 40, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  MA_Distance_Momentum_10_5_LongTerm: (($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 5)) / (Abs(Ref(($close - Mean($close, 10)) / Mean($close, 10), 5)) + 0.0001) * Sign(($close - Mean($close, 10)) / Mean($close, 10))
+  Momentum_Consistency_5_20_LongTerm: Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) / (Abs(($close - Ref($close, 20)) / Ref($close, 20)) + 0.0001) * ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Relative_Strength_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Price_Change_Relative_Mean_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Price_Acceleration_Norm_20_10_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 20), 10) + 0.0001)
+  Momentum_Consistency_10_30_LongTerm: Sign(($close - Ref($close, 10)) / Ref($close, 10)) * Sign(($close - Ref($close, 30)) / Ref($close, 30)) * Abs(($close - Ref($close, 10)) / Ref($close, 10)) / (Abs(($close - Ref($close, 30)) / Ref($close, 30)) + 0.0001) * ($close - Ref($close, 30)) / Ref($close, 30)
+  Price_Quantile_75_20_LongTerm: $close / (Quantile($close, 20, 0.75) + 0.0001) - 1
+  Price_Quantile_25_60_LongTerm: $close / (Quantile($close, 60, 0.25) + 0.0001) - 1
+  Price_Change_Relative_Q50_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5) + 0.0001)
+  Price_MA_Quantile_Cumulative_20_LongTerm: Sum($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.5), 10) / (10 + 0.0001)
+  Price_Change_Relative_Extreme_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Min(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Max(($close - Ref($close, 1)) / Ref($close, 1), 30) - Min(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Price_MA_Q75_Norm_20_LongTerm: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.75)) / (Quantile($close / Mean($close, 20), 20, 0.75) + 0.0001)
+  Volatility_Quantile_Position_20_40_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 40, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 40, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 40, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Change_Quantile_Cumulative_30_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15) / (15 + 0.0001)
+  MA_Distance_Momentum_10_10_LongTerm: (($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 10)) / (Abs(Ref(($close - Mean($close, 10)) / Mean($close, 10), 10)) + 0.0001) * Sign(($close - Mean($close, 10)) / Mean($close, 10))
+  Price_MA_Angle_30_LongTerm: Slope($close, 30) / $close / (Slope(Mean($close, 30), 30) / Mean($close, 30) + 0.0001)
+  Price_Change_Quantile_Position_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25) + 0.0001)
+  Price_Change_Relative_Range_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25) + 0.0001)
+  MA_Distance_Norm_Change_Rate_30_LongTerm: (($close - Mean($close, 30)) / (Std($close, 30) + 0.0001) - (Ref($close, 15) - Mean(Ref($close, 15), 30)) / (Std(Ref($close, 15), 30) + 0.0001)) / (Abs((Ref($close, 15) - Mean(Ref($close, 15), 30)) / (Std(Ref($close, 15), 30) + 0.0001)) + 0.0001)
+  Price_Acceleration_Norm_20_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 20), 20) + 0.0001)
+  Price_Change_Relative_Range_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25) + 0.0001)
+  Price_Change_Quantile_Position_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25) + 0.0001)
+  MA_Distance_Cumulative_Change_20_LongTerm: Sum(($close - Mean($close, 20)) / Mean($close, 20), 10) - Ref(Sum((Ref($close, 10) - Mean(Ref($close, 10), 20)) / Mean(Ref($close, 10), 20), 10), 10)
+  Momentum_Consistency_10_20_LongTerm: Sign(($close - Ref($close, 10)) / Ref($close, 10)) * Sign(($close - Ref($close, 20)) / Ref($close, 20)) * Abs(($close - Ref($close, 10)) / Ref($close, 10)) / (Abs(($close - Ref($close, 20)) / Ref($close, 20)) + 0.0001) * ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Quantile_75_30_LongTerm: $close / (Quantile($close, 30, 0.75) + 0.0001) - 1
+  Price_Change_Lag_10_20_LongTerm: Ref(($close - Ref($close, 1)) / Ref($close, 1), 10) * Ref(($close - Ref($close, 1)) / Ref($close, 1), 20)
+  Trend_Acceleration_10_LongTerm: (Slope($close, 10) / $close - Ref(Slope($close, 10), 5) / Ref($close, 5)) / (Abs(Ref(Slope($close, 10), 5) / Ref($close, 5)) + 0.0001)
+  MA_Distance_Momentum_30_10_LongTerm: (($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 10)) / (Abs(Ref(($close - Mean($close, 30)) / Mean($close, 30), 10)) + 0.0001) * Sign(($close - Mean($close, 30)) / Mean($close, 30))
+  Trend_Acceleration_30_LongTerm: (Slope($close, 30) / $close - Ref(Slope($close, 30), 15) / Ref($close, 15)) / (Abs(Ref(Slope($close, 30), 15) / Ref($close, 15)) + 0.0001)
+  Price_MA_Reversal_Signal_20_5_LongTerm: (1 - Sign(Ref($close / Mean($close, 20), 5) - 1) * Sign($close / Mean($close, 20) - 1)) / 2 * $close / Mean($close, 20) - Ref($close / Mean($close, 20), 5)
+  Price_Relative_Strength_60_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 60)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 60) + 0.0001)
+  MA_Distance_Cumulative_20_LongTerm: Sum(($close - Mean($close, 20)) / Mean($close, 20), 10) / (10 + 0.0001)
+  Price_Quantile_Position_Change_20_10_LongTerm: ($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001) - Ref(($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001), 10) * Sign(($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001))
+  Price_MA_Q50_Norm_30_LongTerm: ($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.5)) / (Quantile($close / Mean($close, 30), 30, 0.5) + 0.0001)
+  Momentum_10_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10)
+  Price_Quantile_50_30_LongTerm: $close / (Quantile($close, 30, 0.5) + 0.0001) - 1
+  Price_Relative_Strength_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_Change_Relative_Mean_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_Sign_Consistency_30_LongTerm: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, 1, 0), 30) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, 1, 0), 30)) / 30
+  Price_Autocorr_10_LongTerm: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 10), 20)
+  Trend_Strength_10_LongTerm: Slope($close, 10) / $close - Ref(Slope($close, 10), 10) / Ref($close, 10)
+  Price_Change_Quantile_CumChange_Rate_30_LongTerm: (Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15), 15)) / (Abs(Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5), 15), 15)) + 0.0001)
+  MA_Distance_Change_30_LongTerm: ($close - Mean($close, 30)) / Mean($close, 30) - (Ref($close, 15) - Mean(Ref($close, 15), 30)) / Mean(Ref($close, 15), 30)
+  Price_Change_Quantile_CumChange_20_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10) - Ref(Sum(($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5), 10), 10)
+  Price_Change_Multi_Quantile_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25) + 0.0001) * (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - ($close - Ref($close, 1)) / Ref($close, 1)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5) + 0.0001)
+  Price_MA_Relative_Change_30_LongTerm: ($close / Mean($close, 30) - Ref($close, 15) / Mean(Ref($close, 15), 30)) / (Ref($close, 15) / Mean(Ref($close, 15), 30) + 0.0001)
+  Price_Change_Diff_10_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) - (Ref($close, 10) - Ref($close, 20)) / Ref($close, 20)
+  Breakout_High_30_LongTerm: ($close - Max($close, 30)) / (Max($close, 30) + 0.0001)
+  MA_Cross_Intensity_20_30_LongTerm: If((Mean($close, 20) - Mean($close, 30)) > 0 != (Ref(Mean($close, 20), 1) - Ref(Mean($close, 30), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Price_Stability_Change_20_LongTerm: (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20) - Std(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20) + 0.0001)
+  Cumulative_Return_30_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 30) / 30
+  Price_MA_Multi_Quantile_Interaction_20_LongTerm: ($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.25)) / (Quantile($close / Mean($close, 20), 20, 0.5) - Quantile($close / Mean($close, 20), 20, 0.25) + 0.0001) * (Quantile($close / Mean($close, 20), 20, 0.75) - $close / Mean($close, 20)) / (Quantile($close / Mean($close, 20), 20, 0.75) - Quantile($close / Mean($close, 20), 20, 0.5) + 0.0001)
+  Price_MA_Quantile_CumChange_Rate_30_LongTerm: (Sum($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.5), 15) - Ref(Sum($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.5), 15), 15)) / (Abs(Ref(Sum($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.5), 15), 15)) + 0.0001)
+  MA_Distance_Norm_Change_Rate_20_LongTerm: (($close - Mean($close, 20)) / (Std($close, 20) + 0.0001) - (Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) / (Abs((Ref($close, 10) - Mean(Ref($close, 10), 20)) / (Std(Ref($close, 10), 20) + 0.0001)) + 0.0001)
+  Momentum_Reversal_10_3_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) * (Ref($close, 3) / $close - 1) * (($close - Ref($close, 10)) / Ref($close, 10) + (Ref($close, 3) / $close - 1))
+  Price_MA_Angle_20_LongTerm: Slope($close, 20) / $close / (Slope(Mean($close, 20), 20) / Mean($close, 20) + 0.0001)
+  Price_MA_Reversal_Signal_30_5_LongTerm: (1 - Sign(Ref($close / Mean($close, 30), 5) - 1) * Sign($close / Mean($close, 30) - 1)) / 2 * $close / Mean($close, 30) - Ref($close / Mean($close, 30), 5)
+  Trend_Strength_20_LongTerm: Slope($close, 20) / $close - Ref(Slope($close, 20), 20) / Ref($close, 20)
+  Price_Change_Relative_Q25_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.25) + 0.0001)
+  Price_MA_Quantile_CumChange_Rate_20_LongTerm: (Sum($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.5), 10) - Ref(Sum($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.5), 10), 10)) / (Abs(Ref(Sum($close / Mean($close, 20) - Quantile($close / Mean($close, 20), 20, 0.5), 10), 10)) + 0.0001)
+  Price_Skewness_30_LongTerm: (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5) - Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  MA_Cross_Intensity_30_60_LongTerm: If((Mean($close, 30) - Mean($close, 60)) > 0 != (Ref(Mean($close, 30), 1) - Ref(Mean($close, 60), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Price_Quantile_Position_Change_30_10_LongTerm: ($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001) - Ref(($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001), 10) * Sign(($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001))
+  Price_Quantile_Position_Change_30_5_LongTerm: ($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001) - Ref(($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001), 5) * Sign(($close - Quantile($close, 30, 0.5)) / (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25) + 0.0001))
+  Price_MA_Quantile_30_LongTerm: ($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 60, 0.5)) / (Quantile($close / Mean($close, 30), 60, 0.5) + 0.0001)
+  MA_Distance_Norm_Cumulative_20_LongTerm: Sum(($close - Mean($close, 20)) / (Std($close, 20) + 0.0001), 10) / (10 + 0.0001)
+  Price_MA_Q75_Norm_30_LongTerm: ($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.75)) / (Quantile($close / Mean($close, 30), 30, 0.75) + 0.0001)
+  Momentum_Decay_Rate_5_20_LongTerm: ($close - Ref($close, 5)) / Ref($close, 5) / (($close - Ref($close, 20)) / Ref($close, 20) + 0.0001) - 1
+  Price_MA_Reversal_Signal_10_5_LongTerm: (1 - Sign(Ref($close / Mean($close, 10), 5) - 1) * Sign($close / Mean($close, 10) - 1)) / 2 * $close / Mean($close, 10) - Ref($close / Mean($close, 10), 5)
+  Price_MA_Reversal_Signal_30_3_LongTerm: (1 - Sign(Ref($close / Mean($close, 30), 3) - 1) * Sign($close / Mean($close, 30) - 1)) / 2 * $close / Mean($close, 30) - Ref($close / Mean($close, 30), 3)
+  Price_Change_Relative_Extreme_20_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Min(($close - Ref($close, 1)) / Ref($close, 1), 20)) / (Max(($close - Ref($close, 1)) / Ref($close, 1), 20) - Min(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  MA_Distance_Norm_Change_Rate_60_LongTerm: (($close - Mean($close, 60)) / (Std($close, 60) + 0.0001) - (Ref($close, 30) - Mean(Ref($close, 30), 60)) / (Std(Ref($close, 30), 60) + 0.0001)) / (Abs((Ref($close, 30) - Mean(Ref($close, 30), 60)) / (Std(Ref($close, 30), 60) + 0.0001)) + 0.0001)
+  Volatility_Quantile_Position_30_40_LongTerm: (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 40, 0.5)) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 40, 0.75) - Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 40, 0.25) + 0.0001) * ($close - Ref($close, 1)) / Ref($close, 1)
+  Price_Change_Lag_5_20_LongTerm: Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) * Ref(($close - Ref($close, 1)) / Ref($close, 1), 20)
+  Breakout_High_20_LongTerm: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001)
+  Trend_Acceleration_20_LongTerm: (Slope($close, 20) / $close - Ref(Slope($close, 20), 10) / Ref($close, 10)) / (Abs(Ref(Slope($close, 20), 10) / Ref($close, 10)) + 0.0001)
+  MA_Triple_10_20_30_LongTerm: $close / Mean($close, 10) - 1 * $close / Mean($close, 20) - 1 * $close / Mean($close, 30) - 1
+  Price_MA_Q25_Norm_60_LongTerm: ($close / Mean($close, 60) - Quantile($close / Mean($close, 60), 60, 0.25)) / (Quantile($close / Mean($close, 60), 60, 0.25) + 0.0001)
+  Price_Quantile_Position_Change_20_5_LongTerm: ($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001) - Ref(($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001), 5) * Sign(($close - Quantile($close, 20, 0.5)) / (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25) + 0.0001))
+  Price_MA_Distance_Sign_20_LongTerm: (Sum(If(($close - Mean($close, 20)) / Mean($close, 20) > 0, 1, 0), 10) - Sum(If(($close - Mean($close, 20)) / Mean($close, 20) < 0, 1, 0), 10)) / (10 + 0.0001)
+  Momentum_Decay_Rate_10_30_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) / (($close - Ref($close, 30)) / Ref($close, 30) + 0.0001) - 1
+  MA_Cross_Intensity_10_20_LongTerm: If((Mean($close, 10) - Mean($close, 20)) > 0 != (Ref(Mean($close, 10), 1) - Ref(Mean($close, 20), 1)) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0)
+  Price_Quantile_Position_Change_60_5_LongTerm: ($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001) - Ref(($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001), 5) * Sign(($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001))
+  Price_Change_Multi_Quantile_30_LongTerm: (($close - Ref($close, 1)) / Ref($close, 1) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25) + 0.0001) * (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) - ($close - Ref($close, 1)) / Ref($close, 1)) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.75) - Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.5) + 0.0001)
+  Price_MA_Reversal_Signal_20_3_LongTerm: (1 - Sign(Ref($close / Mean($close, 20), 3) - 1) * Sign($close / Mean($close, 20) - 1)) / 2 * $close / Mean($close, 20) - Ref($close / Mean($close, 20), 3)
+  Price_MA_Multi_Quantile_Interaction_30_LongTerm: ($close / Mean($close, 30) - Quantile($close / Mean($close, 30), 30, 0.25)) / (Quantile($close / Mean($close, 30), 30, 0.5) - Quantile($close / Mean($close, 30), 30, 0.25) + 0.0001) * (Quantile($close / Mean($close, 30), 30, 0.75) - $close / Mean($close, 30)) / (Quantile($close / Mean($close, 30), 30, 0.75) - Quantile($close / Mean($close, 30), 30, 0.5) + 0.0001)
+  Price_Change_Relative_Q50_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 20, 0.5) + 0.0001)
+  Price_Autocorr_20_LongTerm: Corr(($close - Ref($close, 1)) / Ref($close, 1), Ref(($close - Ref($close, 1)) / Ref($close, 1), 20), 40)
+  Breakout_High_60_LongTerm: ($close - Max($close, 60)) / (Max($close, 60) + 0.0001)
+  Momentum_Decay_Rate_10_60_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) / (($close - Ref($close, 60)) / Ref($close, 60) + 0.0001) - 1
+  Price_Change_Relative_Q25_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(($close - Ref($close, 1)) / Ref($close, 1), 30, 0.25) + 0.0001)
+  Price_MA_Reversal_Signal_10_3_LongTerm: (1 - Sign(Ref($close / Mean($close, 10), 3) - 1) * Sign($close / Mean($close, 10) - 1)) / 2 * $close / Mean($close, 10) - Ref($close / Mean($close, 10), 3)
+  Price_Quantile_Position_Change_60_10_LongTerm: ($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001) - Ref(($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001), 10) * Sign(($close - Quantile($close, 60, 0.5)) / (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25) + 0.0001))
+  Price_MA_Angle_60_LongTerm: Slope($close, 60) / $close / (Slope(Mean($close, 60), 60) / Mean($close, 60) + 0.0001)
+  MA_Ratio_Squared_60_LongTerm: $close / Mean($close, 60) - 1 * $close / Mean($close, 60) - 1
+  MA_Ratio_Squared_30_LongTerm: $close / Mean($close, 30) - 1 * $close / Mean($close, 30) - 1
+  MA_Ratio_Squared_20_LongTerm: $close / Mean($close, 20) - 1 * $close / Mean($close, 20) - 1
+  Price_Change_Autocorr_30_1_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 30) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 1) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 1))) + 0.0001)
+  Price_Change_Autocorr_10_3_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 10) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 3) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 3))) + 0.0001)
+  Price_Change_Autocorr_20_3_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 20) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 3) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 3))) + 0.0001)
+  Price_Change_Autocorr_30_3_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 30) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 3) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 3))) + 0.0001)
+  Price_Change_Autocorr_10_1_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 10) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 1) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 1))) + 0.0001)
+  Price_Cycle_10_20_LongTerm: Corr(($close - Ref($close, 10)) / Ref($close, 10), ($close - Ref($close, 20)) / Ref($close, 20), 20)
+  Price_Change_Autocorr_20_5_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 20) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 5) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 5))) + 0.0001)
+  Price_Change_Autocorr_30_5_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 30) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 5) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 30), 5))) + 0.0001)
+  Price_Change_Autocorr_20_1_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 20) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 1) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 20), 1))) + 0.0001)
+  Price_Change_Autocorr_10_5_LongTerm: Mean(($close - Ref($close, 1)) / Ref($close, 1), 10) * Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 5) / (Sqrt(Abs(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10)) * Abs(Ref(Mean(($close - Ref($close, 1)) / Ref($close, 1), 10), 5))) + 0.0001)
+  Breakout_Strength_Norm_20_20_LongTerm: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  MA60_Slope20_LongTerm: ($close / Mean($close, 60) - 1) * (Slope($close, 20) / $close)
+  MA20_Slope20_LongTerm: ($close / Mean($close, 20) - 1) * (Slope($close, 20) / $close)
+  Breakout_Strength_Norm_30_20_LongTerm: ($close - Max($close, 30)) / (Max($close, 30) + 0.0001) - (Min($close, 30) - $close) / (Min($close, 30) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Cumulative_Return_Norm_10_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Breakout_Strength_Norm_10_20_LongTerm: ($close - Max($close, 10)) / (Max($close, 10) + 0.0001) - (Min($close, 10) - $close) / (Min($close, 10) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Breakout_Strength_Norm_10_10_LongTerm: ($close - Max($close, 10)) / (Max($close, 10) + 0.0001) - (Min($close, 10) - $close) / (Min($close, 10) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Breakout_Strength_Norm_30_10_LongTerm: ($close - Max($close, 30)) / (Max($close, 30) + 0.0001) - (Min($close, 30) - $close) / (Min($close, 30) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  MA20_Slope10_LongTerm: ($close / Mean($close, 20) - 1) * (Slope($close, 10) / $close)
+  Price_Change_Relative_Volatility_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Price_Change_Relative_Volatility_60_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 60) + 0.0001)
+  Cumulative_Return_Norm_20_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 20) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  MA30_Slope10_LongTerm: ($close / Mean($close, 30) - 1) * (Slope($close, 10) / $close)
+  Price_Change_Relative_Vol_Quantile_30_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 60, 0.5) + 0.0001)
+  MA60_Slope10_LongTerm: ($close / Mean($close, 60) - 1) * (Slope($close, 10) / $close)
+  Cumulative_Return_Norm_30_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 30) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001)
+  Price_Change_Relative_Vol_Quantile_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Quantile(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 40, 0.5) + 0.0001)
+  Price_MA_Distance_Squared_30_LongTerm: ($close - Mean($close, 30)) / Mean($close, 30) * ($close - Mean($close, 30)) / Mean($close, 30)
+  Price_MA_Distance_Squared_20_LongTerm: ($close - Mean($close, 20)) / Mean($close, 20) * ($close - Mean($close, 20)) / Mean($close, 20)
+  Extreme_Ratio_20_LongTerm: Max($close, 20) / (Min($close, 20) + 0.0001) - 1
+  Extreme_Ratio_30_LongTerm: Max($close, 30) / (Min($close, 30) + 0.0001) - 1
+  Quantile_Range_20_LongTerm: (Quantile($close, 20, 0.75) - Quantile($close, 20, 0.25)) / $close
+  Price_Smoothness_20_LongTerm: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Price_Stability_Signal_30_LongTerm: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 30) + 0.0001) * $close / Mean($close, 30) - 1
+  Extreme_Ratio_60_LongTerm: Max($close, 60) / (Min($close, 60) + 0.0001) - 1
+  Price_Stability_Signal_20_LongTerm: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * $close / Mean($close, 20) - 1
+  MA_Cross_Strength_5_30_3_LongTerm: Mean((Mean($close, 5) - Mean($close, 30)) / Mean($close, 30), 3) * Sign((Mean($close, 5) - Mean($close, 30)) / Mean($close, 30))
+  MA_Cross_Strength_5_30_5_LongTerm: Mean((Mean($close, 5) - Mean($close, 30)) / Mean($close, 30), 5) * Sign((Mean($close, 5) - Mean($close, 30)) / Mean($close, 30))
+  MA_Cross_Strength_5_20_3_LongTerm: Mean((Mean($close, 5) - Mean($close, 20)) / Mean($close, 20), 3) * Sign((Mean($close, 5) - Mean($close, 20)) / Mean($close, 20))
+  Price_Change_Consistency_5_10_10_LongTerm: Mean(Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 10)) / Ref($close, 10)), 10) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) * Abs(($close - Ref($close, 10)) / Ref($close, 10))
+  Volatility_Clustering_30_LongTerm: Std(($close - Ref($close, 1)) / Ref($close, 1), 30) * Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 30), 30)
+  Volatility_Clustering_20_LongTerm: Std(($close - Ref($close, 1)) / Ref($close, 1), 20) * Ref(Std(($close - Ref($close, 1)) / Ref($close, 1), 20), 20)
+  MA_Cross_Strength_5_20_5_LongTerm: Mean((Mean($close, 5) - Mean($close, 20)) / Mean($close, 20), 5) * Sign((Mean($close, 5) - Mean($close, 20)) / Mean($close, 20))
+  Price_Change_Consistency_5_10_5_LongTerm: Mean(Sign(($close - Ref($close, 5)) / Ref($close, 5)) * Sign(($close - Ref($close, 10)) / Ref($close, 10)), 5) * Abs(($close - Ref($close, 5)) / Ref($close, 5)) * Abs(($close - Ref($close, 10)) / Ref($close, 10))
+  Price_Acceleration_Norm_5_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 20) + 0.0001)
+  MA_Cross_Strength_10_30_3_LongTerm: Mean((Mean($close, 10) - Mean($close, 30)) / Mean($close, 30), 3) * Sign((Mean($close, 10) - Mean($close, 30)) / Mean($close, 30))
+  MA_Cross_Strength_10_30_5_LongTerm: Mean((Mean($close, 10) - Mean($close, 30)) / Mean($close, 30), 5) * Sign((Mean($close, 10) - Mean($close, 30)) / Mean($close, 30))
+  MA_Cross_Strength_10_20_3_LongTerm: Mean((Mean($close, 10) - Mean($close, 20)) / Mean($close, 20), 3) * Sign((Mean($close, 10) - Mean($close, 20)) / Mean($close, 20))
+  Price_Change_Consistency_3_10_10_LongTerm: Mean(Sign(($close - Ref($close, 3)) / Ref($close, 3)) * Sign(($close - Ref($close, 10)) / Ref($close, 10)), 10) * Abs(($close - Ref($close, 3)) / Ref($close, 3)) * Abs(($close - Ref($close, 10)) / Ref($close, 10))
+  MA_Cross_Strength_10_20_5_LongTerm: Mean((Mean($close, 10) - Mean($close, 20)) / Mean($close, 20), 5) * Sign((Mean($close, 10) - Mean($close, 20)) / Mean($close, 20))
+  Price_Change_Consistency_3_10_5_LongTerm: Mean(Sign(($close - Ref($close, 3)) / Ref($close, 3)) * Sign(($close - Ref($close, 10)) / Ref($close, 10)), 5) * Abs(($close - Ref($close, 3)) / Ref($close, 3)) * Abs(($close - Ref($close, 10)) / Ref($close, 10))
+  RSV_30_LongTerm: ($close - Min($low, 30)) / (Max($high, 30) - Min($low, 30) + 0.0001)
+  Price_Change_10_20_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) * ($close - Ref($close, 20)) / Ref($close, 20)
+  Price_Change_10_30_LongTerm: ($close - Ref($close, 10)) / Ref($close, 10) * ($close - Ref($close, 30)) / Ref($close, 30)
+  Multi_Timeframe_10_20_LongTerm: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 20)) / Ref($close, 20) > 0, 1, If(($close - Ref($close, 20)) / Ref($close, 20) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 20)) / Ref($close, 20)))
+  Price_MA_Distance_Squared_60_LongTerm_Slope25_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * Slope($close, 25) / $close
+  Price_MA_Distance_Squared_60_LongTerm_Slope15_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * Slope($close, 15) / $close
+  Price_MA_Distance_Squared_60_LongTerm_Slope40_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * Slope($close, 40) / $close
+  MA30_Slope20_LongTerm: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close)
+  Breakout_Strength_Norm_20_10_LongTerm: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  Price_Change_Relative_Volatility_20_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001)
+  Quantile_Range_60_LongTerm: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close
+  Price_MA_Distance_Squared_60_LongTerm: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60)
+  MA30_Slope20_LongTerm_MA50_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * $close / Mean($close, 50) - 1
+  MA30_Slope20_LongTerm_MA80_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * $close / Mean($close, 80) - 1
+  MA30_Slope20_LongTerm_MA100_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * $close / Mean($close, 100) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA50_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA80_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 80) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA100_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 100) - 1
+  Price_Change_Relative_Volatility_20_LongTerm_MA50_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * $close / Mean($close, 50) - 1
+  Price_Change_Relative_Volatility_20_LongTerm_MA80_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_Change_Relative_Volatility_20_LongTerm_MA100_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * $close / Mean($close, 100) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_Slope15_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 15) / $close
+  MA30_Slope20_LongTerm_Slope25_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 25) / $close
+  Price_Change_Relative_Volatility_20_LongTerm_Slope40_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * Slope($close, 40) / $close
+  Price_Change_Relative_Volatility_20_LongTerm_Slope25_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * Slope($close, 25) / $close
+  MA30_Slope20_LongTerm_Slope15_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 15) / $close
+  Breakout_Strength_Norm_20_10_LongTerm_Slope25_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close
+  Breakout_Strength_Norm_20_10_LongTerm_Slope40_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 40) / $close
+  Quantile_Range_60_LongTerm_MA50_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 50) - 1
+  Quantile_Range_60_LongTerm_MA80_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 80) - 1
+  Quantile_Range_60_LongTerm_MA100_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 100) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA50_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 50) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA80_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 80) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA100_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 100) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_Slope15_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * Slope($close, 15) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_Slope25_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * Slope($close, 25) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_Slope40_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * Slope($close, 40) / $close
+  Quantile_Range_30_LongTerm: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close
+  Price_Smoothness_10_LongTerm: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001)
+  MA_Distance_CumChange_10_10_LongTerm: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10))
+  Breakout_Low_20_LongTerm: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001)
+  Price_Acceleration_Norm_5_10_LongTerm: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001)
+  Price_Change_Relative_Volatility_20_LongTerm_MA40_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * $close / Mean($close, 40) - 1
+  Price_Change_Relative_Volatility_20_LongTerm_Slope15_Extend: ($close - Ref($close, 1)) / Ref($close, 1) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 20) + 0.0001) * Slope($close, 15) / $close
+  Quantile_Range_60_LongTerm_Slope25_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * Slope($close, 25) / $close
+  Quantile_Range_60_LongTerm_Slope15_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * Slope($close, 15) / $close
+  Quantile_Range_60_LongTerm_Slope40_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * Slope($close, 40) / $close
+  Price_Smoothness_10_LongTerm_Slope15_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 15) / $close
+  Price_Smoothness_10_LongTerm_Slope40_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 40) / $close
+  Quantile_Range_30_LongTerm_MA50_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 50) - 1
+  Quantile_Range_30_LongTerm_MA80_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 80) - 1
+  Quantile_Range_30_LongTerm_MA100_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 100) - 1
+  Price_Smoothness_10_LongTerm_MA40_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1
+  Price_Smoothness_10_LongTerm_MA80_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_Smoothness_10_LongTerm_MA100_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 100) - 1
+  Breakout_Low_20_LongTerm_Slope40_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_10_LongTerm_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_10_LongTerm_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_10_LongTerm_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 100) - 1
+  Quantile_Range_30_LongTerm_Slope40_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 40) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_MA50_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 50) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA80_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA100_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 100) - 1
+  Breakout_Low_20_LongTerm_MA50_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 50) - 1
+  Breakout_Low_20_LongTerm_MA80_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 80) - 1
+  Breakout_Low_20_LongTerm_MA100_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 100) - 1
+  RSV_60_LongTerm_MA40_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * $close / Mean($close, 40) - 1
+  RSV_20_LongTerm_MA80_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * $close / Mean($close, 80) - 1
+  RSV_60_LongTerm_MA50_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * $close / Mean($close, 50) - 1
+  RSV_20_LongTerm_MA100_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * $close / Mean($close, 100) - 1
+  RSV_60_LongTerm_MA80_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * $close / Mean($close, 80) - 1
+  RSV_60_LongTerm_MA100_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * $close / Mean($close, 100) - 1
+  Cumulative_Return_10_LongTerm: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10
+  RSV_20_LongTerm: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001)
+  MA_Distance_CumChange_10_5_LongTerm: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10))
+  Price_Asymmetry_20_LongTerm: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001)
+  MA30_Slope20_LongTerm_MA40_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * $close / Mean($close, 40) - 1
+  Breakout_Low_20_LongTerm_Slope15_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * Slope($close, 15) / $close
+  Breakout_Low_20_LongTerm_Slope25_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * Slope($close, 25) / $close
+  Price_Asymmetry_20_LongTerm_Slope25_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 25) / $close
+  Cumulative_Return_10_LongTerm_Slope25_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 25) / $close
+  Cumulative_Return_10_LongTerm_Slope15_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 15) / $close
+  RSV_20_LongTerm_Slope40_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * Slope($close, 40) / $close
+  RSV_60_LongTerm_Slope15_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * Slope($close, 15) / $close
+  RSV_20_LongTerm_Slope25_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * Slope($close, 25) / $close
+  RSV_20_LongTerm_Slope15_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * Slope($close, 15) / $close
+  Price_Asymmetry_20_LongTerm_MA50_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 50) - 1
+  Cumulative_Return_10_LongTerm_MA50_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 50) - 1
+  Price_Asymmetry_20_LongTerm_MA80_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_Asymmetry_20_LongTerm_MA100_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 100) - 1
+  Cumulative_Return_10_LongTerm_MA80_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 50) - 1
+  Cumulative_Return_10_LongTerm_MA100_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 80) - 1
+  RSV_20_LongTerm_MA40_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 100) - 1
+  RSV_20_LongTerm_MA50_Extend: ($close - Min($low, 20)) / (Max($high, 20) - Min($low, 20) + 0.0001) * $close / Mean($close, 50) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA50_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 50) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA80_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA80_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA100_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA100_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 100) - 1
+  Multi_Timeframe_10_30_LongTerm_MA100_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * $close / Mean($close, 100) - 1
+  Multi_Timeframe_10_30_LongTerm_MA80_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * $close / Mean($close, 80) - 1
+  Multi_Timeframe_10_30_LongTerm_MA40_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * $close / Mean($close, 40) - 1
+  Multi_Timeframe_10_30_LongTerm_MA50_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * $close / Mean($close, 50) - 1
+  Multi_Timeframe_10_30_LongTerm_Slope40_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * Slope($close, 40) / $close
+  Multi_Timeframe_10_30_LongTerm_Slope25_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * Slope($close, 25) / $close
+  Price_MA_Relative_Position_20_LongTerm: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001)
+  MA_Distance_CumChange_20_10_LongTerm: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20))
+  Price_MA_Relative_Position_30_LongTerm: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001)
+  MA_Distance_CumChange_10_10_LongTerm_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close
+  Quantile_Range_30_LongTerm_Slope15_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 15) / $close
+  RSV_60_LongTerm_Slope40_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * Slope($close, 40) / $close
+  RSV_60_LongTerm_Slope25_Extend: ($close - Min($low, 60)) / (Max($high, 60) - Min($low, 60) + 0.0001) * Slope($close, 25) / $close
+  Price_MA_Relative_Position_20_LongTerm_Slope15_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * Slope($close, 15) / $close
+  Price_MA_Relative_Position_20_LongTerm_Slope25_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * Slope($close, 25) / $close
+  Price_MA_Relative_Position_20_LongTerm_Slope40_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * Slope($close, 40) / $close
+  MA_Distance_CumChange_20_10_LongTerm_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_20_10_LongTerm_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_10_LongTerm_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA50_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_30_10_LongTerm: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30))
+  MA_Distance_CumChange_20_5_LongTerm: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20))
+  Price_MA_Angle_Change_20_5_LongTerm: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20)
+  MA_Distance_CumChange_20_10_LongTerm_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_10_LongTerm_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_10_LongTerm_MA40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1
+  Multi_Timeframe_10_30_LongTerm_Slope15_Extend: If(($close - Ref($close, 10)) / Ref($close, 10) > 0, 1, If(($close - Ref($close, 10)) / Ref($close, 10) < 0, -1, 0)) * If(($close - Ref($close, 30)) / Ref($close, 30) > 0, 1, If(($close - Ref($close, 30)) / Ref($close, 30) < 0, -1, 0)) * (Abs(($close - Ref($close, 10)) / Ref($close, 10)) + Abs(($close - Ref($close, 30)) / Ref($close, 30))) * Slope($close, 15) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope25_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 25) / $close
+  Price_MA_Angle_Change_20_5_LongTerm_Slope25_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 25) / $close
+  Price_MA_Angle_Change_20_5_LongTerm_Slope15_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 15) / $close
+  MA_Distance_CumChange_30_10_LongTerm_MA40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA80_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA100_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 100) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_MA80_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * $close / Mean($close, 80) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_MA50_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * $close / Mean($close, 50) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_MA40_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * $close / Mean($close, 40) - 1
+  Quantile_Range_60_LongTerm_MA40_Extend_MA100_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Quantile_Range_60_LongTerm_MA40_Extend_MA40_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Quantile_Range_60_LongTerm_MA40_Extend_MA80_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Quantile_Range_60_LongTerm_MA40_Extend_MA50_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1
+  MA30_Slope20_LongTerm_Slope40_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close
+  Quantile_Range_60_LongTerm_MA40_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1
+  MA30_Slope20_LongTerm_Slope40_Extend_Slope40_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  MA30_Slope20_LongTerm_Slope40_Extend_Slope15_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_MA50_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_MA80_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_MA100_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_Slope15_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_Slope25_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Breakout_Strength_Norm_20_10_LongTerm_MA40_Extend_Slope40_Extend: ($close - Max($close, 20)) / (Max($close, 20) + 0.0001) - (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  MA30_Slope20_LongTerm_Slope40_Extend_MA40_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  MA30_Slope20_LongTerm_Slope40_Extend_MA80_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  MA30_Slope20_LongTerm_Slope40_Extend_MA100_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Quantile_Range_60_LongTerm_MA40_Extend_Slope40_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  Quantile_Range_60_LongTerm_MA40_Extend_Slope15_Extend: (Quantile($close, 60, 0.75) - Quantile($close, 60, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_MA100_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_MA80_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_MA50_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_MA40_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1
+  Price_Smoothness_10_LongTerm_Slope25_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close
+  Price_Smoothness_10_LongTerm_Slope25_Extend_Slope25_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * Slope($close, 25) / $close
+  Price_Smoothness_10_LongTerm_Slope25_Extend_Slope15_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 40) / $close
+  Price_Smoothness_10_LongTerm_Slope25_Extend_MA40_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 40) - 1
+  Price_Smoothness_10_LongTerm_Slope25_Extend_MA80_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  Price_Smoothness_10_LongTerm_Slope25_Extend_MA100_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_Slope25_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Price_MA_Distance_Squared_60_LongTerm_MA40_Extend_Slope15_Extend: ($close - Mean($close, 60)) / Mean($close, 60) * ($close - Mean($close, 60)) / Mean($close, 60) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Quantile_Range_30_LongTerm_MA40_Extend_MA100_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Quantile_Range_30_LongTerm_MA40_Extend_MA80_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Quantile_Range_30_LongTerm_MA40_Extend_MA50_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Quantile_Range_30_LongTerm_MA40_Extend_MA40_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close
+  Quantile_Range_30_LongTerm_MA40_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1
+  Price_Smoothness_10_LongTerm_MA50_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope25_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_MA40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Price_Smoothness_10_LongTerm_MA50_Extend_MA100_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * $close / Mean($close, 100) - 1
+  Price_Smoothness_10_LongTerm_MA50_Extend_MA50_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * $close / Mean($close, 50) - 1
+  Price_Smoothness_10_LongTerm_MA50_Extend_MA80_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * $close / Mean($close, 80) - 1
+  Price_Smoothness_10_LongTerm_MA50_Extend_Slope15_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * Slope($close, 15) / $close
+  Price_Smoothness_10_LongTerm_MA50_Extend_Slope25_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * Slope($close, 25) / $close
+  Price_Smoothness_10_LongTerm_MA50_Extend_Slope40_Extend: 1 / (Std(($close - Ref($close, 1)) / Ref($close, 1), 10) + 0.0001) * $close / Mean($close, 50) - 1 * Slope($close, 40) / $close
+  Quantile_Range_30_LongTerm_MA40_Extend_Slope25_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Quantile_Range_30_LongTerm_MA40_Extend_Slope15_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_MA40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Quantile_Range_30_LongTerm_Slope25_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1
+  Quantile_Range_30_LongTerm_Slope25_Extend_Slope25_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * Slope($close, 25) / $close
+  Quantile_Range_30_LongTerm_Slope25_Extend_MA50_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+  Quantile_Range_30_LongTerm_Slope25_Extend_MA80_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  Quantile_Range_30_LongTerm_Slope25_Extend_MA100_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_Slope40_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_Slope15_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_Slope25_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_10_LongTerm_MA40_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_MA80_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_MA50_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Price_Acceleration_Norm_5_10_LongTerm_MA40_Extend_MA100_Extend: ($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5) / (Std(($close - Ref($close, 1)) / Ref($close, 1) - Ref(($close - Ref($close, 1)) / Ref($close, 1), 5), 10) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Breakout_Low_20_LongTerm_MA40_Extend_MA40_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Breakout_Low_20_LongTerm_MA40_Extend_MA50_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Breakout_Low_20_LongTerm_MA40_Extend_MA80_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Breakout_Low_20_LongTerm_MA40_Extend_MA100_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Breakout_Low_20_LongTerm_MA40_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1
+  Price_Asymmetry_20_LongTerm_Slope40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close
+  Price_Asymmetry_20_LongTerm_Slope15_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_MA50_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_MA80_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_MA100_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_MA50_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 50) - 1
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_MA80_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 80) - 1
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_MA100_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 100) - 1
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_Slope25_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * Slope($close, 25) / $close
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_Slope40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_Slope40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * Slope($close, 40) / $close
+  Price_Asymmetry_20_LongTerm_Slope15_Extend_Slope15_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 15) / $close * Slope($close, 15) / $close
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_Slope25_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  Breakout_Low_20_LongTerm_MA40_Extend_Slope25_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Breakout_Low_20_LongTerm_MA40_Extend_Slope15_Extend: (Min($close, 20) - $close) / (Min($close, 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Cumulative_Return_10_LongTerm_Slope40_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close
+  MA30_Slope20_LongTerm_Slope40_Extend_MA50_Extend: ($close / Mean($close, 30) - 1) * (Slope($close, 20) / $close) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_10_LongTerm_Slope40_Extend_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 10) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  Price_Asymmetry_20_LongTerm_Slope40_Extend_Slope15_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  Cumulative_Return_10_LongTerm_Slope40_Extend_MA50_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+  Cumulative_Return_10_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  Cumulative_Return_10_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 15) / $close
+  Cumulative_Return_10_LongTerm_Slope40_Extend_Slope40_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Cumulative_Return_10_LongTerm_Slope40_Extend_Slope15_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  Cumulative_Return_10_LongTerm_MA40_Extend_MA100_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Cumulative_Return_10_LongTerm_MA40_Extend_MA80_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Cumulative_Return_10_LongTerm_MA40_Extend_MA50_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Cumulative_Return_10_LongTerm_MA40_Extend_Slope15_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Cumulative_Return_10_LongTerm_MA40_Extend_MA40_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Cumulative_Return_10_LongTerm_MA40_Extend_Slope25_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Cumulative_Return_10_LongTerm_MA40_Extend_Slope40_Extend: Sum(($close - Ref($close, 1)) / Ref($close, 1), 10) / 10 * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close
+  Price_Asymmetry_20_LongTerm_MA40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope25_Extend_Slope40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 25) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_5_LongTerm_Slope15_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * Slope($close, 15) / $close * $close / Mean($close, 100) - 1
+  Price_Asymmetry_20_LongTerm_MA40_Extend_MA50_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Price_Asymmetry_20_LongTerm_MA40_Extend_MA100_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Price_Asymmetry_20_LongTerm_MA40_Extend_MA40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Price_Asymmetry_20_LongTerm_MA40_Extend_Slope25_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Price_Asymmetry_20_LongTerm_MA40_Extend_Slope15_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_Asymmetry_20_LongTerm_MA40_Extend_Slope40_Extend: (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) - Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20)) / (Sum(If(($close - Ref($close, 1)) / Ref($close, 1) > 0, ($close - Ref($close, 1)) / Ref($close, 1), 0), 20) + Sum(If(($close - Ref($close, 1)) / Ref($close, 1) < 0, Abs(($close - Ref($close, 1)) / Ref($close, 1)), 0), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_MA50_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_MA80_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_MA100_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_MA40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_Slope25_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * Slope($close, 25) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_MA40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 40) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_MA80_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_MA100_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_Slope25_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  MA_Distance_CumChange_10_5_LongTerm_MA40_Extend_Slope15_Extend: Sum(($close - Mean($close, 10)) / Mean($close, 10) - Ref(($close - Mean($close, 10)) / Mean($close, 10), 1), 5) * Sign(($close - Mean($close, 10)) / Mean($close, 10)) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_Slope15_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope15_Extend_Slope40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 15) / $close * Slope($close, 40) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_Slope25_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_Slope40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * Slope($close, 40) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_Slope40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_Slope15_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_Slope15_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_MA40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_MA50_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_MA80_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope40_Extend_MA100_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_MA80_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_30_LongTerm_Slope25_Extend_MA100_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_MA40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_MA50_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_MA100_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_MA80_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_Slope15_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_Slope25_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Price_MA_Relative_Position_20_LongTerm_MA40_Extend_Slope40_Extend: ($close / Mean($close, 20) - Min($close / Mean($close, 20), 20)) / (Max($close / Mean($close, 20), 20) - Min($close / Mean($close, 20), 20) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_MA40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_MA80_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_MA100_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_Slope25_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_Slope15_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  Price_MA_Relative_Position_30_LongTerm_MA40_Extend_Slope40_Extend: ($close / Mean($close, 30) - Min($close / Mean($close, 30), 30)) / (Max($close / Mean($close, 30), 30) - Min($close / Mean($close, 30), 30) + 0.0001) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_10_LongTerm_Slope40_Extend_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 10) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_Slope25_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_Slope40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_MA40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_MA80_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_MA100_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close
+  Quantile_Range_30_LongTerm_Slope25_Extend_Slope15_Extend: (Quantile($close, 30, 0.75) - Quantile($close, 30, 0.25)) / $close * Slope($close, 25) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope40_Extend_Slope40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 40) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope40_Extend_Slope15_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_Slope40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * Slope($close, 40) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope15_Extend_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 15) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_Slope25_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_Slope25_Extend_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * Slope($close, 25) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_MA50_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_MA80_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_30_10_LongTerm_Slope15_Extend_MA100_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * Slope($close, 15) / $close * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_MA80_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_MA50_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_MA100_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_Slope40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * Slope($close, 40) / $close
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_Slope25_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * Slope($close, 25) / $close
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_Slope15_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * Slope($close, 15) / $close
+  MA_Distance_CumChange_30_10_LongTerm_MA50_Extend_MA40_Extend: Sum(($close - Mean($close, 30)) / Mean($close, 30) - Ref(($close - Mean($close, 30)) / Mean($close, 30), 1), 10) * Sign(($close - Mean($close, 30)) / Mean($close, 30)) * $close / Mean($close, 50) - 1 * $close / Mean($close, 40) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_Slope25_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * Slope($close, 25) / $close
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_MA80_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * $close / Mean($close, 80) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_MA100_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * $close / Mean($close, 100) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_MA40_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * $close / Mean($close, 40) - 1
+  Price_MA_Angle_Change_20_5_LongTerm_Slope40_Extend_Slope15_Extend: (($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) / (Abs(Ref(($close - Mean($close, 20)) / Mean($close, 20), 5)) + 0.0001) * ($close - Mean($close, 20)) / Mean($close, 20) * Slope($close, 40) / $close * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_MA50_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 50) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_Slope40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * Slope($close, 40) / $close
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_Slope25_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * Slope($close, 25) / $close
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_MA80_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 80) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_MA100_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 100) - 1
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_Slope15_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * Slope($close, 15) / $close
+  MA_Distance_CumChange_20_5_LongTerm_MA40_Extend_MA40_Extend: Sum(($close - Mean($close, 20)) / Mean($close, 20) - Ref(($close - Mean($close, 20)) / Mean($close, 20), 1), 5) * Sign(($close - Mean($close, 20)) / Mean($close, 20)) * $close / Mean($close, 40) - 1 * $close / Mean($close, 40) - 1
+min_ic_threshold: 0.02
+min_icir_threshold: 0.1

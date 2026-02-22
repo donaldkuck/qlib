@@ -1,0 +1,25 @@
+# 回测参数覆盖示例（仅写需要调整的项，会与 workflow_config 中的 port_analysis_config 合并）
+# 用法: python run_backtest_only.py --run_id <run_id> --backtest_config backtest_config_example.yaml
+
+port_analysis_config:
+  strategy:
+    kwargs:
+      # TopkDrop 参数
+      topk: 20          # 持仓股票数量
+      n_drop: 5         # 每天替换数量
+      hold_thresh: 10   # 最小持有天数
+      # 加仓/止盈
+      add_position_ratio: 0.03   # 加仓比例
+      profit_threshold: 0.05     # 止盈阈值
+      reduce_position_ratio: 0.2 # 止盈减仓比例
+      max_single_stock_ratio: 0.05  # 单只最大仓位
+  backtest:
+    start_time: "2025-01-01"
+    end_time: "2025-12-31"
+    account: 100000000
+    exchange_kwargs:
+      limit_threshold: 0.095
+      deal_price: close
+      open_cost: 0.0005
+      close_cost: 0.0015
+      min_cost: 5
