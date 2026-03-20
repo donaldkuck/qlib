@@ -7,11 +7,11 @@ port_analysis_config:
       # TopkDrop 参数
       topk: 20          # 持仓股票数量
       n_drop: 5         # 每天替换数量
-      hold_thresh: 3   # 最小持有天数
+      hold_thresh: 1   # 最小持有天数
       # 加仓/止盈
-      add_position_ratio: 0.03   # 加仓比例
+      add_position_ratio: 0.01   # 加仓比例
       profit_threshold: 0.05     # 止盈阈值
-      reduce_position_ratio: 0.2 # 止盈减仓比例
+      reduce_position_ratio: 0.5 # 止盈减仓比例
       max_single_stock_ratio: 0.05  # 单只最大仓位
   backtest:
     start_time: "2025-01-01"

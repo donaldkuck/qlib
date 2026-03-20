@@ -22,8 +22,6 @@ short_term_data_handler_config: &short_term_data_handler_config
     custom_factors_file: ./factor_config.yaml
     # 启用股票ID的one-hot编码（让模型学习股票特定的特征）
     add_stock_id_onehot: false
-    # 短期目标：未来1日收益率（用于止盈）
-    label_expr: "Ref($close, -1) / $close - 1"
     infer_processors:
         - class: RobustZScoreNorm
           kwargs:
@@ -36,9 +34,9 @@ short_term_data_handler_config: &short_term_data_handler_config
         - class: DropnaLabel
         # 注意：移除CSRankNorm，保留原始收益率值，这样"正预测"判断才有意义
         # CSRankNorm会把标签转换为0-1的排名，导致策略逻辑失效
-        - class: CSRankNorm
-          kwargs:
-              fields_group: label
+        # - class: CSRankNorm
+        #   kwargs:
+        #       fields_group: label
 
 # 长期因子配置（用于开仓和止损）- 使用自定义因子
 long_term_data_handler_config: &long_term_data_handler_config
@@ -56,8 +54,6 @@ long_term_data_handler_config: &long_term_data_handler_config
     custom_factors_file: ./factor_config_longterm.yaml
     # 启用股票ID的one-hot编码（让模型学习股票特定的特征）
     add_stock_id_onehot: false
-    # 长期目标：未来5日收益率（真正的长期目标）
-    label_expr: "Ref($close, -5) / $close - 1"
     infer_processors:
         - class: RobustZScoreNorm
           kwargs:
@@ -86,15 +82,32 @@ port_analysis_config: &port_analysis_config
         kwargs:
             # TopkDrop 参数
             topk: 20  # 持仓股票数量（减少到30，提高资金集中度）
-            n_drop: 5  # 每天替换的股票数量（减少到2，进一步降低交易频率）
+            n_drop: 3  # 每天替换的股票数量（减少到2，进一步降低交易频率）
             method_sell: bottom  # 卖出方法：bottom（卖出预测值最低的）
             method_buy: top  # 买入方法：top（买入预测值最高的）
-            hold_thresh: 10  # 最小持有天数（增加到10天，大幅减少交易频率）
+            hold_thresh: 20  # 最小持有天数（增加到10天，大幅减少交易频率）
+            long_signal_quantile: 0.5  # 长期信号阈值：高于横截面50%分位视为长期为正
+            short_buy_quantile: 0.6  # 短期买入过滤阈值：高于60%分位才允许新开仓
+            short_add_quantile: 0.7  # 短期加仓阈值：高于70%分位才允许加仓
+            short_reduce_quantile: 0.4  # 短期减仓阈值：低于40%分位且已有盈利时考虑减仓
+            buy_score_long_weight: 0.7  # 买入排序中长期信号权重
+            buy_score_short_weight: 0.3  # 买入排序中短期信号权重
+            sell_score_long_weight: 0.8  # 卖出排序中长期信号权重
+            sell_score_short_weight: 0.2  # 卖出排序中短期信号权重
+            add_size_min_multiplier: 0.5  # 弱一些的强势信号也允许小幅加仓
+            add_size_max_multiplier: 1.5  # 最强信号的加仓倍数上限
             # 加仓/止盈参数（进一步降低频率以减少交易成本）
-            add_position_ratio: 0.03  # 加仓比例（降低到3%，进一步减少交易）
-            profit_threshold: 0.05  # 止盈阈值（提高到5%，大幅减少止盈频率）
-            reduce_position_ratio: 0.2  # 止盈时减仓比例（降低到20%，减少交易）
+            open_position_ratio: 0.04  # 首次开仓单只仓位（1%）
+            add_position_ratio: 0.01  # 加仓比例（降低到3%，进一步减少交易）
+            profit_threshold: 0.5  # 止盈阈值（盈利超过50%时止盈，降低频率以减少交易）
+            reduce_position_ratio: 0.5  # 止盈时减仓比例（降低到20%，减少交易）
             max_single_stock_ratio: 0.05  # 单只股票最大仓位比例（相对于总资产，例如0.05表示最多5%）
+            # 止损参数
+            stop_loss_threshold: -0.5  # 止损阈值（亏损超过此比例时止损，例如-0.05表示亏损5%时止损）
+            # 回撤控制参数
+            max_drawdown: null  # 最大回撤阈值（例如0.15表示15%），超过此值降低仓位，设为null表示不启用
+            drawdown_warning: null  # 回撤预警阈值（例如0.10表示10%），超过此值开始降低仓位，设为null表示使用max_drawdown*0.7
+            drawdown_reduce_ratio: 0.3  # 回撤时减仓比例（例如0.3表示减仓30%）
             # 其他参数
             risk_degree: 0.95
             only_tradable: false
@@ -129,7 +142,7 @@ task:
             n_epochs: 300  # 训练轮数
             lr: 0.0001  # 学习率
             metric: loss  # 评估指标
-            early_stop: 5  # 早停轮数
+            early_stop: 10  # 早停轮数
             loss: mse  # 损失函数
             base_model: LSTM  # 基座模型（LSTM/GRU）
             model_path: null  # 预训练基座模型路径（可选）
@@ -163,7 +176,7 @@ task:
             n_epochs: 300  # 训练轮数
             lr: 0.0001  # 学习率
             metric: loss  # 评估指标
-            early_stop: 5  # 早停轮数
+            early_stop: 10  # 早停轮数
             loss: mse  # 损失函数
             base_model: LSTM  # 基座模型（LSTM/GRU）
             model_path: null  # 预训练基座模型路径（可选）
@@ -205,4 +218,3 @@ task:
           module_path: qlib.workflow.record_temp
           kwargs: 
             config: *port_analysis_config
-

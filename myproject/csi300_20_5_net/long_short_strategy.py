@@ -11,9 +11,13 @@
 3. 加仓/止盈：根据短期预测值对已持仓股票进行加仓或止盈
    - 短期预测为正：加仓
    - 短期预测为负且盈利：止盈（减仓）
+4. 仓位分配：使用总资产计算等权仓位，确保每只股票的仓位固定
+   - 不再基于可用现金动态分配，避免后续买入金额递减的问题
+   - 每只股票的目标仓位 = 总资产 * risk_degree / topk
 """
 
 import copy
+import os
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Optional, Tuple, Union
@@ -57,11 +61,23 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         method_sell: str = "bottom",  # 卖出方法：bottom（卖出预测值最低的）
         method_buy: str = "top",  # 买入方法：top（买入预测值最高的）
         hold_thresh: int = 1,  # 最小持有天数
+        long_signal_quantile: float = 0.5,  # 长期信号为正的分位阈值
+        short_buy_quantile: float = 0.6,  # 短期买入过滤分位阈值
+        short_add_quantile: float = 0.7,  # 短期加仓分位阈值
+        short_reduce_quantile: float = 0.4,  # 短期减仓/止盈分位阈值
+        buy_score_long_weight: float = 0.7,  # 买入排序中长期信号权重
+        buy_score_short_weight: float = 0.3,  # 买入排序中短期信号权重
+        sell_score_long_weight: float = 0.8,  # 卖出排序中长期信号权重
+        sell_score_short_weight: float = 0.2,  # 卖出排序中短期信号权重
+        add_size_min_multiplier: float = 0.5,  # 加仓最小倍数（相对基础加仓单位）
+        add_size_max_multiplier: float = 1.5,  # 加仓最大倍数（相对基础加仓单位）
         # 海龟突破参数
         enable_turtle_breakout: bool = False,  # 是否启用海龟突破过滤（默认关闭）
         turtle_breakout_period: int = 20,  # 海龟突破周期（N日）
         # 加仓/止盈参数
-        add_position_ratio: float = 0.1,  # 加仓比例（相对于单只股票仓位）
+        add_position_ratio: float = 0.1,  # 加仓比例（相对于单只股票仓位），当 position_unit_ratio 为 None 时使用
+        position_unit_ratio: float = 0.01,  # 加仓单位（相对总资产），如 0.01=1%
+        open_position_ratio: float = 0.01,  # 开仓时单只仓位（相对总资产），如 0.01=1%
         profit_threshold: float = 0.02,  # 止盈阈值（盈利超过此比例时可以考虑止盈）
         reduce_position_ratio: float = 0.5,  # 止盈时减仓比例（相对于当前仓位）
         max_single_stock_ratio: float = 0.05,  # 单只股票最大仓位比例（相对于总资产）
@@ -72,7 +88,7 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         drawdown_warning: float = None,  # 回撤预警阈值（例如0.10表示10%），超过此值开始降低仓位
         drawdown_reduce_ratio: float = 0.3,  # 回撤时减仓比例（例如0.3表示减仓30%）
         # 其他参数
-        risk_degree: float = 0.95,
+        risk_degree: float = 0.90,  # 总仓位上限（0.90=90%），留一定现金应对赎回/加仓
         only_tradable: bool = False,
         forbid_all_trade_at_limit: bool = True,
         # 固定股票池（可选）
@@ -98,6 +114,8 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             最小持有天数
         add_position_ratio : float
             加仓比例（相对于单只股票仓位，例如0.1表示加仓10%）
+        open_position_ratio : float
+            开仓时单只仓位（相对总资产，例如0.01表示1%）
         profit_threshold : float
             止盈阈值（盈利超过此比例时可以考虑止盈）
         reduce_position_ratio : float
@@ -110,9 +128,15 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         if 'signal' in kwargs and kwargs['signal'] is not None:
             long_term_signal = kwargs.pop('signal')
         
-        # 保存recorder以便后续加载短期信号
+        # 保存recorder以便后续加载长期/短期信号
         self.recorder = kwargs.pop('recorder', None)
+        self.long_term_signal_path = None
         self.short_term_signal_path = None
+        
+        # 提取不需要传递给父类的参数
+        self.stats_output_dir = kwargs.pop('stats_output_dir', None)
+        kwargs.pop('long_term_dataset', None)  # 不需要保存，只是用于传递
+        kwargs.pop('short_term_dataset', None)  # 不需要保存，只是用于传递
         
         if long_term_model is not None and long_term_dataset is not None:
             long_term_signal = (long_term_model, long_term_dataset)
@@ -122,6 +146,21 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         # 如果没有提供长期信号，使用默认值
         if long_term_signal is None:
             raise ValueError("必须提供长期信号（long_term_signal或signal参数）")
+
+        # 如果长期信号是字符串（如 "<PRED>" 或 "*.pkl"），先从 recorder 显式加载，
+        # 避免 BaseSignalStrategy 将其误判为模块配置并尝试 import。
+        if isinstance(long_term_signal, str):
+            self.long_term_signal_path = "pred.pkl" if long_term_signal == "<PRED>" else long_term_signal
+            if self.recorder is None:
+                raise ValueError(f"长期信号为路径 {self.long_term_signal_path}，但未提供 recorder")
+            try:
+                from qlib.backtest.signal import SignalWCache
+                long_term_pred_data = self.recorder.load_object(self.long_term_signal_path)
+                if long_term_pred_data is None:
+                    raise ValueError(f"recorder 中未找到长期信号文件: {self.long_term_signal_path}")
+                long_term_signal = SignalWCache(long_term_pred_data)
+            except Exception as e:
+                raise ValueError(f"无法加载长期信号 {self.long_term_signal_path}: {e}") from e
         
         # 使用长期信号初始化基类（用于兼容）
         super().__init__(
@@ -129,6 +168,9 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             risk_degree=risk_degree,
             **kwargs
         )
+        
+        # 初始化交易日志文件 handler（只写入文件，不输出到控制台）
+        self._init_trade_logger()
         
         # 创建短期信号
         # 如果short_term_signal是字符串（文件路径），则延迟加载
@@ -152,9 +194,21 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         self.method_sell = method_sell
         self.method_buy = method_buy
         self.hold_thresh = hold_thresh
+        self.long_signal_quantile = long_signal_quantile
+        self.short_buy_quantile = short_buy_quantile
+        self.short_add_quantile = short_add_quantile
+        self.short_reduce_quantile = short_reduce_quantile
+        self.buy_score_long_weight = buy_score_long_weight
+        self.buy_score_short_weight = buy_score_short_weight
+        self.sell_score_long_weight = sell_score_long_weight
+        self.sell_score_short_weight = sell_score_short_weight
+        self.add_size_min_multiplier = add_size_min_multiplier
+        self.add_size_max_multiplier = add_size_max_multiplier
         self.enable_turtle_breakout = enable_turtle_breakout
         self.turtle_breakout_period = turtle_breakout_period
         self.add_position_ratio = add_position_ratio
+        self.position_unit_ratio = position_unit_ratio
+        self.open_position_ratio = open_position_ratio  # 开仓单只仓位（总资产比例）
         self.profit_threshold = profit_threshold
         self.reduce_position_ratio = reduce_position_ratio
         self.max_single_stock_ratio = max_single_stock_ratio
@@ -176,37 +230,62 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         self.last_drawdown_reduce_date: pd.Timestamp = None
         self.drawdown_reduce_cooldown_days: int = 5  # 减仓后5天内不再减仓
     
-    def _is_prediction_positive(self, pred_value: float, all_pred_values: pd.Series = None) -> bool:
+    def _init_trade_logger(self):
+        """
+        初始化交易日志记录器（已禁用，不再写入 trade_records.log）
+        """
+        pass
+    
+    def _is_prediction_positive(self, pred_value: float, all_pred_values: pd.Series = None, quantile: float = 0.5) -> bool:
         """
         判断预测值是否为正（预测上涨）
         
         Parameters
         ----------
         pred_value : float
-            预测值（可能是原始值或rank值）
+            预测值（原始收益率预测值，正值表示预测上涨，负值表示预测下跌）
         all_pred_values : pd.Series, optional
-            所有预测值（用于计算中位数作为阈值）
+            所有预测值（用于计算相对阈值）
         
         Returns
         -------
         bool
             是否为正（预测上涨）
         """
-        # 如果有所有预测值，使用排名前70%作为阈值（更宽松，避免过滤掉好股票）
-        if all_pred_values is not None and len(all_pred_values) > 0:
-            threshold = all_pred_values.quantile(0.3)  # 前70%（排名小于0.3分位数）
-            return pred_value > threshold
-        
-        # 否则，使用固定阈值
-        # 如果预测值大于0，认为是正（预测上涨）
-        # 如果是rank值（0-1之间），小于0.5认为是正（排名在前50%）
-        if pred_value > 0:
-            return True
-        elif 0 < pred_value <= 1:
-            # 可能是rank值，小于0.5表示排名在前50%（预测上涨）
-            return pred_value < 0.5
-        else:
+        # 检查NaN
+        if pd.isna(pred_value):
             return False
+        
+        # 如果有所有预测值，使用分位数阈值（相对排名）
+        if all_pred_values is not None and len(all_pred_values) > 0:
+            valid_values = all_pred_values.dropna()
+            if len(valid_values) > 0:
+                threshold = valid_values.quantile(quantile)
+                return pred_value > threshold
+        
+        # 否则，直接判断是否大于0（预测正收益）
+        return pred_value > 0
+
+    def _build_combined_buy_score(self, long_term_pred: pd.Series, short_term_pred: pd.Series) -> pd.Series:
+        """构建买入排序用的长期/短期组合分数。"""
+        long_rank = long_term_pred.rank(pct=True)
+        short_rank = short_term_pred.rank(pct=True)
+        return long_rank * self.buy_score_long_weight + short_rank * self.buy_score_short_weight
+
+    def _build_combined_sell_score(self, long_term_pred: pd.Series, short_term_pred: pd.Series) -> pd.Series:
+        """构建卖出排序用的弱势分数，分数越低越优先卖出。"""
+        long_rank = long_term_pred.rank(pct=True)
+        short_rank = short_term_pred.rank(pct=True)
+        return long_rank * self.sell_score_long_weight + short_rank * self.sell_score_short_weight
+
+    def _get_add_size_multiplier(self, score: float) -> float:
+        """根据信号强弱调整加仓倍数。"""
+        if pd.isna(score):
+            return self.add_size_min_multiplier
+        clipped_score = min(max(float(score), 0.0), 1.0)
+        return self.add_size_min_multiplier + (
+            self.add_size_max_multiplier - self.add_size_min_multiplier
+        ) * clipped_score
     
     def _is_turtle_breakout(self, stock_id: str, current_time: pd.Timestamp) -> bool:
         """
@@ -447,14 +526,17 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             # 未启用突破过滤，使用所有股票
             long_term_pred_breakout = long_term_pred_filtered
             short_term_pred_breakout = short_term_pred_filtered
+
+        combined_buy_score = self._build_combined_buy_score(long_term_pred_breakout, short_term_pred_breakout)
+        combined_sell_score = self._build_combined_sell_score(long_term_pred_breakout, short_term_pred_breakout)
         
         # 当前持仓按长期预测值排序（只考虑突破股票）
-        current_stock_list_breakout = [s for s in current_stock_list if s in long_term_pred_breakout.index]
-        last = long_term_pred_breakout.reindex(current_stock_list_breakout).sort_values(ascending=False).index
+        current_stock_list_breakout = [s for s in current_stock_list if s in combined_sell_score.index]
+        last = combined_sell_score.reindex(current_stock_list_breakout).sort_values(ascending=False).index
         
         # 选择要买入的候选股票（基于长期预测值，排除已持仓，只考虑突破股票）
         if self.method_buy == "top":
-            available_for_buy = long_term_pred_breakout[~long_term_pred_breakout.index.isin(last)]
+            available_for_buy = combined_buy_score[~combined_buy_score.index.isin(last)]
             if len(available_for_buy) > 0:
                 today_candidates = get_first_n(
                     available_for_buy.sort_values(ascending=False).index,
@@ -467,7 +549,7 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         
         # 合并候选股票和当前持仓，用于选择要卖出的股票
         if len(last) > 0 or len(today_candidates) > 0:
-            comb = long_term_pred_breakout.reindex(last.union(pd.Index(today_candidates))).sort_values(ascending=False).index
+            comb = combined_sell_score.reindex(last.union(pd.Index(today_candidates))).sort_values(ascending=False).index
         else:
             comb = pd.Index([])
         
@@ -479,9 +561,18 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 sell_candidates = pd.Index([])
         else:
             raise NotImplementedError(f"卖出方法 {self.method_sell} 不支持")
+
+        # 先基于最小持有期过滤计划卖出列表，避免后续买入数量按“计划卖出”高估
+        time_per_step = self.trade_calendar.get_freq()
+        executable_sell_candidates = []
+        for code in sell_candidates:
+            if current_temp.get_stock_count(code, bar=time_per_step) < self.hold_thresh:
+                continue
+            executable_sell_candidates.append(code)
+        sell_candidates = pd.Index(executable_sell_candidates)
         
         # 实际要买入的股票数量
-        buy_count = len(sell_candidates) + self.topk - len(last)
+        buy_count = max(0, len(sell_candidates) + self.topk - len(last))
         buy_candidates = today_candidates[:buy_count] if len(today_candidates) > 0 else []
         
         # ========== 2. 买入筛选：只选择长期和短期预测都为正的股票 ==========
@@ -495,9 +586,12 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             long_term_value = long_term_pred_filtered.loc[stock_id]
             short_term_value = short_term_pred_filtered.loc[stock_id]
             
-            # 检查长期和短期预测是否都为正（使用中位数作为阈值）
-            is_long_term_positive = self._is_prediction_positive(long_term_value, long_term_pred_filtered)
-            is_short_term_positive = self._is_prediction_positive(short_term_value, short_term_pred_filtered)
+            is_long_term_positive = self._is_prediction_positive(
+                long_term_value, long_term_pred_filtered, quantile=self.long_signal_quantile
+            )
+            is_short_term_positive = self._is_prediction_positive(
+                short_term_value, short_term_pred_filtered, quantile=self.short_buy_quantile
+            )
             
             if is_long_term_positive and is_short_term_positive:
                 buy_list.append(stock_id)
@@ -505,14 +599,21 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 # 只要求长期预测为正（备选方案）
                 backup_buy_list.append(stock_id)
         
-        # 如果符合条件的股票不够，使用备选方案
+        # 如果符合条件的股票不够，使用长期为正的备选股票补足，避免组合长期吃不满仓
         if len(buy_list) < buy_count:
             needed = buy_count - len(buy_list)
-            buy_list.extend(backup_buy_list[:needed])
+            fallback = backup_buy_list[:needed]
+            buy_list.extend(fallback)
             if len(buy_list) < buy_count:
-                logger.warning(f"买入候选股票不足：需要 {buy_count} 只，实际只有 {len(buy_list)} 只（长期和短期预测都为正：{len(buy_list) - len(backup_buy_list[:needed])} 只，仅长期预测为正：{len(backup_buy_list[:needed])} 只）")
+                logger.warning(
+                    f"买入候选股票不足：需要 {buy_count} 只，实际只有 {len(buy_list)} 只 "
+                    f"（双正信号 {len(buy_list) - len(fallback)} 只，仅长期为正 {len(fallback)} 只）"
+                )
         
-        # ========== 3. 生成卖出订单 ==========
+        # 统一交易记录（首次买入、加仓、换仓卖出、止损卖出、止盈减仓等）
+        trade_records: List[Dict] = []
+        
+        # ========== 3. 生成卖出订单（换仓：TopkDrop 调出标的全部卖出） ==========
         sell_order_list = []
         for code in current_stock_list:
             if not self.trade_exchange.is_stock_tradable(
@@ -524,13 +625,9 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 continue
             
             if code in sell_candidates:
-                # 检查最小持有天数
-                time_per_step = self.trade_calendar.get_freq()
-                if current_temp.get_stock_count(code, bar=time_per_step) < self.hold_thresh:
-                    continue
-                
                 # 生成卖出订单
                 sell_amount = current_temp.get_stock_amount(code=code)
+                entry_price = self.entry_prices.get(code)
                 sell_order = Order(
                     stock_id=code,
                     amount=sell_amount,
@@ -544,43 +641,58 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                     trade_val, trade_cost, trade_price = self.trade_exchange.deal_order(
                         sell_order, position=current_temp
                     )
-                    # 更新现金
                     cash += trade_val - trade_cost
-                    # 清除入场价格记录
+                    # 换仓卖出：区分止盈/止损
+                    if entry_price is not None and entry_price > 0 and trade_price is not None:
+                        profit_ratio = (trade_price - entry_price) / entry_price
+                        reason = f"换仓止盈{profit_ratio*100:.2f}%" if profit_ratio >= 0 else f"换仓止损{profit_ratio*100:.2f}%"
+                    else:
+                        reason = "TopkDrop调出"
+                    trade_records.append({
+                        "date": trade_start_time,
+                        "type": "换仓卖出",
+                        "stock_id": code,
+                        "amount": sell_amount,
+                        "price": trade_price,
+                        "reason": reason,
+                    })
                     self.entry_prices.pop(code, None)
         
         # ========== 4. 生成买入订单 ==========
         buy_order_list = []
-        # 计算可用资金（考虑卖出后释放的现金）
-        available_cash = cash
-        # 按信号强度分配仓位（长期和短期预测的加权平均）
+        # 开仓：单只仓位 = 总资产 * open_position_ratio（默认 5%）
+        total_value = current_temp.calculate_value()
         if len(buy_list) > 0:
-            # 计算每只股票的信号强度（长期预测权重0.6，短期预测权重0.4）
-            signal_scores = {}
-            for code in buy_list:
-                if code in long_term_pred_filtered.index and code in short_term_pred_filtered.index:
-                    long_score = long_term_pred_filtered.loc[code]
-                    short_score = short_term_pred_filtered.loc[code]
-                    # 归一化到0-1范围（使用排名）
-                    long_rank = (long_term_pred_filtered > long_score).sum() / len(long_term_pred_filtered)
-                    short_rank = (short_term_pred_filtered > short_score).sum() / len(short_term_pred_filtered)
-                    # 综合得分（排名越小越好，所以用1-rank）
-                    signal_scores[code] = 0.6 * (1 - long_rank) + 0.4 * (1 - short_rank)
-                else:
-                    signal_scores[code] = 0.5  # 默认值
-            
-            # 按信号强度分配资金
-            total_score = sum(signal_scores.values())
-            if total_score > 0:
-                # 每只股票的资金 = 总资金 * 该股票信号强度 / 总信号强度
-                stock_values = {
-                    code: available_cash * self.risk_degree * risk_degree_multiplier * signal_scores[code] / total_score
-                    for code in buy_list
-                }
+            max_single_value = total_value * self.max_single_stock_ratio
+            desired_value_per_stock = min(
+                total_value * self.open_position_ratio * risk_degree_multiplier,
+                max_single_value,
+            )
+
+            current_equity_value = total_value - cash
+            target_total_exposure = total_value * self.risk_degree * risk_degree_multiplier
+            remaining_capacity = max(0.0, target_total_exposure - current_equity_value)
+            available_buy_budget = min(cash, remaining_capacity)
+
+            if available_buy_budget <= 0:
+                stock_values = {}
             else:
-                # 如果总信号强度为0，等权分配
-                value_per_stock = available_cash * self.risk_degree * risk_degree_multiplier / len(buy_list)
-                stock_values = {code: value_per_stock for code in buy_list}
+                buy_scores = combined_buy_score.reindex(buy_list).fillna(0.0)
+                min_score = float(buy_scores.min()) if len(buy_scores) > 0 else 0.0
+                shifted_scores = buy_scores - min_score
+                positive_scores = shifted_scores + max(1e-6, shifted_scores.max() * 0.05)
+                score_sum = float(positive_scores.sum())
+
+                if score_sum <= 0:
+                    total_desired_buy_value = desired_value_per_stock * len(buy_list)
+                    scale = min(1.0, available_buy_budget / total_desired_buy_value) if total_desired_buy_value > 0 else 0.0
+                    scaled_value_per_stock = desired_value_per_stock * scale
+                    stock_values = {code: min(scaled_value_per_stock, max_single_value) for code in buy_list}
+                else:
+                    stock_values = {}
+                    for code in buy_list:
+                        raw_value = available_buy_budget * (positive_scores.loc[code] / score_sum)
+                        stock_values[code] = min(raw_value, desired_value_per_stock, max_single_value)
         else:
             stock_values = {}
         
@@ -612,9 +724,16 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             )
             buy_order_list.append(buy_order)
             
-            # 记录入场价格（如果之前没有持仓）
             if code not in current_stock_list:
                 self.entry_prices[code] = buy_price
+                trade_records.append({
+                    "date": trade_start_time,
+                    "type": "首次买入",
+                    "stock_id": code,
+                    "amount": buy_amount,
+                    "price": buy_price,
+                    "reason": "新入选",
+                })
         
         # ========== 5. 回撤控制：如果回撤过大，主动减仓 ==========
         adjust_order_list = []
@@ -622,8 +741,38 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         # 如果回撤过大，主动减仓（卖出部分持仓）
         if should_reduce_position and len(current_stock_list) > 0:
             logger.warning(f"执行回撤控制减仓：当前持仓 {len(current_stock_list)} 只股票，回撤 {current_drawdown*100:.2f}%")
-            # 按长期预测值排序，卖出预测值最低的股票
-            stocks_to_reduce = long_term_pred_filtered.reindex(current_stock_list).sort_values(ascending=True).index
+            # 优先减掉组合分数较弱、且已有盈利的仓位
+            reduce_candidates = []
+            for code in current_stock_list:
+                if code in sell_candidates or code not in combined_sell_score.index:
+                    continue
+                current_amount = current_temp.get_stock_amount(code)
+                if current_amount <= 0:
+                    continue
+                current_price = self.trade_exchange.get_deal_price(
+                    stock_id=code,
+                    start_time=trade_start_time,
+                    end_time=trade_end_time,
+                    direction=OrderDir.SELL,
+                )
+                entry_price = self.entry_prices.get(code)
+                profit_ratio = 0.0
+                if (
+                    entry_price is not None
+                    and entry_price > 0
+                    and current_price is not None
+                    and current_price > 0
+                ):
+                    profit_ratio = (current_price - entry_price) / entry_price
+                reduce_candidates.append((code, combined_sell_score.loc[code], profit_ratio))
+
+            stocks_to_reduce = [
+                code
+                for code, _, _ in sorted(
+                    reduce_candidates,
+                    key=lambda item: (item[2] <= 0, item[1], -item[2]),
+                )
+            ]
             # 减仓数量：至少减仓 drawdown_reduce_ratio 比例的股票
             reduce_count = max(1, int(len(current_stock_list) * self.drawdown_reduce_ratio))
             stocks_to_reduce = stocks_to_reduce[:reduce_count]
@@ -660,6 +809,13 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                     if self.trade_exchange.check_order(reduce_order):
                         adjust_order_list.append(reduce_order)
                         logger.warning(f"回撤控制：股票 {code} 减仓 {reduce_amount} 股（{reduce_amount/current_amount*100:.1f}%）")
+                        trade_records.append({
+                            "date": trade_start_time,
+                            "type": "回撤减仓",
+                            "stock_id": code,
+                            "amount": reduce_amount,
+                            "reason": f"回撤{current_drawdown*100:.2f}%超阈值",
+                        })
             
             # 如果执行了减仓，记录日期（用于冷却期）
             if len(adjust_order_list) > 0:
@@ -673,6 +829,7 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
         
         # 获取总资产（用于计算单只股票最大仓位）
         total_value = current_temp.calculate_value()
+        remaining_adjust_cash = max(0.0, cash)
         
         for code in current_stock_list_after_sell:
             if code not in long_term_pred_filtered.index or code not in short_term_pred_filtered.index:
@@ -681,8 +838,18 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
             # 获取长期和短期预测值
             long_term_value = long_term_pred_filtered.loc[code]
             short_term_value = short_term_pred_filtered.loc[code]
-            is_long_term_positive = self._is_prediction_positive(long_term_value, long_term_pred_filtered)
-            is_short_term_positive = self._is_prediction_positive(short_term_value, short_term_pred_filtered)
+            is_long_term_positive = self._is_prediction_positive(
+                long_term_value, long_term_pred_filtered, quantile=self.long_signal_quantile
+            )
+            is_short_term_positive = self._is_prediction_positive(
+                short_term_value, short_term_pred_filtered, quantile=self.short_buy_quantile
+            )
+            is_short_term_strong = self._is_prediction_positive(
+                short_term_value, short_term_pred_filtered, quantile=self.short_add_quantile
+            )
+            is_short_term_weak = not self._is_prediction_positive(
+                short_term_value, short_term_pred_filtered, quantile=self.short_reduce_quantile
+            )
             
             # 获取当前持仓和价格
             current_amount = current_temp.get_stock_amount(code)
@@ -725,7 +892,14 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 if self.trade_exchange.check_order(stop_loss_order):
                     adjust_order_list.append(stop_loss_order)
                     self.entry_prices.pop(code, None)
-                    logger.debug(f"股票 {code} 亏损 {profit_ratio*100:.2f}%，超过止损阈值 {self.stop_loss_threshold*100:.2f}%，止损卖出 {current_amount} 股")
+                    trade_records.append({
+                        "date": trade_start_time,
+                        "type": "止损卖出",
+                        "stock_id": code,
+                        "amount": current_amount,
+                        "price": current_price,
+                        "reason": f"亏损{profit_ratio*100:.2f}%",
+                    })
             
             # 然后检查长期预测
             elif not is_long_term_positive:
@@ -748,9 +922,16 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 if self.trade_exchange.check_order(stop_loss_order):
                     adjust_order_list.append(stop_loss_order)
                     self.entry_prices.pop(code, None)
-                    logger.debug(f"股票 {code} 长期预测为负，止损卖出 {current_amount} 股")
+                    trade_records.append({
+                        "date": trade_start_time,
+                        "type": "长期预测为负卖出",
+                        "stock_id": code,
+                        "amount": current_amount,
+                        "price": current_price,
+                        "reason": "长期预测为负",
+                    })
             
-            elif is_short_term_positive:
+            elif is_short_term_strong:
                 # 长期预测为正，短期预测为正：加仓
                 if not self.trade_exchange.is_stock_tradable(
                     stock_id=code,
@@ -760,26 +941,21 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                 ):
                     continue
                 
-                # 计算加仓金额，考虑单只股票最大仓位限制
+                # 加仓金额：与开仓单位一致 = 总资产 * position_unit_ratio（如 1%）
                 current_value = current_amount * current_price
                 max_single_stock_value = total_value * self.max_single_stock_ratio
-                add_value = current_value * self.add_position_ratio
-                
-                # 检查是否超过最大仓位
-                if current_value + add_value > max_single_stock_value:
+                add_score = combined_buy_score.get(code, np.nan)
+                add_multiplier = self._get_add_size_multiplier(add_score)
+                add_value = total_value * self.position_unit_ratio * risk_degree_multiplier * add_multiplier
+                if add_value > max(0, max_single_stock_value - current_value):
                     add_value = max(0, max_single_stock_value - current_value)
-                
-                # 检查可用资金（考虑回撤控制）
-                available_cash = current_temp.get_cash()
-                max_add_value = available_cash * self.risk_degree * risk_degree_multiplier
+                max_add_value = remaining_adjust_cash * self.risk_degree * risk_degree_multiplier
                 if add_value > max_add_value:
                     add_value = max_add_value
-                
                 if add_value > 0:
                     add_amount = add_value / current_price
                     factor = self.trade_exchange.get_factor(stock_id=code, start_time=trade_start_time, end_time=trade_end_time)
                     add_amount = self.trade_exchange.round_amount_by_trade_unit(add_amount, factor)
-                    
                     if add_amount > 0:
                         add_order = Order(
                             stock_id=code,
@@ -790,14 +966,21 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                         )
                         if self.trade_exchange.check_order(add_order):
                             adjust_order_list.append(add_order)
-                            # 更新入场价格（加权平均）
+                            remaining_adjust_cash = max(0.0, remaining_adjust_cash - add_value)
                             old_price = self.entry_prices.get(code, current_price)
                             old_amount = current_amount
                             new_price = (old_amount * old_price + add_amount * current_price) / (old_amount + add_amount)
                             self.entry_prices[code] = new_price
-                            logger.debug(f"股票 {code} 短期预测为正，加仓 {add_amount} 股，更新入场价格 {new_price:.2f}")
+                            trade_records.append({
+                                "date": trade_start_time,
+                                "type": "加仓",
+                                "stock_id": code,
+                                "amount": add_amount,
+                                "price": current_price,
+                                "reason": f"短期强势({add_multiplier:.2f}x)",
+                            })
             
-            elif not is_short_term_positive and profit_ratio > self.profit_threshold:
+            elif is_short_term_weak and profit_ratio > self.profit_threshold:
                 # 长期预测为正，短期预测为负且盈利：止盈（减仓）
                 if not self.trade_exchange.is_stock_tradable(
                     stock_id=code,
@@ -825,7 +1008,13 @@ class TopkDropLongShortStrategy(BaseSignalStrategy):
                         remaining_amount = current_amount - reduce_amount
                         if remaining_amount > 0:
                             self.entry_prices[code] = current_price
-                        logger.debug(f"股票 {code} 短期预测为负且盈利 {profit_ratio:.2%}，止盈减仓 {reduce_amount} 股")
-        
-        return TradeDecisionWO(sell_order_list + buy_order_list + adjust_order_list, self)
+                        trade_records.append({
+                            "date": trade_start_time,
+                            "type": "止盈减仓",
+                            "stock_id": code,
+                            "amount": reduce_amount,
+                            "price": current_price,
+                            "reason": f"盈利{profit_ratio*100:.2f}%",
+                        })
 
+        return TradeDecisionWO(sell_order_list + buy_order_list + adjust_order_list, self)

@@ -16,17 +16,17 @@ port_analysis_config: &port_analysis_config
             verbose: false  # 禁用进度条，方便日志重定向
     strategy:
         class: ReversalGridStrategy
-        module_path: myproject.reversal_grid_strategy
+        module_path: reversal_grid_strategy
         kwargs:
             # 股票代码（单只股票，可以根据需要修改）
             stock_id: SH600000  # 浦发银行，示例股票
             # 趋势计算参数
-            long_trend_period: 15  # 长期趋势周期（天）
+            long_trend_period: 12  # 长期趋势周期（天）
             short_trend_period: 3  # 短期趋势周期（天）
-            trend_threshold: 0.01  # 趋势判断阈值（绝对值小于此值视为持平，0.1%）
+            trend_threshold: 0.02  # 趋势判断阈值（绝对值小于此值视为持平，0.1%）
             # ATR参数
             atr_period: 14  # ATR计算周期
-            atr_multiplier: 1  # ATR倍数（用于判断反转/止损，默认3.0）
+            atr_multiplier: 1.5  # ATR倍数（用于判断反转/止损，默认3.0）
             grid_atr_interval: 0.2  # 网格加仓间隔（ATR倍数，默认0.5）
             entry_atr_multiplier: 1 # 开仓条件ATR倍数（用于判断开仓，默认1.0）
             # 历史数据回看参数

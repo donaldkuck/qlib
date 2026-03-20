@@ -18,6 +18,14 @@ import numpy as np
 from pathlib import Path
 from typing import Dict
 
+# 添加当前目录到sys.path，以便导入reversal_strategy模块
+current_dir = Path(__file__).parent.absolute()
+project_root = current_dir.parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 # 配置日志（在导入qlib之前）
 import logging
 logging.basicConfig(

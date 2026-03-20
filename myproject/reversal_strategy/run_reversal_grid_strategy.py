@@ -43,6 +43,9 @@ for p in paths_to_remove:
 
 import qlib
 
+# 添加当前目录和项目根目录到sys.path，以便导入reversal_strategy模块
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 

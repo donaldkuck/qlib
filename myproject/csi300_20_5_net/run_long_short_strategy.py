@@ -13,6 +13,7 @@
 import sys
 import time
 import warnings
+import gc  # 用于内存管理
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple, List
 import pandas as pd
@@ -51,10 +52,13 @@ for p in paths_to_remove:
 # 先导入qlib（从安装的包）
 import qlib
 
-# 然后添加项目根目录到路径（用于导入myproject模块）
+# 然后添加项目根目录到路径（用于导入myproject模块，如 custom_factor_handler）
 # 此时qlib已经导入，即使项目根目录在sys.path中，也不会重新导入qlib
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
+# 添加当前目录（hongli_long_short_gats）到路径，使 workflow 中的 module_path: long_short_strategy 能正确导入
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
 from qlib.workflow import R
 from qlib.utils import init_instance_by_config, flatten_dict
 from qlib.workflow.record_temp import SignalRecord, SigAnaRecord, PortAnaRecord
@@ -63,6 +67,126 @@ from qlib.utils.time import Freq
 import qlib.contrib.report.analysis_position as qcr_analysis_position
 import qlib.contrib.report.analysis_model as qcr_analysis_model
 import yaml
+import os
+
+
+# 红利股列表 (qlib格式)
+RED_CHIP_STOCKS = [
+    # 银行
+    "SH600036", "SH600015", "SH600016", "SH600000",
+    "SH601166", "SH601169", "SH601288", "SH601398",
+    "SH601939", "SH601988", "SH601998", "SH601229",
+    "SZ000001", "SZ002142",
+    # 保险
+    "SH601318", "SH601336", "SH601601", "SH601628", "SH601319",
+    # 公用事业
+    "SH600900", "SH600886", "SH600795", "SH600905",
+    "SH601985", "SH600021", "SH600726", "SH600011",
+    # 能源
+    "SH600028", "SH601857", "SH601872", "SH601868",
+    "SH601088", "SH601898", "SH600188", "SH601699",
+    # 材料
+    "SH600019", "SH600585",
+    # 消费
+    "SH600519", "SH600887", "SH600690", "SH600809",
+    "SH600600", "SH600132", "SZ000858", "SZ000568",
+    "SZ000651", "SZ000333", "SZ002304", "SZ000596",
+    # 医药
+    "SH600276", "SH600436", "SH600521",
+    "SZ000538", "SZ000661", "SH600196",
+    # 交运
+    "SH600018", "SH600029", "SH600115", "SH601111",
+    "SH600350", "SH600377", "SH601006", "SH601919",
+    # 电信
+    "SH600941", "SH601728", "SH600050",
+    # 地产
+    "SH600048", "SZ000002", "SZ001979",
+    # 汽车
+    "SH600104", "SH601238", "SH601633", "SZ000625",
+    # 机械
+    "SH600031", "SZ000425",
+    # 基建
+    "SH601186", "SH601390", "SH601668",
+    "SH601800", "SH601618", "SH601669",
+    # 化工
+    "SH600309", "SH600346", "SH600426",
+    # 有色
+    "SH600362", "SH601899", "SH601168", "SH600489",
+    # 券商
+    "SH600030", "SH600837", "SH600999", "SH601688",
+]
+
+
+STRATEGY_PARAM_TEMPLATES: Dict[str, Dict[str, Any]] = {
+    "focused_15_3": {
+        "topk": 15,
+        "n_drop": 3,
+        "hold_thresh": 8,
+    },
+    "balanced_20_4": {
+        "topk": 20,
+        "n_drop": 4,
+        "hold_thresh": 10,
+    },
+    "broad_25_5": {
+        "topk": 25,
+        "n_drop": 5,
+        "hold_thresh": 10,
+    },
+}
+
+
+def apply_strategy_param_template(config: Dict[str, Any], template_name: Optional[str]) -> Optional[str]:
+    """按模板覆盖策略核心参数。"""
+    if not template_name:
+        return None
+    if template_name not in STRATEGY_PARAM_TEMPLATES:
+        raise ValueError(
+            f"未知策略参数模板: {template_name}，可选模板: {', '.join(sorted(STRATEGY_PARAM_TEMPLATES))}"
+        )
+
+    strategy_kwargs = (
+        config.setdefault("port_analysis_config", {})
+        .setdefault("strategy", {})
+        .setdefault("kwargs", {})
+    )
+    strategy_kwargs.update(STRATEGY_PARAM_TEMPLATES[template_name])
+    config["strategy_param_template"] = template_name
+    return template_name
+
+
+def load_label_expr_from_factor_config(config_path: Path) -> Optional[str]:
+    """从 factor config YAML 读取当前 label_expr。"""
+    if not config_path.exists():
+        return None
+    with open(config_path, "r", encoding="utf-8") as f:
+        factor_config = yaml.safe_load(f) or {}
+    label_expr = factor_config.get("label_expr")
+    return label_expr.strip() if isinstance(label_expr, str) and label_expr.strip() else None
+
+
+def sync_handler_label_expr_from_factor_configs(config: Dict[str, Any], base_dir: Path) -> Dict[str, Optional[str]]:
+    """用 factor config 中的 label_expr 覆盖 workflow 里的 handler label_expr。"""
+    synced = {"short": None, "long": None}
+    handler_mappings = [
+        ("short", "short_term_data_handler_config"),
+        ("long", "long_term_data_handler_config"),
+    ]
+
+    for key, config_name in handler_mappings:
+        handler_cfg = config.get(config_name)
+        if not isinstance(handler_cfg, dict):
+            continue
+        factor_file = handler_cfg.get("custom_factors_file")
+        if not factor_file:
+            continue
+        factor_path = (base_dir / factor_file).resolve() if not Path(factor_file).is_absolute() else Path(factor_file)
+        label_expr = load_label_expr_from_factor_config(factor_path)
+        if label_expr:
+            handler_cfg["label_expr"] = label_expr
+            synced[key] = label_expr
+
+    return synced
 
 
 def validate_config(config: Dict[str, Any]) -> None:
@@ -166,6 +290,157 @@ def print_metrics(metrics: Dict[str, Any], title: str) -> None:
             print(f"  {key}: {value}")
 
 
+def _to_series(data: Any) -> Optional[pd.Series]:
+    """将 DataFrame/Series 统一转换为 Series。"""
+    if data is None:
+        return None
+    if isinstance(data, pd.DataFrame):
+        return data.iloc[:, 0] if len(data.columns) > 0 else data.squeeze()
+    return data
+
+
+def _load_dataset_label(dataset, segment: str = "test") -> Optional[pd.Series]:
+    """从 dataset 指定分段加载标签序列。"""
+    if segment not in dataset.segments:
+        return None
+    selector_raw = dataset.segments[segment]
+    selector = slice(*selector_raw) if isinstance(selector_raw, (tuple, list)) else selector_raw
+    if not hasattr(dataset.handler, '_learn') or dataset.handler._learn is None:
+        dataset.setup_data()
+    label_data = dataset.handler.fetch(
+        selector=selector,
+        col_set=["label"],
+        data_key=dataset.handler.DK_L,
+    )
+    return _to_series(label_data)
+
+
+def _align_prediction_label(pred: Any, label: Any) -> Tuple[Optional[pd.Series], Optional[pd.Series]]:
+    """对齐预测和标签索引。"""
+    pred_series = _to_series(pred)
+    label_series = _to_series(label)
+    if pred_series is None or label_series is None:
+        return None, None
+    common_idx = pred_series.index.intersection(label_series.index)
+    if len(common_idx) == 0:
+        return None, None
+    return pred_series.loc[common_idx], label_series.loc[common_idx]
+
+
+def _calculate_stock_win_rate_results(pred: pd.Series, label: pd.Series) -> Optional[List[Dict[str, Any]]]:
+    """按股票计算方向预测胜率。"""
+    if pred is None or label is None:
+        return None
+    pred_aligned, label_aligned = _align_prediction_label(pred, label)
+    if pred_aligned is None or label_aligned is None:
+        return None
+    if not isinstance(pred_aligned.index, pd.MultiIndex):
+        return None
+
+    results = []
+    instruments = pred_aligned.index.get_level_values(1)
+    for stock_id in instruments.unique():
+        stock_mask = instruments == stock_id
+        stock_pred = pred_aligned[stock_mask]
+        stock_label = label_aligned[stock_mask]
+        if len(stock_pred) == 0:
+            continue
+        correct = ((stock_pred > 0) & (stock_label > 0)) | ((stock_pred < 0) & (stock_label < 0))
+        results.append({
+            'stock_id': stock_id,
+            'win_rate': float(correct.mean()) if len(correct) > 0 else 0.0,
+            'total': int(len(correct)),
+            'correct': int(correct.sum()),
+        })
+    return results
+
+
+def _aggregate_prediction_accuracy(frame: pd.DataFrame, group_keys: List[str]) -> pd.DataFrame:
+    """按分组聚合长期/短期/综合方向预测正确率。"""
+    rows = []
+    grouped = frame.groupby(group_keys, sort=False)
+    for group_key, group_df in grouped:
+        if not isinstance(group_key, tuple):
+            group_key = (group_key,)
+
+        row = {key: value for key, value in zip(group_keys, group_key)}
+
+        long_term_valid = group_df['long_term_label'].notna()
+        short_term_valid = group_df['short_term_label'].notna()
+        combined_valid = long_term_valid & short_term_valid
+
+        row.update({
+            'long_term_accuracy': float(group_df.loc[long_term_valid, 'long_term_correct'].mean()) if long_term_valid.any() else 0.0,
+            'long_term_total': int(long_term_valid.sum()),
+            'long_term_correct': int(group_df.loc[long_term_valid, 'long_term_correct'].sum()) if long_term_valid.any() else 0,
+            'short_term_accuracy': float(group_df.loc[short_term_valid, 'short_term_correct'].mean()) if short_term_valid.any() else 0.0,
+            'short_term_total': int(short_term_valid.sum()),
+            'short_term_correct': int(group_df.loc[short_term_valid, 'short_term_correct'].sum()) if short_term_valid.any() else 0,
+            'combined_accuracy': float(group_df.loc[combined_valid, 'combined_correct'].mean()) if combined_valid.any() else 0.0,
+            'combined_total': int(combined_valid.sum()),
+            'combined_correct': int(group_df.loc[combined_valid, 'combined_correct'].sum()) if combined_valid.any() else 0,
+        })
+        rows.append(row)
+
+    return pd.DataFrame(rows)
+
+
+def _load_test_prediction_and_label(recorder, pred_name: str, dataset) -> Tuple[Optional[pd.Series], Optional[pd.Series]]:
+    """加载测试段预测和标签，并完成基础对齐。"""
+    pred = recorder.load_object(pred_name)
+    pred = _to_series(pred)
+    label = _load_dataset_label(dataset, "test")
+    label = _to_series(label)
+    return _align_prediction_label(pred, label)
+
+
+def _predict_segment_and_align(model, dataset, segment: str) -> Tuple[Optional[pd.Series], Optional[pd.Series]]:
+    """临时将指定 segment 映射到 test 入口做预测，并与该 segment 标签对齐。"""
+    target_slice = dataset.segments.get(segment)
+    if target_slice is None:
+        return None, None
+
+    original_test = dataset.segments.get("test")
+    dataset.segments["test"] = target_slice
+    try:
+        pred = _to_series(model.predict(dataset))
+        label = _load_dataset_label(dataset, segment)
+        return _align_prediction_label(pred, label)
+    finally:
+        if original_test is not None:
+            dataset.segments["test"] = original_test
+        else:
+            dataset.segments.pop("test", None)
+
+
+def _load_segment_features(dataset, segment: str, data_key=None) -> Optional[pd.DataFrame]:
+    """从指定 segment 加载特征数据。"""
+    if segment not in dataset.segments:
+        return None
+    selector_raw = dataset.segments[segment]
+    selector = slice(*selector_raw) if isinstance(selector_raw, (tuple, list)) else selector_raw
+    if not hasattr(dataset.handler, "_learn") or dataset.handler._learn is None:
+        dataset.setup_data()
+    if data_key is None:
+        data_key = dataset.handler.DK_R
+    feature_data = dataset.handler.fetch(
+        selector=selector,
+        col_set=["feature"],
+        data_key=data_key,
+    )
+    return feature_data if isinstance(feature_data, pd.DataFrame) else None
+
+
+def _build_pred_label_frame(pred: Any, label: Any) -> Optional[pd.DataFrame]:
+    """将预测和标签整理为 qlib 图表分析所需的 pred_label DataFrame。"""
+    pred_aligned, label_aligned = _align_prediction_label(pred, label)
+    if pred_aligned is None or label_aligned is None:
+        return None
+    pred_df = pred_aligned.to_frame("score")
+    label_df = label_aligned.to_frame("label")
+    return pd.concat([label_df, pred_df], axis=1, sort=True).reindex(label_df.index)
+
+
 def load_port_analysis(recorder, par: Optional[PortAnaRecord] = None) -> Optional[Dict[str, Any]]:
     """加载回测分析结果，尝试多个可能的路径"""
     port_analysis = None
@@ -199,6 +474,362 @@ def load_port_analysis(recorder, par: Optional[PortAnaRecord] = None) -> Optiona
     return None
 
 
+def split_time_series_folds(train_start: str, train_end: str, n_folds: int = 5) -> List[Tuple[str, str, str, str]]:
+    """
+    将时间序列数据分割为 n 个 fold（用于时间序列交叉验证）
+    
+    对于时间序列数据，使用时间顺序分割，每个 fold 的训练集是前面的数据，验证集是后面的数据。
+    例如，5-fold 分割：
+    - Fold 1: train=[0-20%], valid=[20-40%]
+    - Fold 2: train=[0-40%], valid=[40-60%]
+    - Fold 3: train=[0-60%], valid=[60-80%]
+    - Fold 4: train=[0-80%], valid=[80-100%]
+    - Fold 5: train=[0-100%], valid=None (使用原始valid集)
+    
+    Parameters
+    ----------
+    train_start : str
+        训练集开始时间
+    train_end : str
+        训练集结束时间
+    n_folds : int
+        fold 数量（默认5）
+        
+    Returns
+    -------
+    List[Tuple[str, str, str, str]]
+        每个 fold 的 (fold_train_start, fold_train_end, fold_valid_start, fold_valid_end)
+        最后一个 fold 的 valid 为 None，表示使用原始 valid 集
+    """
+    train_start_ts = pd.Timestamp(train_start)
+    train_end_ts = pd.Timestamp(train_end)
+    total_days = (train_end_ts - train_start_ts).days
+    
+    folds = []
+    for i in range(1, n_folds + 1):
+        if i < n_folds:
+            # 前 n-1 个 fold：训练集是前 i/n 的数据，验证集是接下来的 1/n 数据
+            fold_train_end_ratio = i / n_folds
+            fold_valid_end_ratio = (i + 1) / n_folds
+            
+            fold_train_end_days = int(total_days * fold_train_end_ratio)
+            fold_valid_end_days = int(total_days * fold_valid_end_ratio)
+            
+            fold_train_end = (train_start_ts + pd.Timedelta(days=fold_train_end_days)).strftime('%Y-%m-%d')
+            fold_valid_start = (train_start_ts + pd.Timedelta(days=fold_train_end_days + 1)).strftime('%Y-%m-%d')
+            fold_valid_end = (train_start_ts + pd.Timedelta(days=fold_valid_end_days)).strftime('%Y-%m-%d')
+            
+            folds.append((train_start, fold_train_end, fold_valid_start, fold_valid_end))
+        else:
+            # 最后一个 fold：使用全部训练数据，验证集使用原始 valid 集
+            folds.append((train_start, train_end, None, None))
+    
+    return folds
+
+
+def train_model_with_nfold(
+    model, 
+    dataset, 
+    model_name: str,
+    n_folds: int = 5,
+    recorder=None,
+    use_nfold: bool = True
+) -> List[Any]:
+    """
+    使用 n-fold 交叉验证训练模型
+    
+    Parameters
+    ----------
+    model : BaseModel
+        模型实例
+    dataset : Dataset
+        数据集
+    model_name : str
+        模型名称（用于保存）
+    n_folds : int
+        fold 数量（默认5）
+    recorder : Recorder
+        记录器（用于保存模型）
+    use_nfold : bool
+        是否使用 n-fold（如果 False，则只训练一次）
+        
+    Returns
+    -------
+    List[BaseModel]
+        所有 fold 的模型列表
+    """
+    from qlib.data.dataset import TSDatasetH
+    from qlib.utils import init_instance_by_config
+    import copy
+    
+    if not use_nfold or n_folds <= 1:
+        # 不使用 n-fold，直接训练
+        print(f"  训练 {model_name}（不使用 n-fold）...")
+        model.fit(dataset)
+        if recorder:
+            recorder.save_objects(**{f"{model_name}_params.pkl": model})
+        return [model]
+    
+    # 使用 n-fold 交叉验证
+    print(f"  训练 {model_name}（使用 {n_folds}-fold 交叉验证）...")
+    
+    # 获取训练集时间段
+    train_segment = dataset.segments.get('train')
+    if isinstance(train_segment, (list, tuple)):
+        train_start, train_end = train_segment[0], train_segment[1]
+    else:
+        # 如果 train_segment 是 slice，需要从 dataset 获取
+        print(f"    ⚠️  无法从 dataset 获取训练集时间段，使用单次训练")
+        model.fit(dataset)
+        if recorder:
+            recorder.save_objects(**{f"{model_name}_params.pkl": model})
+        return [model]
+    
+    # 分割 fold
+    folds = split_time_series_folds(train_start, train_end, n_folds)
+    
+    models = []
+    for fold_idx, (fold_train_start, fold_train_end, fold_valid_start, fold_valid_end) in enumerate(folds, 1):
+        print(f"\n    Fold {fold_idx}/{n_folds}:")
+        print(f"      训练集: {fold_train_start} 到 {fold_train_end}")
+        if fold_valid_start and fold_valid_end:
+            print(f"      验证集: {fold_valid_start} 到 {fold_valid_end}")
+        else:
+            print(f"      验证集: 使用原始验证集")
+        
+        # 创建新的 dataset 配置（修改 segments）
+        dataset_config = {
+            'class': dataset.__class__.__name__,
+            'module_path': dataset.__class__.__module__,
+            'kwargs': {}
+        }
+        
+        # 复制 handler 配置
+        if hasattr(dataset, 'handler'):
+            handler = dataset.handler
+            handler_config = {
+                'class': handler.__class__.__name__,
+                'module_path': handler.__class__.__module__,
+                'kwargs': {}
+            }
+            
+            # 复制 handler 的初始化参数
+            if hasattr(handler, 'instruments'):
+                handler_config['kwargs']['instruments'] = handler.instruments
+            if hasattr(handler, 'start_time'):
+                handler_config['kwargs']['start_time'] = handler.start_time
+            if hasattr(handler, 'end_time'):
+                handler_config['kwargs']['end_time'] = handler.end_time
+            if hasattr(handler, 'fit_start_time'):
+                handler_config['kwargs']['fit_start_time'] = handler.fit_start_time
+            if hasattr(handler, 'fit_end_time'):
+                handler_config['kwargs']['fit_end_time'] = handler.fit_end_time
+            if hasattr(handler, 'freq'):
+                handler_config['kwargs']['freq'] = handler.freq
+            if hasattr(handler, 'infer_processors'):
+                handler_config['kwargs']['infer_processors'] = handler.infer_processors
+            if hasattr(handler, 'learn_processors'):
+                handler_config['kwargs']['learn_processors'] = handler.learn_processors
+            
+            # 添加自定义因子相关参数
+            if hasattr(handler, 'custom_factors'):
+                handler_config['kwargs']['custom_factors'] = handler.custom_factors
+            if hasattr(handler, 'custom_factors_file'):
+                handler_config['kwargs']['custom_factors_file'] = handler.custom_factors_file
+            if hasattr(handler, 'label_expr'):
+                handler_config['kwargs']['label_expr'] = handler.label_expr
+            
+            dataset_config['kwargs']['handler'] = handler_config
+        
+        # 设置 segments
+        if fold_valid_start and fold_valid_end:
+            dataset_config['kwargs']['segments'] = {
+                'train': [fold_train_start, fold_train_end],
+                'valid': [fold_valid_start, fold_valid_end],
+                'test': dataset.segments.get('test', dataset.segments.get('valid'))
+            }
+        else:
+            # 最后一个 fold：使用原始 segments
+            dataset_config['kwargs']['segments'] = dataset.segments.copy()
+            dataset_config['kwargs']['segments']['train'] = [fold_train_start, fold_train_end]
+        
+        # 复制其他 dataset 参数
+        if isinstance(dataset, TSDatasetH):
+            dataset_config['kwargs']['step_len'] = dataset.step_len
+        
+        # 创建新的 dataset
+        fold_dataset = init_instance_by_config(dataset_config)
+        
+        # 确保 fold_dataset 的数据已准备好（setup_data）
+        if not hasattr(fold_dataset.handler, '_learn') or fold_dataset.handler._learn is None:
+            fold_dataset.setup_data()
+        
+        # 从 fold_dataset 中获取实际特征维度（最准确的方法）
+        actual_d_feat = None
+        try:
+            if hasattr(fold_dataset, 'handler') and hasattr(fold_dataset.handler, '_learn'):
+                if fold_dataset.handler._learn is not None:
+                    # 获取特征维度
+                    if isinstance(fold_dataset.handler._learn.columns, pd.MultiIndex):
+                        feature_cols = fold_dataset.handler._learn.columns.get_level_values(0).unique()
+                        if 'feature' in feature_cols:
+                            feature_data = fold_dataset.handler._learn['feature']
+                            if hasattr(feature_data, 'shape') and len(feature_data.shape) > 1:
+                                actual_d_feat = feature_data.shape[1]
+                                print(f"      - 从数据中检测到特征维度: {actual_d_feat}")
+        except Exception as e:
+            print(f"      ⚠️  无法从数据中获取特征维度: {e}")
+        
+        # 创建新的模型（复制配置）
+        model_config = {
+            'class': model.__class__.__name__,
+            'module_path': model.__class__.__module__,
+            'kwargs': {}
+        }
+        
+        # 复制模型参数（但优先使用从数据中检测到的 d_feat）
+        for attr in ['d_feat', 'fea_dim', 'd_model', 'hidden_size', 'num_layers', 'dropout', 'n_epochs', 
+                     'lr', 'early_stop', 'metric', 'loss', 'base_model', 'optimizer', 
+                     'GPU', 'n_jobs', 'batch_size', 'use_augmentation', 'noise_std', 
+                     'noise_prob', 'scale_range', 'scale_prob', 'nhead', 'reg', 'seed',
+                     'cnn_dim', 'cnn_kernel_size', 'rnn_dim', 'rnn_dups', 'rnn_layers']:
+            if hasattr(model, attr):
+                model_config['kwargs'][attr] = getattr(model, attr)
+        
+        # 优先使用从数据中检测到的特征维度（d_feat 或 fea_dim）
+        if actual_d_feat is not None:
+            model_config['kwargs']['d_feat'] = actual_d_feat
+            if model.__class__.__name__ == 'KRNN':
+                model_config['kwargs']['fea_dim'] = actual_d_feat
+            print(f"      - 使用从数据中检测到的特征维度: {actual_d_feat}")
+        elif 'd_feat' not in model_config['kwargs'] or model_config['kwargs']['d_feat'] is None:
+            # 如果无法从数据中获取，使用模型实例中的值或配置中的 fea_dim（KRNN）
+            if hasattr(model, 'd_feat') and model.d_feat is not None:
+                model_config['kwargs']['d_feat'] = model.d_feat
+                print(f"      - 使用模型实例中的 d_feat: {model.d_feat}")
+            elif model.__class__.__name__ == 'KRNN' and hasattr(model, 'fea_dim'):
+                model_config['kwargs']['fea_dim'] = model.fea_dim
+                print(f"      - 使用模型实例中的 fea_dim: {model.fea_dim}")
+            else:
+                # 使用默认值（根据模型类型）
+                if 'TransformerModel' in model.__class__.__name__:
+                    default_d_feat = 20  # TransformerModel 的默认值
+                elif model.__class__.__name__ == 'KRNN':
+                    default_d_feat = model_config['kwargs'].get('fea_dim', 6)
+                else:
+                    default_d_feat = 360  # 其他模型的默认值
+                model_config['kwargs']['d_feat'] = default_d_feat
+                if model.__class__.__name__ == 'KRNN':
+                    model_config['kwargs']['fea_dim'] = default_d_feat
+                print(f"      ⚠️  使用默认特征维度: {default_d_feat}")
+        
+        fold_model = init_instance_by_config(model_config)
+        
+        # 训练 fold 模型
+        try:
+            fold_model.fit(fold_dataset)
+            models.append(fold_model)
+            
+            # 保存 fold 模型
+            if recorder:
+                recorder.save_objects(**{f"{model_name}_fold{fold_idx}_params.pkl": fold_model})
+            
+            print(f"      ✓ Fold {fold_idx} 训练完成")
+            
+            # 清理内存
+            del fold_dataset
+            gc.collect()
+            
+        except Exception as e:
+            print(f"      ❌ Fold {fold_idx} 训练失败: {e}")
+            import traceback
+            traceback.print_exc()
+            # 如果某个 fold 失败，继续训练其他 fold
+    
+    if len(models) == 0:
+        print(f"    ⚠️  所有 fold 训练失败，使用单次训练")
+        model.fit(dataset)
+        if recorder:
+            recorder.save_objects(**{f"{model_name}_params.pkl": model})
+        return [model]
+    
+    # 保存所有模型的列表
+    if recorder:
+        recorder.save_objects(**{f"{model_name}_all_folds.pkl": models})
+    
+    print(f"\n    ✓ {n_folds}-fold 交叉验证完成，共训练 {len(models)} 个模型")
+    
+    return models
+
+
+def predict_with_nfold_ensemble(
+    models: List[Any],
+    dataset,
+    ensemble_method: str = 'mean'
+) -> pd.Series:
+    """
+    使用 n-fold 模型进行集成预测
+    
+    Parameters
+    ----------
+    models : List[BaseModel]
+        所有 fold 的模型列表
+    dataset : Dataset
+        数据集
+    ensemble_method : str
+        集成方法：'mean'（平均）或 'median'（中位数）
+        
+    Returns
+    -------
+    pd.Series
+        集成预测结果
+    """
+    if len(models) == 0:
+        raise ValueError("模型列表为空")
+    
+    if len(models) == 1:
+        # 只有一个模型，直接预测
+        return models[0].predict(dataset)
+    
+    # 使用多个模型预测并集成
+    predictions = []
+    for i, model in enumerate(models):
+        try:
+            pred = model.predict(dataset)
+            if isinstance(pred, pd.DataFrame):
+                pred = pred.iloc[:, 0] if len(pred.columns) > 0 else pred.squeeze()
+            predictions.append(pred)
+        except Exception as e:
+            print(f"    ⚠️  Fold {i+1} 模型预测失败: {e}")
+            continue
+    
+    if len(predictions) == 0:
+        raise ValueError("所有模型预测失败")
+    
+    # 对齐所有预测的索引
+    if len(predictions) > 1:
+        common_idx = predictions[0].index
+        for pred in predictions[1:]:
+            common_idx = common_idx.intersection(pred.index)
+        if len(common_idx) == 0:
+            raise ValueError("n-fold 集成预测失败：各 fold 预测结果没有共同索引")
+        
+        aligned_predictions = [pred.loc[common_idx] for pred in predictions]
+    else:
+        aligned_predictions = predictions
+        common_idx = predictions[0].index
+    
+    # 集成预测
+    if ensemble_method == 'mean':
+        ensemble_pred = pd.concat(aligned_predictions, axis=1).mean(axis=1)
+    elif ensemble_method == 'median':
+        ensemble_pred = pd.concat(aligned_predictions, axis=1).median(axis=1)
+    else:
+        raise ValueError(f"不支持的集成方法: {ensemble_method}")
+    
+    return ensemble_pred
+
+
 def calculate_prediction_win_rate(recorder, long_term_dataset, short_term_dataset) -> Tuple[Optional[List], Optional[List]]:
     """
     计算并打印长期和短期预测在每只股票上的胜率
@@ -217,140 +848,26 @@ def calculate_prediction_win_rate(recorder, long_term_dataset, short_term_datase
         print("预测胜率分析")
         print("=" * 80)
         
-        # 加载长期预测和标签
-        long_term_pred = recorder.load_object("long_term_pred.pkl")
-        if long_term_pred is None:
-            print("  ⚠️  无法加载长期预测数据")
-            return
-        
-        # 加载短期预测
-        short_term_pred = recorder.load_object("short_term_pred.pkl")
-        if short_term_pred is None:
-            print("  ⚠️  无法加载短期预测数据")
-            return
-        
-        # 获取长期标签数据
-        # 使用 handler.fetch() 方法获取标签数据
-        try:
-            # 获取test段的slice
-            if 'test' in long_term_dataset.segments:
-                test_slice = long_term_dataset.segments['test']
-                if isinstance(test_slice, (tuple, list)):
-                    test_selector = slice(*test_slice)
-                else:
-                    test_selector = test_slice
-            else:
-                raise ValueError("长期数据集中没有test段")
-            
-            # 确保数据集已经setup
-            if not hasattr(long_term_dataset.handler, '_learn'):
-                long_term_dataset.setup_data()
-            
-            # 使用handler.fetch获取标签数据
-            long_term_label_data = long_term_dataset.handler.fetch(
-                selector=test_selector,
-                col_set=["label"],
-                data_key=long_term_dataset.handler.DK_L
+        long_term_pred_aligned, long_term_label_aligned = _load_test_prediction_and_label(
+            recorder, "long_term_pred.pkl", long_term_dataset
+        )
+        if long_term_pred_aligned is None or long_term_label_aligned is None:
+            long_term_pred_aligned, long_term_label_aligned = _load_test_prediction_and_label(
+                recorder, "pred.pkl", long_term_dataset
             )
-            
-            if isinstance(long_term_label_data, pd.DataFrame) and len(long_term_label_data.columns) > 0:
-                long_term_label = long_term_label_data.iloc[:, 0]
-            else:
-                long_term_label = long_term_label_data.squeeze() if hasattr(long_term_label_data, 'squeeze') else long_term_label_data
-        except Exception as e:
-            print(f"  ⚠️  无法加载长期标签数据: {e}")
-            long_term_label = None
-        
-        # 获取短期标签数据
-        try:
-            # 获取test段的slice
-            if 'test' in short_term_dataset.segments:
-                test_slice = short_term_dataset.segments['test']
-                if isinstance(test_slice, (tuple, list)):
-                    test_selector = slice(*test_slice)
-                else:
-                    test_selector = test_slice
-            else:
-                raise ValueError("短期数据集中没有test段")
-            
-            # 确保数据集已经setup
-            if not hasattr(short_term_dataset.handler, '_learn'):
-                short_term_dataset.setup_data()
-            
-            # 使用handler.fetch获取标签数据
-            short_term_label_data = short_term_dataset.handler.fetch(
-                selector=test_selector,
-                col_set=["label"],
-                data_key=short_term_dataset.handler.DK_L
-            )
-            
-            if isinstance(short_term_label_data, pd.DataFrame) and len(short_term_label_data.columns) > 0:
-                short_term_label = short_term_label_data.iloc[:, 0]
-            else:
-                short_term_label = short_term_label_data.squeeze() if hasattr(short_term_label_data, 'squeeze') else short_term_label_data
-        except Exception as e:
-            print(f"  ⚠️  无法加载短期标签数据: {e}")
-            short_term_label = None
-        
-        # 处理DataFrame格式
-        if isinstance(long_term_pred, pd.DataFrame):
-            long_term_pred = long_term_pred.iloc[:, 0] if len(long_term_pred.columns) > 0 else long_term_pred.squeeze()
-        if isinstance(short_term_pred, pd.DataFrame):
-            short_term_pred = short_term_pred.iloc[:, 0] if len(short_term_pred.columns) > 0 else short_term_pred.squeeze()
-        if isinstance(long_term_label, pd.DataFrame):
-            long_term_label = long_term_label.iloc[:, 0] if len(long_term_label.columns) > 0 else long_term_label.squeeze()
-        if isinstance(short_term_label, pd.DataFrame):
-            short_term_label = short_term_label.iloc[:, 0] if len(short_term_label.columns) > 0 else short_term_label.squeeze()
-        
-        # 对齐索引
-        if long_term_label is not None:
-            common_idx_long = long_term_pred.index.intersection(long_term_label.index)
-            if len(common_idx_long) > 0:
-                long_term_pred_aligned = long_term_pred.loc[common_idx_long]
-                long_term_label_aligned = long_term_label.loc[common_idx_long]
-            else:
-                long_term_pred_aligned = None
-                long_term_label_aligned = None
-        else:
-            long_term_pred_aligned = None
-            long_term_label_aligned = None
-        
-        if short_term_label is not None:
-            common_idx_short = short_term_pred.index.intersection(short_term_label.index)
-            if len(common_idx_short) > 0:
-                short_term_pred_aligned = short_term_pred.loc[common_idx_short]
-                short_term_label_aligned = short_term_label.loc[common_idx_short]
-            else:
-                short_term_pred_aligned = None
-                short_term_label_aligned = None
-        else:
-            short_term_pred_aligned = None
-            short_term_label_aligned = None
+
+        short_term_pred_aligned, short_term_label_aligned = _load_test_prediction_and_label(
+            recorder, "short_term_pred.pkl", short_term_dataset
+        )
+        if short_term_pred_aligned is None or short_term_label_aligned is None:
+            print("  ⚠️  无法加载短期预测或标签数据")
+            return None, None
         
         # 计算长期预测胜率（按股票分组）
         if long_term_pred_aligned is not None and long_term_label_aligned is not None:
             print("\n【长期预测胜率（按股票）】")
-            long_term_results = []
-            
-            # 按股票分组
-            if isinstance(long_term_pred_aligned.index, pd.MultiIndex):
-                # MultiIndex格式 (datetime, instrument)
-                for stock_id in long_term_pred_aligned.index.get_level_values(1).unique():
-                    stock_mask = long_term_pred_aligned.index.get_level_values(1) == stock_id
-                    stock_pred = long_term_pred_aligned[stock_mask]
-                    stock_label = long_term_label_aligned[stock_mask]
-                    
-                    if len(stock_pred) > 0:
-                        # 计算胜率：预测方向正确（预测>0且实际>0，或预测<0且实际<0）
-                        correct = ((stock_pred > 0) & (stock_label > 0)) | ((stock_pred < 0) & (stock_label < 0))
-                        win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
-                        long_term_results.append({
-                            'stock_id': stock_id,
-                            'win_rate': win_rate,
-                            'total': len(correct),
-                            'correct': correct.sum()
-                        })
-            else:
+            long_term_results = _calculate_stock_win_rate_results(long_term_pred_aligned, long_term_label_aligned) or []
+            if not long_term_results:
                 # 单索引格式，无法按股票分组
                 correct = ((long_term_pred_aligned > 0) & (long_term_label_aligned > 0)) | ((long_term_pred_aligned < 0) & (long_term_label_aligned < 0))
                 win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
@@ -381,27 +898,8 @@ def calculate_prediction_win_rate(recorder, long_term_dataset, short_term_datase
         # 计算短期预测胜率（按股票分组）
         if short_term_pred_aligned is not None and short_term_label_aligned is not None:
             print("\n【短期预测胜率（按股票）】")
-            short_term_results = []
-            
-            # 按股票分组
-            if isinstance(short_term_pred_aligned.index, pd.MultiIndex):
-                # MultiIndex格式 (datetime, instrument)
-                for stock_id in short_term_pred_aligned.index.get_level_values(1).unique():
-                    stock_mask = short_term_pred_aligned.index.get_level_values(1) == stock_id
-                    stock_pred = short_term_pred_aligned[stock_mask]
-                    stock_label = short_term_label_aligned[stock_mask]
-                    
-                    if len(stock_pred) > 0:
-                        # 计算胜率：预测方向正确
-                        correct = ((stock_pred > 0) & (stock_label > 0)) | ((stock_pred < 0) & (stock_label < 0))
-                        win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
-                        short_term_results.append({
-                            'stock_id': stock_id,
-                            'win_rate': win_rate,
-                            'total': len(correct),
-                            'correct': correct.sum()
-                        })
-            else:
+            short_term_results = _calculate_stock_win_rate_results(short_term_pred_aligned, short_term_label_aligned) or []
+            if not short_term_results:
                 # 单索引格式，无法按股票分组
                 correct = ((short_term_pred_aligned > 0) & (short_term_label_aligned > 0)) | ((short_term_pred_aligned < 0) & (short_term_label_aligned < 0))
                 win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
@@ -428,6 +926,13 @@ def calculate_prediction_win_rate(recorder, long_term_dataset, short_term_datase
                 print(f"  胜率中位数: {pd.Series([r['win_rate'] for r in short_term_results]).median()*100:.2f}%")
                 print(f"  胜率>50%的股票数: {sum(1 for r in short_term_results if r['win_rate'] > 0.5)}/{len(short_term_results)}")
                 print(f"  胜率>60%的股票数: {sum(1 for r in short_term_results if r['win_rate'] > 0.6)}/{len(short_term_results)}")
+                # 若短期胜率偏低，给出可操作建议
+                avg_st = sum(r['win_rate'] for r in short_term_results) / len(short_term_results) if short_term_results else 0
+                if avg_st < 0.52:
+                    print(f"\n  [短期胜率偏低建议] 可尝试：")
+                    print(f"    1. 短期 handler 开启 add_stock_id_onehot: true，或增加 hidden_size/n_epochs")
+                    print(f"    2. 短期标签改为 2～3 日收益（label_expr）可能更易预测")
+                    print(f"    3. 检查短期模型是否需要更强正则或更长训练轮数")
         
         # 返回结果
         return long_term_results if 'long_term_results' in locals() and len(long_term_results) > 0 else None, \
@@ -438,6 +943,157 @@ def calculate_prediction_win_rate(recorder, long_term_dataset, short_term_datase
         import traceback
         traceback.print_exc()
         return None, None
+
+
+def calculate_and_output_prediction_statistics(recorder, long_term_dataset, short_term_dataset):
+    """
+    计算并输出预测数据统计结果
+    
+    输出内容：
+    1. 个股总体正确率（从高到低排序，只输出正确率>55%的）
+    2. 分年度个股正确率（只输出正确率>55%的）
+    
+    Parameters
+    ----------
+    recorder : Recorder
+        记录器对象
+    long_term_dataset : Dataset
+        长期数据集
+    short_term_dataset : Dataset
+        短期数据集
+    """
+    from pathlib import Path
+    
+    try:
+        # 加载预测数据
+        long_term_pred = recorder.load_object("long_term_pred.pkl")
+        short_term_pred = recorder.load_object("short_term_pred.pkl")
+        
+        if long_term_pred is None or short_term_pred is None:
+            print("  ⚠️  无法加载预测数据，跳过统计")
+            return
+        
+        long_term_pred = _to_series(long_term_pred)
+        short_term_pred = _to_series(short_term_pred)
+
+        print("  - 获取标签数据...")
+        try:
+            long_term_label = _load_dataset_label(long_term_dataset, "test")
+            short_term_label = _load_dataset_label(short_term_dataset, "test")
+        except Exception as e:
+            print(f"  ⚠️  获取标签数据失败: {e}")
+            import traceback
+            traceback.print_exc()
+            return
+
+        if long_term_label is None:
+            print("  ⚠️  长期数据集中没有test段，跳过统计")
+            return
+        if short_term_label is None:
+            print("  ⚠️  短期数据集中没有test段，跳过统计")
+            return
+
+        long_term_label = _to_series(long_term_label)
+        short_term_label = _to_series(short_term_label)
+
+        if not isinstance(long_term_pred.index, pd.MultiIndex) or not isinstance(long_term_label.index, pd.MultiIndex):
+            print("  ⚠️  长期预测或标签索引格式不正确，跳过统计")
+            return
+        if not isinstance(short_term_pred.index, pd.MultiIndex) or not isinstance(short_term_label.index, pd.MultiIndex):
+            print("  ⚠️  短期预测或标签索引格式不正确，跳过统计")
+            return
+
+        long_term_pred_aligned, long_term_label_aligned = _align_prediction_label(long_term_pred, long_term_label)
+        short_term_pred_aligned, short_term_label_aligned = _align_prediction_label(short_term_pred, short_term_label)
+        if long_term_pred_aligned is None or long_term_label_aligned is None:
+            print("  ⚠️  长期预测和标签索引不匹配，跳过统计")
+            return
+        if short_term_pred_aligned is None or short_term_label_aligned is None:
+            print("  ⚠️  短期预测和标签索引不匹配，跳过统计")
+            return
+        
+        # 准备输出目录
+        output_dir = Path(f"mlruns/{recorder.experiment_id}/{recorder.id}/prediction_stats")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        common_idx = long_term_pred_aligned.index.intersection(short_term_pred_aligned.index)
+        if len(common_idx) == 0:
+            print("  ⚠️  长短期预测没有共同索引，跳过统计")
+            return
+
+        # 将预测记录转换为DataFrame
+        records_list = []
+        for idx in common_idx:
+            date = idx[0] if isinstance(idx, tuple) else idx
+            stock_id = idx[1] if isinstance(idx, tuple) and len(idx) > 1 else idx
+            records_list.append({
+                'date': date,
+                'stock_id': stock_id,
+                'long_term_pred': long_term_pred_aligned.loc[idx],
+                'short_term_pred': short_term_pred_aligned.loc[idx],
+                'long_term_label': long_term_label_aligned.loc[idx],
+                'short_term_label': short_term_label_aligned.loc[idx],
+            })
+        
+        if len(records_list) == 0:
+            print("  ⚠️  没有有效的预测记录，跳过统计")
+            return
+        
+        df = pd.DataFrame(records_list)
+        
+        # 计算正确率（预测方向与实际收益方向一致）
+        df['long_term_correct'] = (
+            ((df['long_term_pred'] > 0) & (df['long_term_label'] > 0)) |
+            ((df['long_term_pred'] < 0) & (df['long_term_label'] < 0))
+        ) & df['long_term_label'].notna()
+        
+        df['short_term_correct'] = (
+            ((df['short_term_pred'] > 0) & (df['short_term_label'] > 0)) |
+            ((df['short_term_pred'] < 0) & (df['short_term_label'] < 0))
+        ) & df['short_term_label'].notna()
+        
+        df['combined_correct'] = df['long_term_correct'] & df['short_term_correct']
+        
+        # 1. 计算个股总体正确率
+        print("  - 计算个股总体正确率...")
+        stock_stats_df = _aggregate_prediction_accuracy(df, ['stock_id'])
+        stock_stats_df = stock_stats_df.sort_values('combined_accuracy', ascending=False)
+        
+        # 只输出正确率>55%的
+        filtered_stock_stats = stock_stats_df[stock_stats_df['combined_accuracy'] > 0.55].copy()
+        
+        # 输出到文件
+        output_file = output_dir / "stock_prediction_accuracy_overall.csv"
+        filtered_stock_stats.to_csv(output_file, index=False, encoding='utf-8-sig')
+        print(f"  ✓ 个股总体正确率统计已保存到: {output_file}")
+        print(f"    共 {len(filtered_stock_stats)} 只股票正确率>55%（共 {len(stock_stats_df)} 只股票）")
+        
+        # 2. 分年度计算个股正确率
+        print("  - 计算分年度个股正确率...")
+        df['year'] = pd.to_datetime(df['date']).dt.year
+        
+        for year in sorted(df['year'].unique()):
+            year_df = df[df['year'] == year]
+            
+            year_stats_df = _aggregate_prediction_accuracy(year_df, ['year', 'stock_id'])
+            if len(year_stats_df) > 0:
+                year_stats_df = year_stats_df.sort_values('combined_accuracy', ascending=False)
+                
+                # 只输出正确率>55%的
+                filtered_year_stats = year_stats_df[year_stats_df['combined_accuracy'] > 0.55].copy()
+                
+                # 输出到文件
+                output_file = output_dir / f"stock_prediction_accuracy_{year}.csv"
+                filtered_year_stats.to_csv(output_file, index=False, encoding='utf-8-sig')
+                print(f"  ✓ {year}年个股正确率统计已保存到: {output_file}")
+                print(f"    {year}年共 {len(filtered_year_stats)} 只股票正确率>55%（共 {len(year_stats_df)} 只股票）")
+        
+        print(f"  ✓ 预测数据统计完成，结果保存在: {output_dir}")
+        
+    except Exception as e:
+        print(f"  ⚠️  计算预测统计失败: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def filter_stock_pool_by_win_rate(
@@ -997,7 +1653,12 @@ def analyze_backtest_results(port_analysis: Dict[str, Any], recorder=None) -> No
             # 不抛出异常，不影响主流程
 
 
-def plot_backtest_results(port_analysis: Dict[str, Any], recorder=None) -> None:
+def plot_backtest_results(
+    port_analysis: Dict[str, Any],
+    recorder=None,
+    long_term_dataset=None,
+    short_term_dataset=None,
+) -> None:
     """使用 qlib 的绘图工具绘制回测结果图表"""
     if recorder is None:
         print("  ⚠️  无法绘图：缺少 recorder 对象")
@@ -1165,23 +1826,23 @@ def plot_backtest_results(port_analysis: Dict[str, Any], recorder=None) -> None:
             # 尝试加载长期和短期模型的预测数据
             models_to_analyze = []
             
-            # 长期模型
-            long_term_pred = recorder.load_object("long_term_pred.pkl")
-            long_term_label = recorder.load_object("label.pkl")  # SignalRecord 保存的标签
-            if long_term_pred is not None and long_term_label is not None:
-                models_to_analyze.append(("长期模型", long_term_pred, long_term_label))
-            
-            # 短期模型
-            short_term_pred = recorder.load_object("short_term_pred.pkl")
-            # 短期模型的标签可能也在 label.pkl 中，或者需要从数据集加载
-            if short_term_pred is not None:
-                # 尝试加载短期标签
-                short_term_label = None
-                # 如果短期模型有单独的标签文件，可以在这里加载
-                # 否则使用长期标签（如果可用）
-                if long_term_label is not None:
-                    short_term_label = long_term_label
-                models_to_analyze.append(("短期模型", short_term_pred, short_term_label))
+            if long_term_dataset is not None:
+                long_term_pred, long_term_label = _load_test_prediction_and_label(
+                    recorder, "long_term_pred.pkl", long_term_dataset
+                )
+                if long_term_pred is None or long_term_label is None:
+                    long_term_pred, long_term_label = _load_test_prediction_and_label(
+                        recorder, "pred.pkl", long_term_dataset
+                    )
+                if long_term_pred is not None and long_term_label is not None:
+                    models_to_analyze.append(("长期模型", long_term_pred, long_term_label))
+
+            if short_term_dataset is not None:
+                short_term_pred, short_term_label = _load_test_prediction_and_label(
+                    recorder, "short_term_pred.pkl", short_term_dataset
+                )
+                if short_term_pred is not None and short_term_label is not None:
+                    models_to_analyze.append(("短期模型", short_term_pred, short_term_label))
             
             # 如果没有找到长期和短期，尝试使用默认的 pred.pkl
             if not models_to_analyze:
@@ -1195,25 +1856,10 @@ def plot_backtest_results(port_analysis: Dict[str, Any], recorder=None) -> None:
                     continue
                 
                 try:
-                    # 准备 pred_label（合并预测和标签）
-                    # 确保 pred_df 有 'score' 列
-                    if isinstance(pred_df, pd.Series):
-                        pred_df = pred_df.to_frame("score")
-                    elif "score" not in pred_df.columns:
-                        # 使用第一列作为 score
-                        pred_df = pred_df.iloc[:, [0]].copy()
-                        pred_df.columns = ["score"]
-                    
-                    # 确保 label_df 有 'label' 列
-                    if isinstance(label_df, pd.Series):
-                        label_df = label_df.to_frame("label")
-                    elif "label" not in label_df.columns:
-                        # 使用第一列作为 label
-                        label_df = label_df.iloc[:, [0]].copy()
-                        label_df.columns = ["label"]
-                    
-                    # 合并预测和标签
-                    pred_label = pd.concat([label_df, pred_df], axis=1, sort=True).reindex(label_df.index)
+                    pred_label = _build_pred_label_frame(pred_df, label_df)
+                    if pred_label is None or pred_label.empty:
+                        print(f"    ⚠️  {model_name} 预测和标签无法对齐，跳过图表生成")
+                        continue
                     
                     # 4.1 Score IC 图表
                     print(f"    [{model_name}] 生成 Score IC 图表...")
@@ -1284,68 +1930,66 @@ def main():
         print(f"\n加载配置文件: {config_path}")
         with open(config_path, 'r', encoding='utf-8') as f:
             config = yaml.safe_load(f)
+
+        synced_label_exprs = sync_handler_label_expr_from_factor_configs(config, config_path.parent)
+        if synced_label_exprs["short"] or synced_label_exprs["long"]:
+            print("✓ 已从 factor config 同步 label_expr")
+            if synced_label_exprs["short"]:
+                print(f"  - 短期标签: {synced_label_exprs['short']}")
+            if synced_label_exprs["long"]:
+                print(f"  - 长期标签: {synced_label_exprs['long']}")
+
+        template_name = os.environ.get("STRATEGY_PARAM_TEMPLATE") or config.get("strategy_param_template")
+        applied_template = apply_strategy_param_template(config, template_name)
+        if applied_template is not None:
+            strategy_kwargs = config["port_analysis_config"]["strategy"]["kwargs"]
+            print(f"✓ 已应用策略参数模板: {applied_template}")
+            print(
+                "  - 核心参数: "
+                f"topk={strategy_kwargs.get('topk')}, "
+                f"n_drop={strategy_kwargs.get('n_drop')}, "
+                f"hold_thresh={strategy_kwargs.get('hold_thresh')}"
+            )
         
         # 验证配置
         validate_config(config)
         print("✓ 配置文件验证通过")
-        
-        # 确保使用固定股票池（当前成分股列表，约300只）
-        # 如果配置中使用字典格式，转换为当前成分股列表
-        print("\n[检查股票池配置] 确保使用固定股票池...")
-        try:
-            from qlib.data import D
-            
-            # 辅助函数：将字典格式的instruments转换为当前成分股列表
-            def convert_instruments_to_list(instruments):
-                """将字典格式的instruments转换为当前成分股列表"""
-                if isinstance(instruments, dict) and 'market' in instruments:
-                    market_name = instruments.get('market', 'csi300')
-                    current_date = "2024-12-31"  # 使用固定日期获取当前成分股
-                    instruments_config = D.instruments(market=market_name)
-                    instruments_list = D.list_instruments(
-                        instruments=instruments_config,
-                        start_time=current_date,
-                        end_time=current_date,
-                        as_list=True
-                    )
-                    if isinstance(instruments_list, list) and len(instruments_list) > 0:
-                        # 过滤有效的股票代码
-                        valid_instruments = [s for s in instruments_list if str(s).startswith('SH') or str(s).startswith('SZ')]
-                        if len(valid_instruments) > 0:
-                            return valid_instruments
-                return None
-            
-            # 检查短期数据处理器配置
-            # 路径: task -> short_term_dataset -> kwargs -> handler -> kwargs -> instruments
-            try:
-                short_handler_kwargs = config.get('task', {}).get('short_term_dataset', {}).get('kwargs', {}).get('handler', {}).get('kwargs', {})
-                if 'instruments' in short_handler_kwargs:
-                    instruments = short_handler_kwargs['instruments']
-                    valid_instruments = convert_instruments_to_list(instruments)
-                    if valid_instruments:
-                        short_handler_kwargs['instruments'] = valid_instruments
-                        print(f"  ✓ 短期数据处理器: 使用固定股票池（{len(valid_instruments)}只股票）")
-            except Exception as e:
-                print(f"  ⚠️  检查短期数据处理器配置失败: {e}")
-            
-            # 检查长期数据处理器配置
-            # 路径: task -> long_term_dataset -> kwargs -> handler -> kwargs -> instruments
-            try:
-                long_handler_kwargs = config.get('task', {}).get('long_term_dataset', {}).get('kwargs', {}).get('handler', {}).get('kwargs', {})
-                if 'instruments' in long_handler_kwargs:
-                    instruments = long_handler_kwargs['instruments']
-                    valid_instruments = convert_instruments_to_list(instruments)
-                    if valid_instruments:
-                        long_handler_kwargs['instruments'] = valid_instruments
-                        print(f"  ✓ 长期数据处理器: 使用固定股票池（{len(valid_instruments)}只股票）")
-            except Exception as e:
-                print(f"  ⚠️  检查长期数据处理器配置失败: {e}")
-                
-        except Exception as e:
-            print(f"  ⚠️  转换股票池配置失败: {e}，将使用原始配置")
-            import traceback
-            traceback.print_exc()
-        
+
+        # 使用配置文件中指定的股票池 (如 csi300)
+        market = config.get('market', 'csi300')
+        print(f"\n[检查股票池配置] 使用配置文件中的股票池: {market}")
+
+        # 注释掉强制使用红利股的代码，改为使用配置文件中的股票池
+        # # 使用红利股固定股票池
+        # print("\n[检查股票池配置] 使用红利股固定股票池...")
+        # print(f"  红利股数量: {len(RED_CHIP_STOCKS)} 只")
+        #
+        # try:
+        #     # 检查短期数据处理器配置
+        #     # 路径: task -> short_term_dataset -> kwargs -> handler -> kwargs -> instruments
+        #     try:
+        #         short_handler_kwargs = config.get('task', {}).get('short_term_dataset', {}).get('kwargs', {}).get('handler', {}).get('kwargs', {})
+        #         if short_handler_kwargs is not None:
+        #             short_handler_kwargs['instruments'] = RED_CHIP_STOCKS.copy()
+        #             print(f"  ✓ 短期数据处理器: 使用红利股股票池（{len(RED_CHIP_STOCKS)}只股票）")
+        #     except Exception as e:
+        #         print(f"  ⚠️  检查短期数据处理器配置失败: {e}")
+        #
+        #     # 检查长期数据处理器配置
+        #     # 路径: task -> long_term_dataset -> kwargs -> handler -> kwargs -> instruments
+        #     try:
+        #         long_handler_kwargs = config.get('task', {}).get('long_term_dataset', {}).get('kwargs', {}).get('handler', {}).get('kwargs', {})
+        #         if long_handler_kwargs is not None:
+        #             long_handler_kwargs['instruments'] = RED_CHIP_STOCKS.copy()
+        #             print(f"  ✓ 长期数据处理器: 使用红利股股票池（{len(RED_CHIP_STOCKS)}只股票）")
+        #     except Exception as e:
+        #         print(f"  ⚠️  检查长期数据处理器配置失败: {e}")
+        #
+        # except Exception as e:
+        #     print(f"  ⚠️  设置红利股股票池失败: {e}，将使用原始配置")
+        #     import traceback
+        #     traceback.print_exc()
+
         # 初始化短期模型和数据集
         print("\n" + "=" * 80)
         print("[初始化] 短期模型和数据集...")
@@ -1354,50 +1998,99 @@ def main():
         short_term_dataset = init_instance_by_config(config['task']['short_term_dataset'])
         
         # 获取实际的特征维度
+        short_term_factor_count = None  # 初始化为None，表示未检测到
         try:
-            # 方法1: 从handler的custom_factors获取
-            if hasattr(short_term_dataset.handler, 'custom_factors'):
-                short_term_factor_count = len(short_term_dataset.handler.custom_factors)
-            else:
-                short_term_factor_count = 0
+            # 方法1: 检查handler类型（适用于Alpha158、Alpha360等内置handler）
+            handler_class_name = short_term_dataset.handler.__class__.__name__
+            if handler_class_name == 'Alpha158':
+                short_term_factor_count = 158
+                print(f"  - 检测到Alpha158 handler，特征维度: 158")
+            elif handler_class_name == 'Alpha360':
+                short_term_factor_count = 360
+                print(f"  - 检测到Alpha360 handler，特征维度: 360")
             
-            # 方法2: 从实际数据中获取特征维度（更准确）
-            # 设置数据集以获取实际数据
-            short_term_dataset.setup_data()
-            # 尝试从handler的数据中获取特征维度
-            if hasattr(short_term_dataset.handler, '_learn') and short_term_dataset.handler._learn is not None:
-                # 从学习数据中获取特征列数
-                feature_cols = short_term_dataset.handler._learn.columns.get_level_values(0).unique()
-                if 'feature' in feature_cols:
-                    feature_data = short_term_dataset.handler._learn['feature']
-                    if hasattr(feature_data, 'shape'):
-                        actual_feature_dim = feature_data.shape[1] if len(feature_data.shape) > 1 else 1
-                        if actual_feature_dim > 0:
-                            short_term_factor_count = actual_feature_dim
-                            print(f"  - 从实际数据检测到特征维度: {actual_feature_dim}")
-                        else:
-                            print(f"  - 从custom_factors检测到因子数量: {short_term_factor_count}")
-                    else:
-                        print(f"  - 从custom_factors检测到因子数量: {short_term_factor_count}")
-                else:
+            # 方法2: 从handler的custom_factors获取（适用于CustomFactorHandler）
+            if short_term_factor_count is None:
+                if hasattr(short_term_dataset.handler, 'custom_factors') and short_term_dataset.handler.custom_factors:
+                    short_term_factor_count = len(short_term_dataset.handler.custom_factors)
                     print(f"  - 从custom_factors检测到因子数量: {short_term_factor_count}")
-            else:
-                print(f"  - 从custom_factors检测到因子数量: {short_term_factor_count}")
+                    
+                    # 如果启用了股票ID one-hot编码，需要加上股票数量
+                    if hasattr(short_term_dataset.handler, 'add_stock_id_onehot') and short_term_dataset.handler.add_stock_id_onehot:
+                        if hasattr(short_term_dataset.handler, 'n_stocks') and short_term_dataset.handler.n_stocks > 0:
+                            short_term_factor_count += short_term_dataset.handler.n_stocks
+                            print(f"  - 添加股票ID one-hot编码: +{short_term_dataset.handler.n_stocks} 维")
+                            print(f"  - 最终特征维度: {short_term_factor_count} (因子数 + 股票数)")
+            
+            # 方法3: 从实际数据中获取特征维度（最准确的方法）
+            if short_term_factor_count is None:
+                # 内存优化：只在必要时调用setup_data，避免重复加载
+                if not hasattr(short_term_dataset.handler, '_learn') or short_term_dataset.handler._learn is None:
+                    short_term_dataset.setup_data()
+                # 尝试从handler的数据中获取特征维度
+                if hasattr(short_term_dataset.handler, '_learn') and short_term_dataset.handler._learn is not None:
+                    # 从学习数据中获取特征列数
+                    feature_cols = short_term_dataset.handler._learn.columns.get_level_values(0).unique()
+                    if 'feature' in feature_cols:
+                        feature_data = short_term_dataset.handler._learn['feature']
+                        if hasattr(feature_data, 'shape'):
+                            actual_feature_dim = feature_data.shape[1] if len(feature_data.shape) > 1 else 1
+                            if actual_feature_dim > 0:
+                                short_term_factor_count = actual_feature_dim
+                                print(f"  - 从实际数据检测到特征维度: {actual_feature_dim}")
+                                # 如果数据已经包含了one-hot编码，这里已经包含了股票数量
+                
+                # 如果还是None，尝试从infer数据获取
+                if short_term_factor_count is None:
+                    if hasattr(short_term_dataset.handler, '_infer') and short_term_dataset.handler._infer is not None:
+                        feature_cols = short_term_dataset.handler._infer.columns.get_level_values(0).unique()
+                        if 'feature' in feature_cols:
+                            feature_data = short_term_dataset.handler._infer['feature']
+                            if hasattr(feature_data, 'shape'):
+                                actual_feature_dim = feature_data.shape[1] if len(feature_data.shape) > 1 else 1
+                                if actual_feature_dim > 0:
+                                    short_term_factor_count = actual_feature_dim
+                                    print(f"  - 从infer数据检测到特征维度: {actual_feature_dim}")
         except Exception as e:
-            print(f"  ⚠️  检测特征维度时出错: {e}，使用custom_factors数量")
-        short_term_factor_count = len(short_term_dataset.handler.custom_factors) if hasattr(short_term_dataset.handler, 'custom_factors') else 0
+            print(f"  ⚠️  检测特征维度时出错: {e}")
+            import traceback
+            traceback.print_exc()
         
         # 在初始化模型之前，先修改配置中的d_feat并确保类型正确
         short_term_model_config = config['task']['short_term_model'].copy()
         if 'kwargs' in short_term_model_config:
-            # 确保d_feat正确
-            if 'd_feat' in short_term_model_config['kwargs']:
-                if short_term_model_config['kwargs']['d_feat'] != short_term_factor_count:
-                    print(f"  - 自动调整配置中的d_feat: {short_term_model_config['kwargs']['d_feat']} -> {short_term_factor_count}")
+            # 获取配置中的d_feat（作为默认值）
+            config_d_feat = short_term_model_config['kwargs'].get('d_feat', None)
+            
+            # 确保特征维度正确：只有当检测到的特征维度 > 0 且与配置不同时才调整
+            short_term_model_class = short_term_model_config.get('class', '')
+            if short_term_factor_count is not None and short_term_factor_count > 0:
+                if config_d_feat is None or config_d_feat != short_term_factor_count:
+                    print(f"  - 自动调整配置中的特征维度: {config_d_feat} -> {short_term_factor_count}")
                     short_term_model_config['kwargs']['d_feat'] = short_term_factor_count
+                    if short_term_model_class == 'KRNN':
+                        short_term_model_config['kwargs']['fea_dim'] = short_term_factor_count
+                else:
+                    print(f"  - 配置中的特征维度={config_d_feat} 与检测到的匹配")
+            else:
+                # 如果无法检测到特征维度，使用配置中的值（不覆盖）
+                if config_d_feat is not None:
+                    print(f"  - 无法自动检测特征维度，使用配置中的值: {config_d_feat}")
+                    short_term_factor_count = config_d_feat  # 用于后续验证
+                else:
+                    # 如果配置中也没有，使用默认值（KRNN 优先用配置中的 fea_dim）
+                    if short_term_model_class == 'KRNN':
+                        default_d_feat = short_term_model_config['kwargs'].get('fea_dim', 6)
+                    else:
+                        default_d_feat = 360
+                    print(f"  - 无法检测特征维度且配置中未指定，使用默认值: {default_d_feat}")
+                    short_term_model_config['kwargs']['d_feat'] = default_d_feat
+                    if short_term_model_class == 'KRNN':
+                        short_term_model_config['kwargs']['fea_dim'] = default_d_feat
+                    short_term_factor_count = default_d_feat  # 用于后续验证
             
             # 确保数值类型参数是数字类型（YAML可能将科学计数法解析为字符串）
-            for key in ['lr', 'dropout', 'reg', 'd_feat', 'd_model', 'batch_size', 'n_epochs', 'early_stop']:
+            for key in ['lr', 'dropout', 'reg', 'd_feat', 'fea_dim', 'd_model', 'hidden_size', 'batch_size', 'n_epochs', 'early_stop', 'cnn_dim', 'rnn_dim', 'rnn_dups', 'rnn_layers', 'cnn_kernel_size']:
                 if key in short_term_model_config['kwargs']:
                     value = short_term_model_config['kwargs'][key]
                     if isinstance(value, str):
@@ -1409,15 +2102,25 @@ def main():
         
         short_term_model = init_instance_by_config(short_term_model_config)
         
-        # 验证d_feat是否正确设置
-        if hasattr(short_term_model, 'd_feat'):
-            if short_term_model.d_feat == short_term_factor_count:
-                print(f"  ✓ 模型d_feat={short_term_model.d_feat} 与特征维度匹配")
+        # 验证特征维度是否正确设置（d_feat 或 fea_dim）
+        if hasattr(short_term_model, 'fea_dim'):
+            if short_term_model.fea_dim == short_term_factor_count:
+                print(f"  ✓ 模型 fea_dim={short_term_model.fea_dim} 与特征维度匹配")
             else:
-                print(f"  ⚠️  警告: 模型d_feat={short_term_model.d_feat} 与特征维度={short_term_factor_count} 仍不匹配")
+                print(f"  ⚠️  警告: 模型 fea_dim={short_term_model.fea_dim} 与特征维度={short_term_factor_count} 仍不匹配")
+        elif hasattr(short_term_model, 'd_feat'):
+            if short_term_model.d_feat == short_term_factor_count:
+                print(f"  ✓ 模型 d_feat={short_term_model.d_feat} 与特征维度匹配")
+            else:
+                print(f"  ⚠️  警告: 模型 d_feat={short_term_model.d_feat} 与特征维度={short_term_factor_count} 仍不匹配")
         
         init_time = time.time() - init_start
         print(f"✓ 短期模型初始化成功 (耗时: {format_time(init_time)})")
+        
+        # 内存优化：如果短期数据集已经setup，释放不需要的临时数据
+        if hasattr(short_term_dataset.handler, '_data') and hasattr(short_term_dataset.handler, 'drop_raw') and short_term_dataset.handler.drop_raw:
+            # drop_raw=True时，_data应该已经被释放，但确保清理其他临时数据
+            gc.collect()
         
         # 初始化长期模型和数据集
         print("\n[初始化] 长期模型和数据集...")
@@ -1426,16 +2129,24 @@ def main():
         long_term_dataset = init_instance_by_config(config['task']['long_term_dataset'])
         
         # 获取实际的特征维度
+        long_term_factor_count = None  # 初始化为None，表示未检测到
         try:
-            # 方法1: 从handler的custom_factors获取
-            if hasattr(long_term_dataset.handler, 'custom_factors'):
+            # 方法1: 从handler的custom_factors获取（适用于CustomFactorHandler）
+            if hasattr(long_term_dataset.handler, 'custom_factors') and long_term_dataset.handler.custom_factors:
                 long_term_factor_count = len(long_term_dataset.handler.custom_factors)
-            else:
-                long_term_factor_count = 0
+                print(f"  - 从custom_factors检测到因子数量: {long_term_factor_count}")
+                
+                # 如果启用了股票ID one-hot编码，需要加上股票数量
+                if hasattr(long_term_dataset.handler, 'add_stock_id_onehot') and long_term_dataset.handler.add_stock_id_onehot:
+                    if hasattr(long_term_dataset.handler, 'n_stocks') and long_term_dataset.handler.n_stocks > 0:
+                        long_term_factor_count += long_term_dataset.handler.n_stocks
+                        print(f"  - 添加股票ID one-hot编码: +{long_term_dataset.handler.n_stocks} 维")
+                        print(f"  - 最终特征维度: {long_term_factor_count} (因子数 + 股票数)")
             
-            # 方法2: 从实际数据中获取特征维度（更准确）
-            # 设置数据集以获取实际数据
-            long_term_dataset.setup_data()
+            # 方法2: 从实际数据中获取特征维度（更准确，适用于所有handler）
+            # 内存优化：只在必要时调用setup_data，避免重复加载
+            if not hasattr(long_term_dataset.handler, '_learn') or long_term_dataset.handler._learn is None:
+                long_term_dataset.setup_data()
             # 尝试从handler的数据中获取特征维度
             if hasattr(long_term_dataset.handler, '_learn') and long_term_dataset.handler._learn is not None:
                 # 从学习数据中获取特征列数
@@ -1447,29 +2158,41 @@ def main():
                         if actual_feature_dim > 0:
                             long_term_factor_count = actual_feature_dim
                             print(f"  - 从实际数据检测到特征维度: {actual_feature_dim}")
-                        else:
-                            print(f"  - 从custom_factors检测到因子数量: {long_term_factor_count}")
-                    else:
-                        print(f"  - 从custom_factors检测到因子数量: {long_term_factor_count}")
-                else:
-                    print(f"  - 从custom_factors检测到因子数量: {long_term_factor_count}")
-            else:
-                print(f"  - 从custom_factors检测到因子数量: {long_term_factor_count}")
         except Exception as e:
-            print(f"  ⚠️  检测特征维度时出错: {e}，使用custom_factors数量")
-        long_term_factor_count = len(long_term_dataset.handler.custom_factors) if hasattr(long_term_dataset.handler, 'custom_factors') else 0
+            print(f"  ⚠️  检测特征维度时出错: {e}")
         
-        # 在初始化模型之前，先修改配置中的d_feat并确保类型正确
+        # 在初始化模型之前，先修改配置中的特征维度并确保类型正确
         long_term_model_config = config['task']['long_term_model'].copy()
         if 'kwargs' in long_term_model_config:
-            # 确保d_feat正确
-            if 'd_feat' in long_term_model_config['kwargs']:
-                if long_term_model_config['kwargs']['d_feat'] != long_term_factor_count:
-                    print(f"  - 自动调整配置中的d_feat: {long_term_model_config['kwargs']['d_feat']} -> {long_term_factor_count}")
+            # 获取配置中的特征维度（作为默认值）
+            config_d_feat = long_term_model_config['kwargs'].get('d_feat', None)
+            long_term_model_class = long_term_model_config.get('class', '')
+            
+            # 确保特征维度正确：只有当检测到的特征维度 > 0 且与配置不同时才调整
+            if long_term_factor_count is not None and long_term_factor_count > 0:
+                if config_d_feat is None or config_d_feat != long_term_factor_count:
+                    print(f"  - 自动调整配置中的特征维度: {config_d_feat} -> {long_term_factor_count}")
                     long_term_model_config['kwargs']['d_feat'] = long_term_factor_count
+                    if long_term_model_class == 'KRNN':
+                        long_term_model_config['kwargs']['fea_dim'] = long_term_factor_count
+                else:
+                    print(f"  - 配置中的特征维度={config_d_feat} 与检测到的匹配")
+            else:
+                # 如果无法检测到特征维度，使用配置中的值（不覆盖）
+                if config_d_feat is not None:
+                    print(f"  - 无法自动检测特征维度，使用配置中的值: {config_d_feat}")
+                else:
+                    if long_term_model_class == 'KRNN':
+                        default_d_feat = long_term_model_config['kwargs'].get('fea_dim', 6)
+                    else:
+                        default_d_feat = 360
+                    print(f"  - 无法检测特征维度且配置中未指定，使用默认值: {default_d_feat}")
+                    long_term_model_config['kwargs']['d_feat'] = default_d_feat
+                    if long_term_model_class == 'KRNN':
+                        long_term_model_config['kwargs']['fea_dim'] = default_d_feat
             
             # 确保数值类型参数是数字类型（YAML可能将科学计数法解析为字符串）
-            for key in ['lr', 'dropout', 'reg', 'd_feat', 'd_model', 'batch_size', 'n_epochs', 'early_stop']:
+            for key in ['lr', 'dropout', 'reg', 'd_feat', 'fea_dim', 'd_model', 'hidden_size', 'batch_size', 'n_epochs', 'early_stop', 'cnn_dim', 'rnn_dim', 'rnn_dups', 'rnn_layers', 'cnn_kernel_size']:
                 if key in long_term_model_config['kwargs']:
                     value = long_term_model_config['kwargs'][key]
                     if isinstance(value, str):
@@ -1481,12 +2204,19 @@ def main():
         
         long_term_model = init_instance_by_config(long_term_model_config)
         
-        # 验证d_feat是否正确设置
-        if hasattr(long_term_model, 'd_feat'):
-            if long_term_model.d_feat == long_term_factor_count:
-                print(f"  ✓ 模型d_feat={long_term_model.d_feat} 与特征维度匹配")
+        # 验证特征维度是否正确设置（fea_dim 或 d_feat）
+        if hasattr(long_term_model, 'fea_dim'):
+            final_fea_dim = long_term_model_config['kwargs'].get('fea_dim', long_term_model.fea_dim)
+            if long_term_model.fea_dim == final_fea_dim:
+                print(f"  ✓ 模型 fea_dim={long_term_model.fea_dim} 设置正确")
             else:
-                print(f"  ⚠️  警告: 模型d_feat={long_term_model.d_feat} 与特征维度={long_term_factor_count} 仍不匹配")
+                print(f"  ⚠️  警告: 模型 fea_dim={long_term_model.fea_dim} 与配置值={final_fea_dim} 不匹配")
+        elif hasattr(long_term_model, 'd_feat'):
+            final_d_feat = long_term_model_config['kwargs'].get('d_feat', long_term_model.d_feat)
+            if long_term_model.d_feat == final_d_feat:
+                print(f"  ✓ 模型 d_feat={long_term_model.d_feat} 设置正确")
+            else:
+                print(f"  ⚠️  警告: 模型 d_feat={long_term_model.d_feat} 与配置值={final_d_feat} 不匹配")
         
         init_time = time.time() - init_start
         print(f"✓ 长期模型初始化成功 (耗时: {format_time(init_time)})")
@@ -1583,10 +2313,54 @@ def main():
                 except Exception as e:
                     print(f"    ⚠️  无法检查训练数据: {e}")
                 
-                short_term_model.fit(short_term_dataset)
-                R.save_objects(**{"short_term_params.pkl": short_term_model})
+                # 检查是否使用 n-fold 交叉验证
+                use_nfold = config.get('task', {}).get('use_nfold', False)
+                n_folds = config.get('task', {}).get('n_folds', 5)
+                
+                if use_nfold:
+                    short_term_models = train_model_with_nfold(
+                        short_term_model, 
+                        short_term_dataset, 
+                        "short_term",
+                        n_folds=n_folds,
+                        recorder=recorder,
+                        use_nfold=True
+                    )
+                    # 保存主模型（使用最后一个 fold 的模型，或所有模型的集成）
+                    if len(short_term_models) > 0:
+                        short_term_model = short_term_models[-1]  # 使用最后一个模型作为主模型
+                        # 保存 state_dict 用于 JoinQuant (不使用 Qlib 类)
+                        import torch
+                        # 获取模型 state_dict - 处理不同模型类型（GATs 使用 GAT_model，其他使用 model）
+                        if hasattr(short_term_model, 'GAT_model'):
+                            model_state = short_term_model.GAT_model.state_dict()
+                        elif hasattr(short_term_model, 'model'):
+                            model_state = short_term_model.model.state_dict()
+                        else:
+                            model_state = short_term_model.state_dict()
+                        R.save_objects(**{"short_term_params.pkl": model_state})
+                        # 保存所有模型用于集成预测（仍然保存完整对象用于 Qlib 分析）
+                        R.save_objects(**{"short_term_all_models.pkl": short_term_models})
+                else:
+                    short_term_model.fit(short_term_dataset)
+                    # 保存 state_dict 用于 JoinQuant
+                    import torch
+                    # 获取模型 state_dict - 处理不同模型类型（GATs 使用 GAT_model，其他使用 model）
+                    if hasattr(short_term_model, 'GAT_model'):
+                        model_state = short_term_model.GAT_model.state_dict()
+                    elif hasattr(short_term_model, 'model'):
+                        model_state = short_term_model.model.state_dict()
+                    else:
+                        model_state = short_term_model.state_dict()
+                    R.save_objects(**{"short_term_params.pkl": model_state})
+                
                 train_time = time.time() - train_start
                 print(f"✓ 短期模型训练完成 (耗时: {format_time(train_time)})")
+                
+                # 内存优化：训练完成后，如果不需要原始数据，可以释放handler中的_learn数据
+                # 注意：drop_raw=True时，_data已经被释放，但_learn可能还在
+                # 这里不主动释放_learn，因为后续IC分析可能需要用到
+                gc.collect()  # 触发垃圾回收，释放训练过程中的临时数据
             except Exception as e:
                 print(f"❌ 短期模型训练失败: {e}")
                 raise
@@ -1595,10 +2369,52 @@ def main():
             print("\n[2/6] 训练长期模型...")
             train_start = time.time()
             try:
-                long_term_model.fit(long_term_dataset)
-                R.save_objects(**{"long_term_params.pkl": long_term_model})
+                # 检查是否使用 n-fold 交叉验证
+                use_nfold = config.get('task', {}).get('use_nfold', False)
+                n_folds = config.get('task', {}).get('n_folds', 5)
+                
+                if use_nfold:
+                    long_term_models = train_model_with_nfold(
+                        long_term_model, 
+                        long_term_dataset, 
+                        "long_term",
+                        n_folds=n_folds,
+                        recorder=recorder,
+                        use_nfold=True
+                    )
+                    # 保存主模型（使用最后一个 fold 的模型，或所有模型的集成）
+                    if len(long_term_models) > 0:
+                        long_term_model = long_term_models[-1]  # 使用最后一个模型作为主模型
+                        # 保存 state_dict 用于 JoinQuant
+                        import torch
+                        # 获取模型 state_dict - 处理不同模型类型（GATs 使用 GAT_model，其他使用 model）
+                        if hasattr(long_term_model, 'GAT_model'):
+                            model_state = long_term_model.GAT_model.state_dict()
+                        elif hasattr(long_term_model, 'model'):
+                            model_state = long_term_model.model.state_dict()
+                        else:
+                            model_state = long_term_model.state_dict()
+                        R.save_objects(**{"long_term_params.pkl": model_state})
+                        # 保存所有模型用于集成预测
+                        R.save_objects(**{"long_term_all_models.pkl": long_term_models})
+                else:
+                    long_term_model.fit(long_term_dataset)
+                    # 保存 state_dict 用于 JoinQuant
+                    import torch
+                    # 获取模型 state_dict - 处理不同模型类型（GATs 使用 GAT_model，其他使用 model）
+                    if hasattr(long_term_model, 'GAT_model'):
+                        model_state = long_term_model.GAT_model.state_dict()
+                    elif hasattr(long_term_model, 'model'):
+                        model_state = long_term_model.model.state_dict()
+                    else:
+                        model_state = long_term_model.state_dict()
+                    R.save_objects(**{"long_term_params.pkl": model_state})
+                
                 train_time = time.time() - train_start
                 print(f"✓ 长期模型训练完成 (耗时: {format_time(train_time)})")
+                
+                # 内存优化：训练完成后触发垃圾回收
+                gc.collect()
             except Exception as e:
                 print(f"❌ 长期模型训练失败: {e}")
                 raise
@@ -1607,9 +2423,49 @@ def main():
             print("\n[3/6] 生成短期预测信号...")
             pred_start = time.time()
             try:
-                short_term_sr = SignalRecord(short_term_model, short_term_dataset, recorder)
-                short_term_sr.generate()
-                short_term_pred = recorder.load_object("pred.pkl")
+                # 检查是否使用 n-fold 集成预测
+                use_nfold = config.get('task', {}).get('use_nfold', False)
+                ensemble_method = config.get('task', {}).get('ensemble_method', 'mean')
+                
+                # 初始化 short_term_sr 变量（用于后续IC分析）
+                short_term_sr = None
+                
+                if use_nfold:
+                    # 尝试加载所有模型
+                    try:
+                        short_term_all_models = recorder.load_object("short_term_all_models.pkl")
+                        if short_term_all_models and len(short_term_all_models) > 1:
+                            print(f"  使用 {len(short_term_all_models)} 个 fold 模型进行集成预测（方法: {ensemble_method}）...")
+                            short_term_pred = predict_with_nfold_ensemble(
+                                short_term_all_models,
+                                short_term_dataset,
+                                ensemble_method=ensemble_method
+                            )
+                            # 保存集成预测结果
+                            recorder.save_objects(**{"short_term_pred.pkl": short_term_pred})
+                            # 创建 SignalRecord 对象用于保存标签数据（用于后续IC分析）
+                            short_term_sr = SignalRecord(short_term_model, short_term_dataset, recorder)
+                            # 只生成标签，不生成预测（预测已经通过集成得到）
+                            try:
+                                short_term_sr.generate()  # 这会保存 label.pkl
+                                # SignalRecord.generate() 可能会覆盖 pred.pkl；短期侧统一恢复到独立文件
+                                recorder.save_objects(**{"short_term_pred.pkl": short_term_pred})
+                            except:
+                                pass  # 如果生成失败，后续会从 dataset 获取标签
+                        else:
+                            # 如果只有一个模型，直接使用
+                            short_term_sr = SignalRecord(short_term_model, short_term_dataset, recorder)
+                            short_term_sr.generate()
+                            short_term_pred = recorder.load_object("pred.pkl")
+                    except Exception as e:
+                        print(f"  ⚠️  加载 n-fold 模型失败，使用单模型预测: {e}")
+                        short_term_sr = SignalRecord(short_term_model, short_term_dataset, recorder)
+                        short_term_sr.generate()
+                        short_term_pred = recorder.load_object("pred.pkl")
+                else:
+                    short_term_sr = SignalRecord(short_term_model, short_term_dataset, recorder)
+                    short_term_sr.generate()
+                    short_term_pred = recorder.load_object("pred.pkl")
                 
                 if short_term_pred is None or len(short_term_pred) == 0:
                     raise ValueError("短期预测信号为空")
@@ -1639,9 +2495,53 @@ def main():
             print("\n[4/6] 生成长期预测信号...")
             pred_start = time.time()
             try:
-                long_term_sr = SignalRecord(long_term_model, long_term_dataset, recorder)
-                long_term_sr.generate()
-                long_term_pred = recorder.load_object("pred.pkl")  # 注意：这会覆盖短期预测的pred.pkl
+                # 检查是否使用 n-fold 集成预测
+                use_nfold = config.get('task', {}).get('use_nfold', False)
+                ensemble_method = config.get('task', {}).get('ensemble_method', 'mean')
+                
+                # 初始化 long_term_sr 变量（用于后续IC分析）
+                long_term_sr = None
+                
+                if use_nfold:
+                    # 尝试加载所有模型
+                    try:
+                        long_term_all_models = recorder.load_object("long_term_all_models.pkl")
+                        if long_term_all_models and len(long_term_all_models) > 1:
+                            print(f"  使用 {len(long_term_all_models)} 个 fold 模型进行集成预测（方法: {ensemble_method}）...")
+                            long_term_pred = predict_with_nfold_ensemble(
+                                long_term_all_models,
+                                long_term_dataset,
+                                ensemble_method=ensemble_method
+                            )
+                            # 保存集成预测结果
+                            recorder.save_objects(**{"long_term_pred.pkl": long_term_pred})
+                            # 创建 SignalRecord 对象用于保存标签数据（用于后续IC分析）
+                            long_term_sr = SignalRecord(long_term_model, long_term_dataset, recorder)
+                            # 只生成标签，不生成预测（预测已经通过集成得到）
+                            try:
+                                long_term_sr.generate()  # 这会保存 label.pkl
+                                # SignalRecord.generate() 会写 pred.pkl，这里恢复为长期集成预测，
+                                # 这样后续 <PRED> 和其他依赖 pred.pkl 的分析都使用 n-fold 结果。
+                                recorder.save_objects(**{
+                                    "pred.pkl": long_term_pred,
+                                    "long_term_pred.pkl": long_term_pred,
+                                })
+                            except:
+                                pass  # 如果生成失败，后续会从 dataset 获取标签
+                        else:
+                            # 如果只有一个模型，直接使用
+                            long_term_sr = SignalRecord(long_term_model, long_term_dataset, recorder)
+                            long_term_sr.generate()
+                            long_term_pred = recorder.load_object("pred.pkl")
+                    except Exception as e:
+                        print(f"  ⚠️  加载 n-fold 模型失败，使用单模型预测: {e}")
+                        long_term_sr = SignalRecord(long_term_model, long_term_dataset, recorder)
+                        long_term_sr.generate()
+                        long_term_pred = recorder.load_object("pred.pkl")
+                else:
+                    long_term_sr = SignalRecord(long_term_model, long_term_dataset, recorder)
+                    long_term_sr.generate()
+                    long_term_pred = recorder.load_object("pred.pkl")  # 注意：这会覆盖短期预测的pred.pkl
                 
                 if long_term_pred is None or len(long_term_pred) == 0:
                     raise ValueError("长期预测信号为空")
@@ -1684,71 +2584,37 @@ def main():
                 # 分析长期模型IC
                 print("\n  【长期模型IC分析】")
                 try:
-                    # 加载长期预测
-                    long_term_pred = recorder.load_object("long_term_pred.pkl")
-                    if long_term_pred is None:
-                        long_term_pred = recorder.load_object("pred.pkl")  # 如果long_term_pred不存在，使用pred.pkl
+                    long_term_pred_aligned, long_term_label_aligned = _load_test_prediction_and_label(
+                        recorder, "long_term_pred.pkl", long_term_dataset
+                    )
+                    if long_term_pred_aligned is None or long_term_label_aligned is None:
+                        long_term_pred_fallback, long_term_label_fallback = _load_test_prediction_and_label(
+                            recorder, "pred.pkl", long_term_dataset
+                        )
+                        long_term_pred_aligned = long_term_pred_fallback
+                        long_term_label_aligned = long_term_label_fallback
                     
-                    # 获取长期标签（从SignalRecord保存的label.pkl）
-                    long_term_label = long_term_sr.load("label.pkl") if hasattr(long_term_sr, 'load') else None
-                    if long_term_label is None:
-                        # 尝试从dataset获取标签
-                        try:
-                            test_slice = long_term_dataset.segments['test']
-                            if isinstance(test_slice, (tuple, list)):
-                                test_selector = slice(*test_slice)
-                            else:
-                                test_selector = test_slice
+                    if long_term_pred_aligned is not None and long_term_label_aligned is not None:
+                        # 计算IC
+                        long_term_ic, long_term_ric = calc_ic(long_term_pred_aligned, long_term_label_aligned, dropna=True)
                             
-                            long_term_dataset.setup_data()
-                            long_term_label_data = long_term_dataset.handler.fetch(
-                                selector=test_selector,
-                                col_set=["label"],
-                                data_key=long_term_dataset.handler.DK_R
-                            )
-                            if isinstance(long_term_label_data, pd.DataFrame) and len(long_term_label_data.columns) > 0:
-                                long_term_label = long_term_label_data.iloc[:, 0]
-                            else:
-                                long_term_label = long_term_label_data.squeeze() if hasattr(long_term_label_data, 'squeeze') else long_term_label_data
-                        except Exception as e:
-                            print(f"    ⚠️  获取长期标签失败: {e}")
-                            long_term_label = None
-                    
-                    if long_term_pred is not None and long_term_label is not None:
-                        # 处理DataFrame格式
-                        if isinstance(long_term_pred, pd.DataFrame):
-                            long_term_pred = long_term_pred.iloc[:, 0] if len(long_term_pred.columns) > 0 else long_term_pred.squeeze()
-                        if isinstance(long_term_label, pd.DataFrame):
-                            long_term_label = long_term_label.iloc[:, 0] if len(long_term_label.columns) > 0 else long_term_label.squeeze()
+                        if long_term_ic is not None and len(long_term_ic) > 0:
+                            ic_mean = long_term_ic.mean()
+                            ic_std = long_term_ic.std()
+                            icir = ic_mean / ic_std if ic_std > 0 else 0
+                            
+                            print(f"    IC均值: {ic_mean:.6f}")
+                            print(f"    IC标准差: {ic_std:.6f}")
+                            print(f"    ICIR: {icir:.4f}")
                         
-                        # 对齐索引
-                        common_idx = long_term_pred.index.intersection(long_term_label.index)
-                        if len(common_idx) > 0:
-                            long_term_pred_aligned = long_term_pred.loc[common_idx]
-                            long_term_label_aligned = long_term_label.loc[common_idx]
+                        if long_term_ric is not None and len(long_term_ric) > 0:
+                            ric_mean = long_term_ric.mean()
+                            ric_std = long_term_ric.std()
+                            ricir = ric_mean / ric_std if ric_std > 0 else 0
                             
-                            # 计算IC
-                            long_term_ic, long_term_ric = calc_ic(long_term_pred_aligned, long_term_label_aligned, dropna=True)
-                            
-                            if long_term_ic is not None and len(long_term_ic) > 0:
-                                ic_mean = long_term_ic.mean()
-                                ic_std = long_term_ic.std()
-                                icir = ic_mean / ic_std if ic_std > 0 else 0
-                                
-                                print(f"    IC均值: {ic_mean:.6f}")
-                                print(f"    IC标准差: {ic_std:.6f}")
-                                print(f"    ICIR: {icir:.4f}")
-                            
-                            if long_term_ric is not None and len(long_term_ric) > 0:
-                                ric_mean = long_term_ric.mean()
-                                ric_std = long_term_ric.std()
-                                ricir = ric_mean / ric_std if ric_std > 0 else 0
-                                
-                                print(f"    Rank IC均值: {ric_mean:.6f}")
-                                print(f"    Rank IC标准差: {ric_std:.6f}")
-                                print(f"    Rank ICIR: {ricir:.4f}")
-                        else:
-                            print(f"    ⚠️  长期预测和标签索引不匹配")
+                            print(f"    Rank IC均值: {ric_mean:.6f}")
+                            print(f"    Rank IC标准差: {ric_std:.6f}")
+                            print(f"    Rank ICIR: {ricir:.4f}")
                     else:
                         print(f"    ⚠️  无法获取长期预测或标签数据")
                 except Exception as e:
@@ -1759,175 +2625,106 @@ def main():
                 # 分析短期模型IC
                 print("\n  【短期模型IC分析】")
                 try:
-                    # 加载短期预测
-                    short_term_pred = recorder.load_object("short_term_pred.pkl")
-                    
-                    # 获取短期标签（从SignalRecord保存的label.pkl）
-                    short_term_label = short_term_sr.load("label.pkl") if hasattr(short_term_sr, 'load') else None
-                    if short_term_label is None:
-                        # 尝试从dataset获取标签
-                        try:
-                            test_slice = short_term_dataset.segments['test']
-                            if isinstance(test_slice, (tuple, list)):
-                                test_selector = slice(*test_slice)
+                    short_term_pred_aligned, short_term_label_aligned = _load_test_prediction_and_label(
+                        recorder, "short_term_pred.pkl", short_term_dataset
+                    )
+                    if short_term_pred_aligned is not None and short_term_label_aligned is not None:
+                        # 计算IC
+                        short_term_ic, short_term_ric = calc_ic(short_term_pred_aligned, short_term_label_aligned, dropna=True)
+                            
+                        if short_term_ic is not None and len(short_term_ic) > 0:
+                            ic_mean = short_term_ic.mean()
+                            ic_std = short_term_ic.std()
+                            icir = ic_mean / ic_std if ic_std > 0 else 0
+                            
+                            print(f"    IC均值: {ic_mean:.6f}")
+                            print(f"    IC标准差: {ic_std:.6f}")
+                            print(f"    ICIR: {icir:.4f}")
+                            
+                            # 🔍 诊断：检查模型是否真的在学习
+                            print(f"\n    【模型学习效果诊断】")
+                            ic_abs_mean = short_term_ic.abs().mean()
+                            print(f"    IC强度（绝对值均值）: {ic_abs_mean:.6f}")
+
+                            # 判断模型是否有效
+                            if ic_abs_mean < 0.01:
+                                print(f"    ❌ 严重警告：模型IC强度 < 0.01，模型可能没有学习到有效信息！")
+                                print(f"       可能原因：")
+                                print(f"       1. 模型欠拟合（dropout过高、模型容量不足）")
+                                print(f"       2. 数据处理导致信息损失（归一化、填充等）")
+                                print(f"       3. 时间序列模型与单点数据不匹配")
+                                print(f"       4. 标签定义不一致")
+                                print(f"       5. 模型训练不充分（epochs太少、学习率不合适）")
+                            elif ic_abs_mean < 0.02:
+                                print(f"    ⚠️  警告：模型IC强度 < 0.02，模型学习效果较差")
+                                print(f"       建议：检查模型配置、数据处理、训练参数")
+                            elif ic_abs_mean < 0.05:
+                                print(f"    ⚠️  模型IC强度 < 0.05，学习效果一般，有改进空间")
                             else:
-                                test_selector = test_slice
+                                print(f"    ✓ 模型IC强度 >= 0.05，学习效果较好")
+
+                            # 检查预测值分布
+                            pred_values = short_term_pred_aligned.values
+                            pred_std = np.std(pred_values)
+                            pred_mean = np.mean(pred_values)
+                            print(f"    预测值统计: 均值={pred_mean:.6f}, 标准差={pred_std:.6f}")
+
+                            if pred_std < 0.001:
+                                print(f"    ⚠️  警告：预测值标准差极小，模型可能输出常数（未学习）")
+                            elif pred_std < 0.01:
+                                print(f"    ⚠️  警告：预测值变化很小，模型可能学习不充分")
+
+                            # 检查IC的稳定性
+                            positive_ic_ratio = (short_term_ic > 0).sum() / len(short_term_ic)
+                            print(f"    正IC比例: {positive_ic_ratio:.2%}")
+
+                            if 0.3 < positive_ic_ratio < 0.7:
+                                print(f"    ⚠️  警告：正IC比例接近50%，模型预测可能接近随机")
+                            elif positive_ic_ratio < 0.3 or positive_ic_ratio > 0.7:
+                                print(f"    ✓ 正IC比例偏离50%，说明模型有方向性预测能力")
                             
-                            short_term_dataset.setup_data()
-                            short_term_label_data = short_term_dataset.handler.fetch(
-                                selector=test_selector,
-                                col_set=["label"],
-                                data_key=short_term_dataset.handler.DK_R
-                            )
-                            if isinstance(short_term_label_data, pd.DataFrame) and len(short_term_label_data.columns) > 0:
-                                short_term_label = short_term_label_data.iloc[:, 0]
-                            else:
-                                short_term_label = short_term_label_data.squeeze() if hasattr(short_term_label_data, 'squeeze') else short_term_label_data
-                        except Exception as e:
-                            print(f"    ⚠️  获取短期标签失败: {e}")
-                            short_term_label = None
-                    
-                    if short_term_pred is not None and short_term_label is not None:
-                        # 处理DataFrame格式
-                        if isinstance(short_term_pred, pd.DataFrame):
-                            short_term_pred = short_term_pred.iloc[:, 0] if len(short_term_pred.columns) > 0 else short_term_pred.squeeze()
-                        if isinstance(short_term_label, pd.DataFrame):
-                            short_term_label = short_term_label.iloc[:, 0] if len(short_term_label.columns) > 0 else short_term_label.squeeze()
-                        
-                        # 对齐索引
-                        common_idx = short_term_pred.index.intersection(short_term_label.index)
-                        if len(common_idx) > 0:
-                            short_term_pred_aligned = short_term_pred.loc[common_idx]
-                            short_term_label_aligned = short_term_label.loc[common_idx]
+                        if short_term_ric is not None and len(short_term_ric) > 0:
+                            ric_mean = short_term_ric.mean()
+                            ric_std = short_term_ric.std()
+                            ricir = ric_mean / ric_std if ric_std > 0 else 0
                             
-                            # 计算IC
-                            short_term_ic, short_term_ric = calc_ic(short_term_pred_aligned, short_term_label_aligned, dropna=True)
-                            
-                            if short_term_ic is not None and len(short_term_ic) > 0:
-                                ic_mean = short_term_ic.mean()
-                                ic_std = short_term_ic.std()
-                                icir = ic_mean / ic_std if ic_std > 0 else 0
-                                
-                                print(f"    IC均值: {ic_mean:.6f}")
-                                print(f"    IC标准差: {ic_std:.6f}")
-                                print(f"    ICIR: {icir:.4f}")
-                                
-                                # 🔍 诊断：检查模型是否真的在学习
-                                print(f"\n    【模型学习效果诊断】")
-                                ic_abs_mean = short_term_ic.abs().mean()
-                                print(f"    IC强度（绝对值均值）: {ic_abs_mean:.6f}")
-                                
-                                # 判断模型是否有效
-                                if ic_abs_mean < 0.01:
-                                    print(f"    ❌ 严重警告：模型IC强度 < 0.01，模型可能没有学习到有效信息！")
-                                    print(f"       可能原因：")
-                                    print(f"       1. 模型欠拟合（dropout过高、模型容量不足）")
-                                    print(f"       2. 数据处理导致信息损失（归一化、填充等）")
-                                    print(f"       3. 时间序列模型与单点数据不匹配")
-                                    print(f"       4. 标签定义不一致")
-                                    print(f"       5. 模型训练不充分（epochs太少、学习率不合适）")
-                                elif ic_abs_mean < 0.02:
-                                    print(f"    ⚠️  警告：模型IC强度 < 0.02，模型学习效果较差")
-                                    print(f"       建议：检查模型配置、数据处理、训练参数")
-                                elif ic_abs_mean < 0.05:
-                                    print(f"    ⚠️  模型IC强度 < 0.05，学习效果一般，有改进空间")
-                                else:
-                                    print(f"    ✓ 模型IC强度 >= 0.05，学习效果较好")
-                                
-                                # 检查预测值分布
-                                pred_values = short_term_pred_aligned.values
-                                pred_std = np.std(pred_values)
-                                pred_mean = np.mean(pred_values)
-                                print(f"    预测值统计: 均值={pred_mean:.6f}, 标准差={pred_std:.6f}")
-                                
-                                if pred_std < 0.001:
-                                    print(f"    ⚠️  警告：预测值标准差极小，模型可能输出常数（未学习）")
-                                elif pred_std < 0.01:
-                                    print(f"    ⚠️  警告：预测值变化很小，模型可能学习不充分")
-                                
-                                # 检查IC的稳定性
-                                positive_ic_ratio = (short_term_ic > 0).sum() / len(short_term_ic)
-                                print(f"    正IC比例: {positive_ic_ratio:.2%}")
-                                
-                                if 0.3 < positive_ic_ratio < 0.7:
-                                    print(f"    ⚠️  警告：正IC比例接近50%，模型预测可能接近随机")
-                                elif positive_ic_ratio < 0.3 or positive_ic_ratio > 0.7:
-                                    print(f"    ✓ 正IC比例偏离50%，说明模型有方向性预测能力")
-                            
-                            if short_term_ric is not None and len(short_term_ric) > 0:
-                                ric_mean = short_term_ric.mean()
-                                ric_std = short_term_ric.std()
-                                ricir = ric_mean / ric_std if ric_std > 0 else 0
-                                
-                                print(f"    Rank IC均值: {ric_mean:.6f}")
-                                print(f"    Rank IC标准差: {ric_std:.6f}")
-                                print(f"    Rank ICIR: {ricir:.4f}")
+                            print(f"    Rank IC均值: {ric_mean:.6f}")
+                            print(f"    Rank IC标准差: {ric_std:.6f}")
+                            print(f"    Rank ICIR: {ricir:.4f}")
                             
                             # 🔍 诊断：检查训练集IC vs 测试集IC（判断是否过拟合）
                             print(f"\n    【过拟合/欠拟合诊断】")
                             try:
-                                # 获取训练集预测
-                                train_slice = short_term_dataset.segments.get('train')
-                                if train_slice:
-                                    # 临时设置test segment为train segment
-                                    original_test = short_term_dataset.segments.get('test')
-                                    short_term_dataset.segments['test'] = train_slice
-                                    try:
-                                        train_pred = short_term_model.predict(short_term_dataset)
-                                        if train_pred is not None and len(train_pred) > 0:
-                                            # 获取训练集标签
-                                            train_selector = slice(*train_slice) if isinstance(train_slice, (list, tuple)) else train_slice
-                                            train_label_data = short_term_dataset.handler.fetch(
-                                                selector=train_selector,
-                                                col_set=["label"],
-                                                data_key=short_term_dataset.handler.DK_L  # 使用DK_L，与训练时一致
-                                            )
-                                            if isinstance(train_label_data, pd.DataFrame) and len(train_label_data.columns) > 0:
-                                                train_label = train_label_data.iloc[:, 0]
-                                            else:
-                                                train_label = train_label_data.squeeze() if hasattr(train_label_data, 'squeeze') else train_label_data
-                                            
-                                            # 对齐并计算训练集IC
-                                            if isinstance(train_pred, pd.DataFrame):
-                                                train_pred = train_pred.iloc[:, 0] if len(train_pred.columns) > 0 else train_pred.squeeze()
-                                            
-                                            train_common_idx = train_pred.index.intersection(train_label.index)
-                                            if len(train_common_idx) > 0:
-                                                train_pred_aligned = train_pred.loc[train_common_idx]
-                                                train_label_aligned = train_label.loc[train_common_idx]
-                                                train_ic, _ = calc_ic(train_pred_aligned, train_label_aligned, dropna=True)
-                                                
-                                                if train_ic is not None and len(train_ic) > 0:
-                                                    train_ic_mean = train_ic.mean()
-                                                    train_ic_abs = train_ic.abs().mean()
-                                                    test_ic_abs = short_term_ic.abs().mean()
-                                                    
-                                                    print(f"    训练集IC强度: {train_ic_abs:.6f}")
-                                                    print(f"    测试集IC强度: {test_ic_abs:.6f}")
-                                                    print(f"    差异: {train_ic_abs - test_ic_abs:.6f}")
-                                                    
-                                                    if train_ic_abs > test_ic_abs * 2:
-                                                        print(f"    ❌ 严重过拟合：训练集IC强度是测试集的 {train_ic_abs/test_ic_abs:.2f} 倍")
-                                                        print(f"       说明：模型在训练集上学到了噪声，泛化能力差")
-                                                        print(f"       建议：增加正则化（dropout、L1/L2）、减少模型复杂度")
-                                                    elif train_ic_abs > test_ic_abs * 1.5:
-                                                        print(f"    ⚠️  过拟合：训练集IC强度明显高于测试集")
-                                                        print(f"       建议：适当增加正则化")
-                                                    elif train_ic_abs < test_ic_abs * 0.8:
-                                                        print(f"    ⚠️  欠拟合：训练集IC强度低于测试集")
-                                                        print(f"       说明：模型学习不充分，可能原因：")
-                                                        print(f"       1. dropout过高（当前: {config['task']['short_term_model']['kwargs'].get('dropout', 'N/A')}）")
-                                                        print(f"       2. 模型容量不足（hidden_size: {config['task']['short_term_model']['kwargs'].get('hidden_size', 'N/A')}）")
-                                                        print(f"       3. 训练轮数不足（n_epochs: {config['task']['short_term_model']['kwargs'].get('n_epochs', 'N/A')}）")
-                                                        print(f"       建议：降低dropout、增加模型容量、增加训练轮数")
-                                                    else:
-                                                        print(f"    ✓ 训练集和测试集IC强度接近，模型泛化能力正常")
-                                    finally:
-                                        # 恢复test segment
-                                        if original_test is not None:
-                                            short_term_dataset.segments['test'] = original_test
-                                        elif 'test' in short_term_dataset.segments and train_slice == short_term_dataset.segments.get('test'):
-                                            del short_term_dataset.segments['test']
+                                train_pred_aligned, train_label_aligned = _predict_segment_and_align(
+                                    short_term_model, short_term_dataset, "train"
+                                )
+                                if train_pred_aligned is not None and train_label_aligned is not None:
+                                    train_ic, _ = calc_ic(train_pred_aligned, train_label_aligned, dropna=True)
+
+                                    if train_ic is not None and len(train_ic) > 0:
+                                        train_ic_abs = train_ic.abs().mean()
+                                        test_ic_abs = short_term_ic.abs().mean()
+
+                                        print(f"    训练集IC强度: {train_ic_abs:.6f}")
+                                        print(f"    测试集IC强度: {test_ic_abs:.6f}")
+                                        print(f"    差异: {train_ic_abs - test_ic_abs:.6f}")
+
+                                        if test_ic_abs > 0 and train_ic_abs > test_ic_abs * 2:
+                                            print(f"    ❌ 严重过拟合：训练集IC强度是测试集的 {train_ic_abs/test_ic_abs:.2f} 倍")
+                                            print(f"       说明：模型在训练集上学到了噪声，泛化能力差")
+                                            print(f"       建议：增加正则化（dropout、L1/L2）、减少模型复杂度")
+                                        elif test_ic_abs > 0 and train_ic_abs > test_ic_abs * 1.5:
+                                            print(f"    ⚠️  过拟合：训练集IC强度明显高于测试集")
+                                            print(f"       建议：适当增加正则化")
+                                        elif train_ic_abs < test_ic_abs * 0.8:
+                                            print(f"    ⚠️  欠拟合：训练集IC强度低于测试集")
+                                            print(f"       说明：模型学习不充分，可能原因：")
+                                            print(f"       1. dropout过高（当前: {config['task']['short_term_model']['kwargs'].get('dropout', 'N/A')}）")
+                                            print(f"       2. 模型容量不足（hidden_size: {config['task']['short_term_model']['kwargs'].get('hidden_size', 'N/A')}）")
+                                            print(f"       3. 训练轮数不足（n_epochs: {config['task']['short_term_model']['kwargs'].get('n_epochs', 'N/A')}）")
+                                            print(f"       建议：降低dropout、增加模型容量、增加训练轮数")
+                                        else:
+                                            print(f"    ✓ 训练集和测试集IC强度接近，模型泛化能力正常")
                             except Exception as e:
                                 print(f"    ⚠️  无法计算训练集IC: {e}")
                                 import traceback
@@ -1938,20 +2735,9 @@ def main():
                             
                             # 尝试计算单个因子的IC（用于对比）
                             try:
-                                # 获取因子数据
-                                test_slice = short_term_dataset.segments['test']
-                                if isinstance(test_slice, (tuple, list)):
-                                    test_selector = slice(*test_slice)
-                                else:
-                                    test_selector = test_slice
-                                
-                                short_term_dataset.setup_data()
-                                
-                                # 获取特征数据
-                                feature_data = short_term_dataset.handler.fetch(
-                                    selector=test_selector,
-                                    col_set=["feature"],
-                                    data_key=short_term_dataset.handler.DK_R
+                                labels = short_term_label_aligned
+                                feature_data = _load_segment_features(
+                                    short_term_dataset, "test", data_key=short_term_dataset.handler.DK_R
                                 )
                                 
                                 # 诊断：检查特征名
@@ -1973,23 +2759,14 @@ def main():
                                                     print(f"    ⚠️  因子数量不匹配！原始因子数={len(original_factor_names)}, 特征数={len(feature_data.columns)}")
                                         except Exception as e:
                                             print(f"    ⚠️  无法获取原始因子名: {e}")
-                                
-                                # 获取标签数据
-                                label_data = short_term_dataset.handler.fetch(
-                                    selector=test_selector,
-                                    col_set=["label"],
-                                    data_key=short_term_dataset.handler.DK_R
-                                )
-                                
-                                if isinstance(label_data, pd.DataFrame) and len(label_data.columns) > 0:
-                                    labels = label_data.iloc[:, 0]
-                                else:
-                                    labels = label_data.squeeze() if hasattr(label_data, 'squeeze') else label_data
-                                
+
                                 # 计算每个因子的IC
-                                if isinstance(feature_data, pd.DataFrame) and len(feature_data) > 0:
+                                if (
+                                    isinstance(feature_data, pd.DataFrame)
+                                    and len(feature_data) > 0
+                                    and labels is not None
+                                ):
                                     factor_ics = []
-                                    factor_names = []
                                     
                                     for col in feature_data.columns:
                                         factor_values = feature_data[col]
@@ -2024,7 +2801,6 @@ def main():
                                                             'ric_abs_mean': factor_ric_abs_mean,
                                                             'name': str(col)
                                                         })
-                                                        factor_names.append(str(col))
                                                 except Exception as e:
                                                     logger.debug(f"计算因子 {col} 的IC失败: {e}")
                                                     pass
@@ -2076,8 +2852,15 @@ def main():
                                             print(f"      ✓ 模型IC强度（{model_ic_strength:.6f}）高于平均因子IC强度（{avg_factor_ic_abs:.6f}），说明模型很好地利用了因子组合")
                                         else:
                                             print(f"      ⚠️  模型IC强度（{model_ic_strength:.6f}）略低于平均因子IC强度（{avg_factor_ic_abs:.6f}），建议优化模型参数")
+                                else:
+                                    print(f"    ⚠️  无法获取测试集特征或标签数据，跳过因子IC对比")
                             except Exception as e:
                                 print(f"    ⚠️  无法计算因子IC对比: {e}")
+                            
+                            # 内存优化：IC分析完成后，释放临时数据
+                            if 'feature_data' in locals():
+                                del feature_data
+                            gc.collect()
                             
                             # 尝试获取特征重要性（如果是LGBM模型）
                             try:
@@ -2126,8 +2909,6 @@ def main():
                                 print(f"    5. 考虑使用更复杂的模型：")
                                 print(f"       - 尝试 GATs TS 或其他深度学习模型")
                                 print(f"       - 或使用集成方法（多个LGBM模型）")
-                        else:
-                            print(f"    ⚠️  短期预测和标签索引不匹配")
                     else:
                         print(f"    ⚠️  无法获取短期预测或标签数据")
                 except Exception as e:
@@ -2151,158 +2932,9 @@ def main():
                 traceback.print_exc()
                 # 不抛出异常，继续执行回测
             
-            # 股票池筛选（基于验证集胜率）
+            # 不再执行基于历史胜率的股票池筛选，避免前视偏差和信号口径不一致
             filtered_stock_pool = None
-            stock_pool_filter_config = config.get('stock_pool_filter_config', {})
-            enable_filter = stock_pool_filter_config.get('enable_stock_pool_filter', True)
-            min_win_rate = stock_pool_filter_config.get('min_win_rate', 0.5)
-            filter_segment = stock_pool_filter_config.get('filter_segment', 'test')  # 已合并valid和test
-            
-            if enable_filter:
-                print(f"\n[筛选股票池] 基于{filter_segment}集胜率筛选股票池...")
-                filter_start = time.time()
-                try:
-                    # 在验证集上生成预测（用于筛选）
-                    print(f"  - 在{filter_segment}集上生成预测用于筛选...")
-                    
-                    # 临时修改dataset的segments，使predict使用验证集
-                    # 保存原始的test segment
-                    original_long_term_test = long_term_dataset.segments.get('test', None)
-                    original_short_term_test = short_term_dataset.segments.get('test', None)
-                    
-                    # 将filter_segment设置为test（因为predict方法使用test segment）
-                    if filter_segment in long_term_dataset.segments:
-                        long_term_dataset.segments['test'] = long_term_dataset.segments[filter_segment]
-                    if filter_segment in short_term_dataset.segments:
-                        short_term_dataset.segments['test'] = short_term_dataset.segments[filter_segment]
-                    
-                    try:
-                        # 生成长期预测（验证集）
-                        long_term_pred_valid = long_term_model.predict(long_term_dataset)
-                        # 生成短期预测（验证集）
-                        short_term_pred_valid = short_term_model.predict(short_term_dataset)
-                    finally:
-                        # 恢复原始的test segment
-                        if original_long_term_test is not None:
-                            long_term_dataset.segments['test'] = original_long_term_test
-                        elif 'test' in long_term_dataset.segments and filter_segment != 'test':
-                            del long_term_dataset.segments['test']
-                        
-                        if original_short_term_test is not None:
-                            short_term_dataset.segments['test'] = original_short_term_test
-                        elif 'test' in short_term_dataset.segments and filter_segment != 'test':
-                            del short_term_dataset.segments['test']
-                    
-                    # 获取标签数据
-                    try:
-                        valid_slice = long_term_dataset.segments[filter_segment]
-                        if isinstance(valid_slice, (tuple, list)):
-                            valid_selector = slice(*valid_slice)
-                        else:
-                            valid_selector = valid_slice
-                        
-                        long_term_dataset.setup_data()
-                        long_term_label_data = long_term_dataset.handler.fetch(
-                            selector=valid_selector,
-                            col_set=["label"],
-                            data_key=long_term_dataset.handler.DK_L
-                        )
-                        short_term_dataset.setup_data()
-                        short_term_label_data = short_term_dataset.handler.fetch(
-                            selector=valid_selector,
-                            col_set=["label"],
-                            data_key=short_term_dataset.handler.DK_L
-                        )
-                        
-                        if isinstance(long_term_label_data, pd.DataFrame) and len(long_term_label_data.columns) > 0:
-                            long_term_label_valid = long_term_label_data.iloc[:, 0]
-                        else:
-                            long_term_label_valid = long_term_label_data.squeeze() if hasattr(long_term_label_data, 'squeeze') else long_term_label_data
-                        
-                        if isinstance(short_term_label_data, pd.DataFrame) and len(short_term_label_data.columns) > 0:
-                            short_term_label_valid = short_term_label_data.iloc[:, 0]
-                        else:
-                            short_term_label_valid = short_term_label_data.squeeze() if hasattr(short_term_label_data, 'squeeze') else short_term_label_data
-                        
-                        # 处理DataFrame格式的预测
-                        if isinstance(long_term_pred_valid, pd.DataFrame):
-                            long_term_pred_valid = long_term_pred_valid.iloc[:, 0] if len(long_term_pred_valid.columns) > 0 else long_term_pred_valid.squeeze()
-                        if isinstance(short_term_pred_valid, pd.DataFrame):
-                            short_term_pred_valid = short_term_pred_valid.iloc[:, 0] if len(short_term_pred_valid.columns) > 0 else short_term_pred_valid.squeeze()
-                        
-                        # 对齐索引
-                        common_idx_long = long_term_pred_valid.index.intersection(long_term_label_valid.index)
-                        common_idx_short = short_term_pred_valid.index.intersection(short_term_label_valid.index)
-                        
-                        if len(common_idx_long) > 0 and len(common_idx_short) > 0:
-                            long_term_pred_aligned = long_term_pred_valid.loc[common_idx_long]
-                            long_term_label_aligned = long_term_label_valid.loc[common_idx_long]
-                            short_term_pred_aligned = short_term_pred_valid.loc[common_idx_short]
-                            short_term_label_aligned = short_term_label_valid.loc[common_idx_short]
-                            
-                            # 计算胜率（按股票分组）
-                            long_term_results = []
-                            short_term_results = []
-                            
-                            # 长期胜率
-                            if isinstance(long_term_pred_aligned.index, pd.MultiIndex):
-                                for stock_id in long_term_pred_aligned.index.get_level_values(1).unique():
-                                    stock_mask = long_term_pred_aligned.index.get_level_values(1) == stock_id
-                                    stock_pred = long_term_pred_aligned[stock_mask]
-                                    stock_label = long_term_label_aligned[stock_mask]
-                                    if len(stock_pred) > 0:
-                                        correct = ((stock_pred > 0) & (stock_label > 0)) | ((stock_pred < 0) & (stock_label < 0))
-                                        win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
-                                        long_term_results.append({
-                                            'stock_id': stock_id,
-                                            'win_rate': win_rate,
-                                            'total': len(correct),
-                                            'correct': correct.sum()
-                                        })
-                            
-                            # 短期胜率
-                            if isinstance(short_term_pred_aligned.index, pd.MultiIndex):
-                                for stock_id in short_term_pred_aligned.index.get_level_values(1).unique():
-                                    stock_mask = short_term_pred_aligned.index.get_level_values(1) == stock_id
-                                    stock_pred = short_term_pred_aligned[stock_mask]
-                                    stock_label = short_term_label_aligned[stock_mask]
-                                    if len(stock_pred) > 0:
-                                        correct = ((stock_pred > 0) & (stock_label > 0)) | ((stock_pred < 0) & (stock_label < 0))
-                                        win_rate = correct.sum() / len(correct) if len(correct) > 0 else 0.0
-                                        short_term_results.append({
-                                            'stock_id': stock_id,
-                                            'win_rate': win_rate,
-                                            'total': len(correct),
-                                            'correct': correct.sum()
-                                        })
-                            
-                            # 筛选股票池
-                            if len(long_term_results) > 0 and len(short_term_results) > 0:
-                                filtered_stock_pool = filter_stock_pool_by_win_rate(
-                                    long_term_results,
-                                    short_term_results,
-                                    min_win_rate=min_win_rate,
-                                    segment=filter_segment
-                                )
-                            else:
-                                print(f"  ⚠️  无法计算胜率，跳过股票池筛选")
-                        else:
-                            print(f"  ⚠️  预测和标签索引不匹配，跳过股票池筛选")
-                    except Exception as e:
-                        print(f"  ⚠️  获取{filter_segment}集标签数据失败: {e}")
-                        print(f"     - 跳过股票池筛选")
-                    
-                    filter_time = time.time() - filter_start
-                    if filtered_stock_pool is not None:
-                        print(f"✓ 股票池筛选完成 (耗时: {format_time(filter_time)})")
-                        print(f"  筛选后股票池大小: {len(filtered_stock_pool)} 只股票")
-                except Exception as e:
-                    print(f"  ⚠️  股票池筛选失败: {e}")
-                    import traceback
-                    traceback.print_exc()
-                    print(f"     - 将使用所有股票进行回测")
-            else:
-                print(f"\n[跳过股票池筛选] enable_stock_pool_filter=false")
+            print("\n[跳过股票池筛选] 已移除基于胜率的 fixed_stock_pool 筛选逻辑")
             
             # 回测分析
             print("\n[6/6] 回测分析...")
@@ -2312,16 +2944,19 @@ def main():
                 
                 # 设置策略参数
                 strategy_config = port_analysis_config['strategy'].copy()
-                strategy_config['kwargs']['signal'] = "<PRED>"  # 使用长期模型的预测（pred.pkl）
+                strategy_config['kwargs']['signal'] = "long_term_pred.pkl"
                 strategy_config['kwargs']['short_term_signal'] = "short_term_pred.pkl"
                 strategy_config['kwargs']['recorder'] = recorder
+                # 传递dataset引用，用于统计
+                strategy_config['kwargs']['long_term_dataset'] = long_term_dataset
+                strategy_config['kwargs']['short_term_dataset'] = short_term_dataset
+                # 设置统计输出目录
+                stats_output_dir = Path(f"mlruns/{recorder.experiment_id}/{recorder.id}/prediction_stats")
+                strategy_config['kwargs']['stats_output_dir'] = str(stats_output_dir)
                 
-                # 如果筛选了股票池，传递给策略
-                if filtered_stock_pool is not None and len(filtered_stock_pool) > 0:
-                    strategy_config['kwargs']['fixed_stock_pool'] = filtered_stock_pool
-                    print(f"  - 使用筛选后的股票池（{len(filtered_stock_pool)}只股票）")
-                else:
-                    print(f"  - 未使用股票池筛选，使用所有股票")
+                # 不再传递 fixed_stock_pool，统一使用策略自身的股票池定义
+                strategy_config['kwargs'].pop('fixed_stock_pool', None)
+                print(f"  - 未使用股票池筛选，使用策略配置中的原始股票池")
                 
                 port_analysis_config['strategy'] = strategy_config
                 
@@ -2354,7 +2989,12 @@ def main():
             else:
                 analyze_backtest_results(port_analysis, recorder=recorder)
                 # 绘制回测分析图表
-                plot_backtest_results(port_analysis, recorder=recorder)
+                plot_backtest_results(
+                    port_analysis,
+                    recorder=recorder,
+                    long_term_dataset=long_term_dataset,
+                    short_term_dataset=short_term_dataset,
+                )
             
             # 计算并打印预测胜率
             print("\n计算预测胜率...")
@@ -2371,6 +3011,17 @@ def main():
                 log_daily_trades_and_positions(recorder)
             except Exception as e:
                 print(f"  ⚠️  生成交易日志失败: {e}")
+                import traceback
+                traceback.print_exc()
+            
+            # 计算并输出预测数据统计
+            print("\n计算并输出预测数据统计...")
+            try:
+                calculate_and_output_prediction_statistics(
+                    recorder, long_term_dataset, short_term_dataset
+                )
+            except Exception as e:
+                print(f"  ⚠️  计算预测统计失败: {e}")
                 import traceback
                 traceback.print_exc()
             

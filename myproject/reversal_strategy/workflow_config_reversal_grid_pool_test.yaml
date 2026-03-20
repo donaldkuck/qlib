@@ -16,7 +16,7 @@ port_analysis_config: &port_analysis_config
             verbose: false
     strategy:
         class: ReversalGridPoolStrategy
-        module_path: myproject.reversal_grid_pool_strategy
+        module_path: reversal_grid_pool_strategy
         kwargs:
             max_holding_stocks: 3  # 最多同时持仓3只股票
             stock_pool:

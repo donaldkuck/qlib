@@ -16,7 +16,7 @@ port_analysis_config: &port_analysis_config
             verbose: false  # 禁用进度条，方便日志重定向
     strategy:
         class: ReversalGridPoolStrategy
-        module_path: myproject.reversal_grid_pool_strategy
+        module_path: reversal_strategy.reversal_grid_pool_strategy
         kwargs:
             max_holding_stocks: 20  # 最多同时持仓20只股票
             # 股票池配置：每只股票有独立的参数
@@ -24,18 +24,19 @@ port_analysis_config: &port_analysis_config
             stock_pool:
                 # 浦发银行
                 SH600000:
-                    max_position_value: 5000000  # 该股票最高持仓500万（1亿/20只股票）
+                    max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.38  # 适当降低ATR倍数，在保持质量的同时增加机会
-                    short_trend_threshold: 0.14  # 适当降低ATR倍数，在保持质量的同时增加机会
+                    long_trend_atr_threshold: 0.1
+                    short_trend_atr_threshold: 0.1
                     atr_period: 14
-                    atr_multiplier: 2.0  # 降低止损距离，更及时止损
-                    grid_atr_interval: 0.5  # 优化：降低网格间隔，更频繁加仓
-                    entry_atr_multiplier: 0.45  # 适当降低开仓门槛，增加开仓机会
-                    lookback_period: 10  # 优化：增加回看周期，更准确判断
-                    grid_size: 0.25  # 优化：降低单次加仓比例，更灵活
-                    initial_position_ratio: 0.95  # 进一步提高初始仓位，最大化资金利用率
+                    atr_multiplier: 2.0
+                    grid_atr_interval: 0.5
+                    entry_atr_multiplier: 0.45
+                    lookback_period: 10
+                    grid_size: 0.25
+                    initial_position_ratio: 0.95
+                    profit_atr_multiplier: 0.5
                     enable_short: false
                 
                 # 中国平安
@@ -43,8 +44,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -59,8 +60,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000  # 统一调整为1000万，让10只股票基本用满资金
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
-                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    long_trend_atr_threshold: 0.17
+                    short_trend_atr_threshold: 0.17
                     atr_period: 14
                     atr_multiplier: 2.2  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.6
@@ -75,8 +76,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -91,8 +92,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -107,8 +108,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -123,8 +124,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -139,8 +140,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -155,8 +156,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -171,8 +172,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -188,8 +189,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -204,8 +205,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -220,8 +221,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -237,8 +238,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
-                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    long_trend_atr_threshold: 0.17
+                    short_trend_atr_threshold: 0.17
                     atr_period: 14
                     atr_multiplier: 2.2
                     grid_atr_interval: 0.6
@@ -253,8 +254,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.48  # 适当降低ATR倍数（白酒波动大，但降低阈值增加机会）
-                    short_trend_threshold: 0.17  # 适当降低ATR倍数
+                    long_trend_atr_threshold: 0.17
+                    short_trend_atr_threshold: 0.17
                     atr_period: 14
                     atr_multiplier: 2.2
                     grid_atr_interval: 0.6
@@ -269,8 +270,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.43  # 适当降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.14  # 适当降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.14
+                    short_trend_atr_threshold: 0.14
                     atr_period: 14
                     atr_multiplier: 2.2
                     grid_atr_interval: 0.6
@@ -285,8 +286,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -302,8 +303,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -318,8 +319,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -334,8 +335,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -351,8 +352,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -367,8 +368,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -383,8 +384,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -400,8 +401,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -417,8 +418,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -433,8 +434,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -450,8 +451,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -466,8 +467,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -483,8 +484,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -500,8 +501,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -516,8 +517,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -532,8 +533,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -548,8 +549,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -564,8 +565,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -580,8 +581,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -596,8 +597,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -612,8 +613,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -628,8 +629,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -644,8 +645,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4  # 降低ATR倍数，增加开仓机会
-                    short_trend_threshold: 0.15  # 降低ATR倍数，增加开仓机会
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0  # 降低止损距离，更及时止损
                     grid_atr_interval: 0.5
@@ -661,8 +662,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -677,8 +678,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -693,8 +694,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -709,8 +710,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -725,8 +726,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -742,8 +743,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -758,8 +759,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -774,8 +775,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -790,8 +791,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.48
-                    short_trend_threshold: 0.17
+                    long_trend_atr_threshold: 0.17
+                    short_trend_atr_threshold: 0.17
                     atr_period: 14
                     atr_multiplier: 2.2
                     grid_atr_interval: 0.6
@@ -806,8 +807,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 15
                     short_trend_period: 5
-                    long_trend_threshold: 0.48
-                    short_trend_threshold: 0.17
+                    long_trend_atr_threshold: 0.17
+                    short_trend_atr_threshold: 0.17
                     atr_period: 14
                     atr_multiplier: 2.2
                     grid_atr_interval: 0.6
@@ -823,8 +824,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -839,8 +840,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -856,8 +857,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -872,8 +873,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -888,8 +889,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -905,8 +906,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -921,8 +922,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -937,8 +938,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -954,8 +955,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -970,8 +971,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5
@@ -986,8 +987,8 @@ port_analysis_config: &port_analysis_config
                     max_position_value: 5000000
                     long_trend_period: 12
                     short_trend_period: 3
-                    long_trend_threshold: 0.4
-                    short_trend_threshold: 0.15
+                    long_trend_atr_threshold: 0.15
+                    short_trend_atr_threshold: 0.15
                     atr_period: 14
                     atr_multiplier: 2.0
                     grid_atr_interval: 0.5

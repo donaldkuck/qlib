@@ -246,24 +246,27 @@ class GATs(Model):
         evals_result["valid"] = []
 
         # load pretrained base_model
-        if self.base_model == "LSTM":
-            pretrained_model = LSTMModel()
-        elif self.base_model == "GRU":
-            pretrained_model = GRUModel()
-        else:
-            raise ValueError("unknown base model name `%s`" % self.base_model)
-
+        # 只有当model_path不为None时才加载预训练权重，并且需要确保d_feat匹配
         if self.model_path is not None:
             self.logger.info("Loading pretrained model...")
+            if self.base_model == "LSTM":
+                pretrained_model = LSTMModel(d_feat=self.d_feat, hidden_size=self.hidden_size, num_layers=self.num_layers)
+            elif self.base_model == "GRU":
+                pretrained_model = GRUModel(d_feat=self.d_feat, hidden_size=self.hidden_size, num_layers=self.num_layers)
+            else:
+                raise ValueError("unknown base model name `%s`" % self.base_model)
             pretrained_model.load_state_dict(torch.load(self.model_path, map_location=self.device))
-
-        model_dict = self.GAT_model.state_dict()
-        pretrained_dict = {
-            k: v for k, v in pretrained_model.state_dict().items() if k in model_dict  # pylint: disable=E1135
-        }
-        model_dict.update(pretrained_dict)
-        self.GAT_model.load_state_dict(model_dict)
-        self.logger.info("Loading pretrained model Done...")
+            
+            model_dict = self.GAT_model.state_dict()
+            pretrained_dict = {
+                k: v for k, v in pretrained_model.state_dict().items() if k in model_dict  # pylint: disable=E1135
+            }
+            model_dict.update(pretrained_dict)
+            self.GAT_model.load_state_dict(model_dict)
+            self.logger.info("Loading pretrained model Done...")
+        else:
+            # 如果model_path为None，不加载预训练权重，直接从头训练
+            self.logger.info("No pretrained model path provided, training from scratch...")
 
         # train
         self.logger.info("training...")
